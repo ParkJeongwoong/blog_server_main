@@ -3,5 +3,5 @@
 .idea
 application-oauth.properties
 
-build
-out
+build/
+out/
