@@ -1,6 +1,6 @@
 package io.github.parkjeongwoong.web;
 
-import io.github.parkjeongwoong.service.posts.PostsService;
+import io.github.parkjeongwoong.config.auth.posts.PostsService;
 import io.github.parkjeongwoong.web.dto.PostsResponseDto;
 import io.github.parkjeongwoong.web.dto.PostsSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.PostsUpdateRequestDto;

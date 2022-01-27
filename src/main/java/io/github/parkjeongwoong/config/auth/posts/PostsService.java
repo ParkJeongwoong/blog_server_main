@@ -1,4 +1,4 @@
-package io.github.parkjeongwoong.service.posts;
+package io.github.parkjeongwoong.config.auth.posts;
 
 import io.github.parkjeongwoong.domain.posts.Posts;
 import io.github.parkjeongwoong.domain.posts.PostsRepository;
