@@ -1,8 +1,7 @@
 package io.github.parkjeongwoong.config.auth.blog;
 
 import io.github.parkjeongwoong.domain.blog.BlogRepository;
-import io.github.parkjeongwoong.domain.blog.Visitors;
-import io.github.parkjeongwoong.web.dto.VisitorSaveRequestDto;
+import io.github.parkjeongwoong.web.dto.VisitorsSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +16,8 @@ public class BlogService {
     private final BlogRepository blogRepository;
 
     @Transactional
-    public Long visited() {
-        VisitorSaveRequestDto requestDto = new VisitorSaveRequestDto();
+    public Long visited(VisitorsSaveRequestDto requestDto) {
+        System.out.println(requestDto.getUrl());
         return blogRepository.save(requestDto.toEntity()).getId();
     }
 
@@ -27,7 +26,7 @@ public class BlogService {
         return blogRepository.findAllDesc().stream().count();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<VisitorsListResponseDto> history() {
         return blogRepository.findAllDesc().stream()
                 .map(VisitorsListResponseDto::new)

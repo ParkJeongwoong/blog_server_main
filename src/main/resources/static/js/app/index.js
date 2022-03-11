@@ -12,6 +12,10 @@ var main = {
         $('#btn-delete').on('click', function () {
             _this.delete();
         });
+
+        $('#btn-visit').on('click', function () {
+            _this.visit();
+        });
     },
     save : function () {
         var data = {
@@ -64,6 +68,24 @@ var main = {
             contentType:'application/json; charset=utf-8'
         }).done(function() {
             alert('글이 삭제되었습니다.');
+            window.location.href = '/';
+        }).fail(function (error) {
+            alert(JSON.stringify(error));
+        });
+    },
+    visit : function () {
+        var data = {
+            url: 'test.com',
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/blog-api/visited',
+            dataType: 'json',
+            contentType:'application/json; charset=utf-8',
+            data: JSON.stringify(data)
+        }).done(function() {
+            alert('방문하였습니다.');
             window.location.href = '/';
         }).fail(function (error) {
             alert(JSON.stringify(error));

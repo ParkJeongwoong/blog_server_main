@@ -8,10 +8,12 @@ import java.time.LocalDateTime;
 @Getter
 public class VisitorsListResponseDto {
     private Long id;
+    private String url;
     private LocalDateTime visitedDate;
 
     public VisitorsListResponseDto(Visitors entity) {
         this.id = entity.getId();
+        this.url = entity.getUrl();
         this.visitedDate = entity.getCreatedDate();
     }
 }
