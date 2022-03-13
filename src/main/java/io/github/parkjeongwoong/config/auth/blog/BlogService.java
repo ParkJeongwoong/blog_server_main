@@ -17,7 +17,7 @@ public class BlogService {
 
     @Transactional
     public Long visited(VisitorsSaveRequestDto requestDto) {
-        System.out.println(requestDto.getUrl());
+        System.out.println("Visitor just visited : " + requestDto.getUrl());
         return blogRepository.save(requestDto.toEntity()).getId();
     }
 
