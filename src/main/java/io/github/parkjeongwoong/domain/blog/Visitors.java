@@ -18,8 +18,12 @@ public class Visitors extends BaseTimeEntity {
     @Column(length = 100, nullable = true)
     private String url;
 
+    @Column(length = 15, nullable = true)
+    private String ip;
+
     @Builder
-    public Visitors(String url) {
+    public Visitors(String url, String ip) {
         this.url = url;
+        this.ip = ip;
     }
 }

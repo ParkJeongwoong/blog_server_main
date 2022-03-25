@@ -18,6 +18,7 @@ public class BlogService {
     @Transactional
     public Long visited(VisitorsSaveRequestDto requestDto) {
         System.out.println("Visitor just visited : " + requestDto.getUrl());
+        System.out.println("Visitor's IP address is : " + requestDto.getIp());
         return blogRepository.save(requestDto.toEntity()).getId();
     }
 

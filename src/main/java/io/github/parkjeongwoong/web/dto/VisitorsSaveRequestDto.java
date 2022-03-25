@@ -4,11 +4,14 @@ import io.github.parkjeongwoong.domain.blog.Visitors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class VisitorsSaveRequestDto {
     private String url;
+    private String ip;
     @Builder
     public VisitorsSaveRequestDto(String url) {
         this.url = url;
@@ -17,6 +20,7 @@ public class VisitorsSaveRequestDto {
     public Visitors toEntity() {
         return Visitors.builder()
                 .url(url)
+                .ip(ip)
                 .build();
     }
 }

@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,6 +23,14 @@ public class BlogApiController {
 
     @PostMapping("/blog-api/visited")
     public void visited(@RequestBody VisitorsSaveRequestDto requestDto) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        System.out.println("X-FORWARDED-FOR : " + ip);
+        if (ip == null) {
+            ip = request.getRemoteAddr();
+            System.out.println("getRemoteAddr : " + ip);
+        }
+        requestDto.setIp(ip);
         blogService.visited(requestDto);
     }
 

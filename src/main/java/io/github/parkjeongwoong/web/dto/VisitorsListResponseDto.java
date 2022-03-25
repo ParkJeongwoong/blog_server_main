@@ -9,11 +9,13 @@ import java.time.LocalDateTime;
 public class VisitorsListResponseDto {
     private Long id;
     private String url;
+    private String ip;
     private LocalDateTime visitedDate;
 
     public VisitorsListResponseDto(Visitors entity) {
         this.id = entity.getId();
         this.url = entity.getUrl();
+        this.ip = entity.getIp();
         this.visitedDate = entity.getCreatedDate();
     }
 }
