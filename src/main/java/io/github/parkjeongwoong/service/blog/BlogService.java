@@ -37,8 +37,6 @@ public class BlogService {
 
     @Transactional(readOnly = true)
     public List<PageVisitorsListResponseDto> countVisitors_page() {
-        System.out.println("--");
-        System.out.println("===");
         return blogRepository.countVisitors_page().stream()
                 .map(PageVisitorsListResponseDto::new)
                 .collect(Collectors.toList());
@@ -46,11 +44,6 @@ public class BlogService {
 
     @Transactional(readOnly = true)
     public List<PageVisitorsListResponseDto> countVisitors_firstPage() {
-        System.out.println("--");
-        System.out.println(blogRepository.countVisitors_firstPage().stream()
-                .map(PageVisitorsListResponseDto::new)
-                .collect(Collectors.toList()));
-        System.out.println("===");
         return blogRepository.countVisitors_firstPage().stream()
                 .map(PageVisitorsListResponseDto::new)
                 .collect(Collectors.toList());
