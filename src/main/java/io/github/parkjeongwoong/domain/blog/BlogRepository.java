@@ -14,7 +14,7 @@ public interface BlogRepository extends JpaRepository<Visitors, Long> {
     @Query("SELECT url as url, COUNT(1) as count FROM Visitors GROUP BY URL ORDER BY 2 DESC")
     List<PageVisitorsListResponseDtoInterface> countVisitors_page();
 
-    @Query(value = "SELECT url as url, COUNT(1) as count FROM Visitors WHERE just_visited = True GROUP BY URL", nativeQuery = true)
+    @Query("SELECT url as url, COUNT(1) as count FROM Visitors WHERE just_visited = True GROUP BY URL")
     List<PageVisitorsListResponseDtoInterface> countVisitors_firstPage();
 
 }
