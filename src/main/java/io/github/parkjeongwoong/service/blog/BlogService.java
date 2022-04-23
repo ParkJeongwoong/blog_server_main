@@ -1,6 +1,7 @@
-package io.github.parkjeongwoong.config.auth.blog;
+package io.github.parkjeongwoong.service.blog;
 
 import io.github.parkjeongwoong.domain.blog.BlogRepository;
+import io.github.parkjeongwoong.web.dto.PageVisitorsListResponseDto;
 import io.github.parkjeongwoong.web.dto.VisitorsSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,20 @@ public class BlogService {
     public List<VisitorsListResponseDto> history() {
         return blogRepository.findAllDesc().stream()
                 .map(VisitorsListResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PageVisitorsListResponseDto> countVisitors_page() {
+        return blogRepository.countVisitors_page().stream()
+                .map(PageVisitorsListResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PageVisitorsListResponseDto> countVisitors_firstPage() {
+        return blogRepository.countVisitors_firstPage().stream()
+                .map(PageVisitorsListResponseDto::new)
                 .collect(Collectors.toList());
     }
 }

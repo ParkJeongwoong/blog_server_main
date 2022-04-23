@@ -21,9 +21,17 @@ public class Visitors extends BaseTimeEntity {
     @Column(length = 15, nullable = true)
     private String ip;
 
+    @Column(length = 100, nullable = true)
+    private String lastPage;
+
+    @Column(nullable = true)
+    private boolean justVisited;
+
     @Builder
-    public Visitors(String url, String ip) {
+    public Visitors(String url, String ip, String lastPage, Boolean justVisited) {
         this.url = url;
         this.ip = ip;
+        this.lastPage = lastPage;
+        this.justVisited = justVisited;
     }
 }

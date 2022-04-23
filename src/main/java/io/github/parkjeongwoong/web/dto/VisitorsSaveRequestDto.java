@@ -12,6 +12,8 @@ import lombok.Setter;
 public class VisitorsSaveRequestDto {
     private String url;
     private String ip;
+    private String lastPage;
+    private Boolean justVisited;
     @Builder
     public VisitorsSaveRequestDto(String url) {
         this.url = url;
@@ -21,6 +23,8 @@ public class VisitorsSaveRequestDto {
         return Visitors.builder()
                 .url(url)
                 .ip(ip)
+                .lastPage(lastPage)
+                .justVisited(justVisited)
                 .build();
     }
 }

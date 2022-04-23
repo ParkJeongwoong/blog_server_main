@@ -1,7 +1,7 @@
 package io.github.parkjeongwoong.web;
 
-import io.github.parkjeongwoong.config.auth.blog.BlogService;
-import io.github.parkjeongwoong.web.dto.HelloResponseDto;
+import io.github.parkjeongwoong.service.blog.BlogService;
+import io.github.parkjeongwoong.web.dto.PageVisitorsListResponseDto;
 import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
 import io.github.parkjeongwoong.web.dto.VisitorsSaveRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,12 @@ public class BlogApiController {
             System.out.println("getRemoteAddr : " + ip);
         }
         requestDto.setIp(ip);
+        if (requestDto.getLastPage() == null) {
+            requestDto.setJustVisited(true);
+        }
+        else {
+            requestDto.setJustVisited(false);
+        }
         blogService.visited(requestDto);
     }
 
@@ -43,4 +49,10 @@ public class BlogApiController {
     public List<VisitorsListResponseDto> history() {
         return blogService.history();
     }
+
+    @GetMapping("/blog-api/page-visitors")
+    public List<PageVisitorsListResponseDto> countVisitors_page() { return blogService.countVisitors_page(); }
+
+    @GetMapping("/blog-api/first-visits")
+    public List<PageVisitorsListResponseDto> countVisitors_firstPage() { return blogService.countVisitors_firstPage(); }
 }

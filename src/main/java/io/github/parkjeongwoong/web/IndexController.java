@@ -2,7 +2,7 @@ package io.github.parkjeongwoong.web;
 
 import io.github.parkjeongwoong.config.auth.LoginUser;
 import io.github.parkjeongwoong.config.auth.dto.SessionUser;
-import io.github.parkjeongwoong.config.auth.posts.PostsService;
+import io.github.parkjeongwoong.service.posts.PostsService;
 import io.github.parkjeongwoong.web.dto.PostsResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
