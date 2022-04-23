@@ -4,6 +4,7 @@ import io.github.parkjeongwoong.domain.BaseTimeEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -24,7 +25,7 @@ public class Visitors extends BaseTimeEntity {
     @Column(length = 100, nullable = true)
     private String lastPage;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private boolean justVisited;
 
     @Builder

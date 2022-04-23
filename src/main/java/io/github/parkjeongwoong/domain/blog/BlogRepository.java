@@ -11,10 +11,10 @@ public interface BlogRepository extends JpaRepository<Visitors, Long> {
     @Query("SELECT v FROM Visitors v ORDER BY v.id DESC")
     List<Visitors> findAllDesc();
 
-    @Query(value = "SELECT url, COUNT(1) as count FROM Visitors GROUP BY URL", nativeQuery = true)
+    @Query("SELECT url, COUNT(1) as count FROM Visitors GROUP BY URL")
     List<PageVisitorsListResponseDtoInterface> countVisitors_page();
 
-    @Query(value = "SELECT url, COUNT(1) as count FROM Visitors WHERE just_visited = True GROUP BY URL", nativeQuery = true)
+    @Query("SELECT url, COUNT(1) as count FROM Visitors WHERE just_visited = True GROUP BY URL")
     List<PageVisitorsListResponseDtoInterface> countVisitors_firstPage();
 
 }

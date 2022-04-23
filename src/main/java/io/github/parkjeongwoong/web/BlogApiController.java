@@ -31,6 +31,7 @@ public class BlogApiController {
             System.out.println("getRemoteAddr : " + ip);
         }
         requestDto.setIp(ip);
+
         if (requestDto.getLastPage() == null) {
             requestDto.setJustVisited(true);
         }
