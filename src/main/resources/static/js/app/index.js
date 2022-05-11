@@ -16,6 +16,10 @@ var main = {
         $('#btn-visit').on('click', function () {
             _this.visit();
         });
+
+        $('#btn-upload').on('click', function () {
+            _this.upload();
+        });
     },
     save : function () {
         var data = {
@@ -87,6 +91,27 @@ var main = {
         }).done(function() {
             alert('방문하였습니다.');
             window.location.href = '/';
+        }).fail(function (error) {
+            alert(JSON.stringify(error));
+        });
+    },
+    upload : function () {
+        var markdown = document.getElementById("markdown-upload");
+        var images = document.getElementById("image-upload");
+        var selectedMarkdown = markdown.files[0];
+        var selectedImages = [...images.files];
+
+        var markdownForm = new FormData();
+        markdownForm.append("markdown", selectedMarkdown);
+
+        $.ajax({
+            type: 'POST'
+          , url: '/blog-api/upload'
+          , processData : false
+          , contentType : false
+          , data: markdownForm
+        }).done(function(res) {
+            alert(res);
         }).fail(function (error) {
             alert(JSON.stringify(error));
         });

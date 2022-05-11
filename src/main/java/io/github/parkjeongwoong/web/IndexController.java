@@ -39,4 +39,6 @@ public class IndexController {
         return "posts-update";
     }
 
+    @GetMapping("/blog-api/upload")
+    public String upload() { return "article_upload"; }
 }

@@ -1,20 +1,28 @@
 package io.github.parkjeongwoong.service.blog;
 
+import io.github.parkjeongwoong.domain.blog.ArticleRepository;
 import io.github.parkjeongwoong.domain.blog.BlogRepository;
+import io.github.parkjeongwoong.web.dto.MarkdownSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.PageVisitorsListResponseDto;
 import io.github.parkjeongwoong.web.dto.VisitorsSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
 public class BlogService {
     private final BlogRepository blogRepository;
+    private final ArticleRepository articleRepository;
 
     @Transactional
     public Long visited(VisitorsSaveRequestDto requestDto) {
@@ -47,5 +55,11 @@ public class BlogService {
         return blogRepository.countVisitors_firstPage().stream()
                 .map(PageVisitorsListResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public String upload_markdown(MarkdownSaveRequestDto requestDto) {
+        articleRepository.save(requestDto.toEntity());
+        return "done";
     }
 }
