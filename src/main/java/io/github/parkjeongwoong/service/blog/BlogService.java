@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,6 +29,7 @@ public class BlogService {
     public Long visited(VisitorsSaveRequestDto requestDto) {
         System.out.println("Visitor just visited : " + requestDto.getUrl());
         System.out.println("Visitor's IP address is : " + requestDto.getIp());
+        System.out.println("Current Time : " + new Date().toString());
         return blogRepository.save(requestDto.toEntity()).getId();
     }
 
