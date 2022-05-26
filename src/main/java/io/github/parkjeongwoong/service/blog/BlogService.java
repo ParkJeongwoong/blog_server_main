@@ -9,15 +9,11 @@ import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -30,7 +26,9 @@ public class BlogService {
         System.out.println("Visitor just visited : " + requestDto.getUrl());
         System.out.println("Visitor's IP address is : " + requestDto.getIp());
         System.out.println("Current Time : " + new Date().toString());
-        if (requestDto.getIp().substring(0,6) == "66.249" || requestDto.getIp() == "58.140.57.190") { // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
+
+        // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
+        if (Objects.equals(requestDto.getIp().substring(0,6), "66.249") || Objects.equals(requestDto.getIp(), "58.140.57.190")) {
             return -1L;
         }
         return blogRepository.save(requestDto.toEntity()).getId();
