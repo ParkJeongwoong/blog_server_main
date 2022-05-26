@@ -30,6 +30,9 @@ public class BlogService {
         System.out.println("Visitor just visited : " + requestDto.getUrl());
         System.out.println("Visitor's IP address is : " + requestDto.getIp());
         System.out.println("Current Time : " + new Date().toString());
+        if (requestDto.getIp().substring(0,6) == "66.249" || requestDto.getIp() == "58.140.57.190") { // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
+            return -1L;
+        }
         return blogRepository.save(requestDto.toEntity()).getId();
     }
 
