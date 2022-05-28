@@ -1,6 +1,7 @@
 package io.github.parkjeongwoong.web;
 
 import io.github.parkjeongwoong.service.blog.BlogService;
+import io.github.parkjeongwoong.service.blog.UploadService;
 import io.github.parkjeongwoong.web.dto.MarkdownSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.PageVisitorsListResponseDto;
 import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
@@ -25,6 +26,7 @@ import java.util.stream.Stream;
 public class BlogApiController {
 
     private final BlogService blogService;
+    private final UploadService uploadService;
 
     @PostMapping("/blog-api/visited")
     public void visited(@RequestBody VisitorsSaveRequestDto requestDto) {
@@ -36,13 +38,10 @@ public class BlogApiController {
             System.out.println("getRemoteAddr : " + ip);
         }
         requestDto.setIp(ip);
-
-        if (requestDto.getLastPage() == null) {
-            requestDto.setJustVisited(true);
-        }
-        else {
+        requestDto.setJustVisited(true);
+        if (requestDto.getLastPage() != null)
             requestDto.setJustVisited(false);
-        }
+
         blogService.visited(requestDto);
     }
 
@@ -64,27 +63,33 @@ public class BlogApiController {
 
     @PostMapping("/blog-api/upload")
     public String article_upload(MultipartHttpServletRequest multiRequest, MarkdownSaveRequestDto requestDto) {
+        Integer image_cnt;
         try {
             MultipartFile multipartFile = multiRequest.getFile("markdown");
 
-            String fileName = multipartFile.getOriginalFilename();
-            InputStream file = multipartFile.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(file);
-            Stream<String> streamOfString = new BufferedReader(inputStreamReader).lines();
-            String streamToString = streamOfString.collect(Collectors.joining("\n"));
-            String title = streamToString.split("\n",2)[0].replace("# ","");
+            if (multipartFile != null && !multipartFile.isEmpty()){
+                String fileName = multipartFile.getOriginalFilename();
+                InputStream file = multipartFile.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(file);
+                Stream<String> streamOfString = new BufferedReader(inputStreamReader).lines();
+                String streamToString = streamOfString.collect(Collectors.joining("\n"));
+                String title = streamToString.split("\n",2)[0].replace("# ","");
 
-            System.out.println("fileName : " + fileName);
-            System.out.println("title : " + title);
+                System.out.println("fileName : " + fileName);
+                System.out.println("title : " + title);
 
-            requestDto.setTitle(title);
-            requestDto.setContent(streamToString);
-            requestDto.setDate(fileName.substring(0,8));
-            requestDto.setFileName(fileName);
+                requestDto.setTitle(title);
+                requestDto.setContent(streamToString);
+                if (fileName != null) {
+                    requestDto.setDate(fileName.substring(0,8));
+                }
+                requestDto.setFileName(fileName);
 
-            blogService.upload_markdown(requestDto);
+                image_cnt = uploadService.upload_markdown(requestDto);
+                System.out.println(image_cnt);
+            }
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return "등록되었습니다.";
     }
