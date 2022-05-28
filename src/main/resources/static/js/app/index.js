@@ -103,6 +103,7 @@ var main = {
 
         var markdownForm = new FormData();
         markdownForm.append("markdown", selectedMarkdown);
+        selectedImages.forEach(image=>markdownForm.append("images", image))
 
         $.ajax({
             type: 'POST'
