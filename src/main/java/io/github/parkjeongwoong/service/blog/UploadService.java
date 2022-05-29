@@ -42,11 +42,11 @@ public class UploadService {
                 File destination = new File(rootPath + File.separator + image.getOriginalFilename());
                 System.out.println("이미지 저장 위치 : " + destination.getPath());
                 image.transferTo(destination);
-                System.out.println("이미지 저장 완료");
                 requestDto.setDirectory(destination.getPath());
                 imageRepository.save(requestDto.toEntity());
                 result++;
             }
+            System.out.println("이미지 저장 완료");
         } catch (Exception e) {
             System.out.println("에러 : " + e.getMessage());
         }
