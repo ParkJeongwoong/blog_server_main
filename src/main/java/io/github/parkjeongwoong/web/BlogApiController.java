@@ -65,11 +65,7 @@ public class BlogApiController {
 
         try {
             MultipartFile multipartFile = multiRequest.getFile("markdown");
-            List<MultipartFile> multipartFile1 = multiRequest.getFiles("images");
-//            System.out.println(multipartFile1.get(0).getOriginalFilename());
-//            System.out.println(multipartFile1.get(1).getOriginalFilename());
-//            System.out.println(multipartFile1.get(2).getOriginalFilename());
-//            System.out.println(multipartFile1.get(3).getOriginalFilename());
+            List<MultipartFile> multipartFile_images = multiRequest.getFiles("images");
 
             if (multipartFile != null && !multipartFile.isEmpty()) {
                 String fileName = multipartFile.getOriginalFilename();
@@ -89,14 +85,16 @@ public class BlogApiController {
                 System.out.println("fileName : " + fileName);
                 System.out.println("title : " + title);
 
-                if (multipartFile1.size() != uploadService.check_image(requestDto.getContent())) {
+                if (multipartFile_images.size() != uploadService.check_image(streamToString)) {
+                    System.out.println("업로드된 이미지 개수 : " + multipartFile_images.size());
+                    System.out.println("파일의 이미지 개수 : " + uploadService.check_image(streamToString));
                     return "첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다";
                 }
 
                 id = uploadService.upload_markdown(requestDto);
 
                 imageSaveRequestDto.setArticle_id(id);
-                if (!uploadService.upload_images(imageSaveRequestDto, multipartFile1, id+"_"+fileName)) return "이미지 저장에 실패했습니다";
+                if (!uploadService.upload_images(imageSaveRequestDto, multipartFile_images, id+"_"+fileName)) return "이미지 저장에 실패했습니다";
             } else {
                 return "파일을 첨부해주세요";
             }
