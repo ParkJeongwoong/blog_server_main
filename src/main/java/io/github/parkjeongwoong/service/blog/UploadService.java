@@ -33,13 +33,15 @@ public class UploadService {
         short result = -1;
         try {
             String rootPath = System.getProperty("user.dir") + File.separator + "article_images" + File.separator + dirName;
+            System.out.println("rootPath" + rootPath);
             File folder = new File(rootPath);
-            if (!folder.exists() && folder.mkdirs()) return return_val;
+            if (!folder.exists() && folder.mkdirs()) return false;
 
             for (MultipartFile image : images) {
                 File destination = new File(rootPath + File.separator + image.getOriginalFilename());
                 image.transferTo(destination);
                 requestDto.setDirectory(destination.getPath());
+                System.out.println("이미지 저장 위치 : " + destination.getPath());
                 imageRepository.save(requestDto.toEntity());
                 result++;
             }
