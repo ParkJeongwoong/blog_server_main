@@ -85,9 +85,9 @@ public class BlogApiController {
                 System.out.println("fileName : " + fileName);
                 System.out.println("title : " + title);
 
+                System.out.println("업로드된 이미지 개수 : " + multipartFile_images.size());
+                System.out.println("파일의 이미지 개수 : " + uploadService.check_image(streamToString));
                 if (multipartFile_images.size() != uploadService.check_image(streamToString)) {
-                    System.out.println("업로드된 이미지 개수 : " + multipartFile_images.size());
-                    System.out.println("파일의 이미지 개수 : " + uploadService.check_image(streamToString));
                     return "첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다";
                 }
 
