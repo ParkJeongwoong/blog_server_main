@@ -35,7 +35,7 @@ public class UploadService {
             String rootPath = System.getProperty("user.dir") + File.separator + "article_images" + File.separator + dirName;
             System.out.println("rootPath : " + rootPath);
             File folder = new File(rootPath);
-            if (!folder.exists() && folder.mkdirs()) return false;
+            if (!folder.exists()) folder.mkdirs();
 
             System.out.println("이미지 저장 시작");
             for (MultipartFile image : images) {
