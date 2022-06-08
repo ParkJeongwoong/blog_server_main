@@ -57,6 +57,7 @@ public class BlogService {
 
     private Boolean isRecordable(String ip) {
         String[] notRecordableArray = {"58.140.57.190" // 공덕 ip
+                                 , "118.221.44.132" // 양평동 ip
                                  , "222.110.245.239" // 키움증권 ip
                                  , "0:0:0:0:0:0:0:1"}; // local test ip
         ArrayList<String> notRecordableList = new ArrayList<>(Arrays.asList(notRecordableArray));
