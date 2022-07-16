@@ -103,4 +103,7 @@ public class BlogApiController {
         }
         return "등록되었습니다";
     }
+
+    @GetMapping("/blog-api/get-article-list")
+    public List<ArticleListResponseDto> getArticleList() { return blogService.getArticleList(); }
 }

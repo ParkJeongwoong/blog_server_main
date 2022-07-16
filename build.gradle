@@ -10,7 +10,6 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 test {
@@ -23,10 +22,10 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 
     // Lombok
-    implementation('org.projectlombok:lombok:1.18.20')
-    annotationProcessor('org.projectlombok:lombok:1.18.20')
-    testImplementation('org.projectlombok:lombok:1.18.20')
-    testAnnotationProcessor('org.projectlombok:lombok:1.18.20')
+    implementation('org.projectlombok:lombok:1.18.24')
+    annotationProcessor('org.projectlombok:lombok:1.18.24')
+    testImplementation('org.projectlombok:lombok:1.18.24')
+    testAnnotationProcessor('org.projectlombok:lombok:1.18.24')
 
     // JPA
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
@@ -37,9 +36,9 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-mustache')
 
     // Auth
-    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
-    implementation('org.springframework.session:spring-session-jdbc')
-    testImplementation("org.springframework.security:spring-security-test")
+//    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
+//    implementation('org.springframework.session:spring-session-jdbc')
+//    testImplementation("org.springframework.security:spring-security-test")
 
     // DB
     implementation("org.springframework.session:spring-session-jdbc")

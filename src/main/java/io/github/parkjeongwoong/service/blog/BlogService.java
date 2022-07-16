@@ -1,6 +1,8 @@
 package io.github.parkjeongwoong.service.blog;
 
+import io.github.parkjeongwoong.domain.blog.ArticleRepository;
 import io.github.parkjeongwoong.domain.blog.BlogRepository;
+import io.github.parkjeongwoong.web.dto.ArticleListResponseDto;
 import io.github.parkjeongwoong.web.dto.PageVisitorsListResponseDto;
 import io.github.parkjeongwoong.web.dto.VisitorsSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 @Service
 public class BlogService {
     private final BlogRepository blogRepository;
+    private final ArticleRepository articleRepository;
 
     @Transactional
     public void visited(VisitorsSaveRequestDto requestDto) {
@@ -52,6 +55,12 @@ public class BlogService {
     public List<PageVisitorsListResponseDto> countVisitors_firstPage() {
         return blogRepository.countVisitors_firstPage().stream()
                 .map(PageVisitorsListResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<ArticleListResponseDto> getArticleList() {
+        return articleRepository.findAllDesc().stream()
+                .map(ArticleListResponseDto::new)
                 .collect(Collectors.toList());
     }
 

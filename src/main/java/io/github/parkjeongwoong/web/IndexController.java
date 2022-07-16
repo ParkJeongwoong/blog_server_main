@@ -1,7 +1,5 @@
 package io.github.parkjeongwoong.web;
 
-import io.github.parkjeongwoong.config.auth.LoginUser;
-import io.github.parkjeongwoong.config.auth.dto.SessionUser;
 import io.github.parkjeongwoong.service.posts.PostsService;
 import io.github.parkjeongwoong.web.dto.PostsResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +15,9 @@ public class IndexController {
     private final PostsService postsService;
 
     @GetMapping("/")
-    public String index(Model model, @LoginUser SessionUser user) {
+    public String index(Model model) {
         model.addAttribute("posts", postsService.findAllDesc());
 
-        if (user != null) {
-            model.addAttribute("userName", user.getName());
-        }
         return "index";
     }
 
