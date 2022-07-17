@@ -6,7 +6,7 @@ plugins {
 
 group 'io.github.parkjeongwoong'
 version '1.0.4-SNAPSHOT-'+new Date().format("yyyyMMddHHmmss")
-sourceCompatibility = 1.8
+sourceCompatibility = 1.9
 
 repositories {
     mavenCentral()
@@ -44,3 +44,4 @@ dependencies {
     implementation("org.springframework.session:spring-session-jdbc")
     implementation("org.mariadb.jdbc:mariadb-java-client")
 }
+targetCompatibility = JavaVersion.VERSION_1_9
