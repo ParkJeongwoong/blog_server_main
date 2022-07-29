@@ -2,7 +2,7 @@ package io.github.parkjeongwoong.service.blog;
 
 import io.github.parkjeongwoong.domain.blog.ArticleRepository;
 import io.github.parkjeongwoong.domain.blog.BlogRepository;
-import io.github.parkjeongwoong.web.dto.ArticleListResponseDto;
+import io.github.parkjeongwoong.web.dto.ArticleResponseDto;
 import io.github.parkjeongwoong.web.dto.PageVisitorsListResponseDto;
 import io.github.parkjeongwoong.web.dto.VisitorsSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
@@ -58,10 +58,14 @@ public class BlogService {
                 .collect(Collectors.toList());
     }
 
-    public List<ArticleListResponseDto> getArticleList() {
+    public List<ArticleResponseDto> getArticleList() {
         return articleRepository.findAllDesc().stream()
-                .map(ArticleListResponseDto::new)
+                .map(ArticleResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    public ArticleResponseDto getArticle(String category, Long categoryId) {
+        return articleRepository.findByCategoryAndId(category, categoryId);
     }
 
     private Boolean isRecordable(String ip) {

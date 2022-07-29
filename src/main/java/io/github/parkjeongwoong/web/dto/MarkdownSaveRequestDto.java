@@ -1,6 +1,7 @@
 package io.github.parkjeongwoong.web.dto;
 
 import io.github.parkjeongwoong.domain.blog.Article;
+import io.github.parkjeongwoong.domain.blog.ArticleRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,13 +15,18 @@ public class MarkdownSaveRequestDto {
     private String content;
     private String date;
     private String fileName;
+    private String category;
+    private String subCategory;
+    private Long categoryId;
 
     @Builder
-    MarkdownSaveRequestDto(String title, String content, String date, String fileName) {
+    MarkdownSaveRequestDto(String title, String content, String date, String fileName, String category, String subCategory) {
         this.title = title;
         this.content = content;
         this.date = date;
         this.fileName = fileName;
+        this.category = category;
+        this.subCategory = subCategory;
     }
 
     public Article toEntity() {
@@ -29,6 +35,9 @@ public class MarkdownSaveRequestDto {
                 .content(content)
                 .date(date)
                 .fileName(fileName)
+                .category(category)
+                .subCategory(subCategory)
+                .categoryId(categoryId)
                 .build();
     }
 }

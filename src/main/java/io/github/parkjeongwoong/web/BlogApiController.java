@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,6 +68,8 @@ public class BlogApiController {
         try {
             MultipartFile multipartFile = multiRequest.getFile("markdown");
             List<MultipartFile> multipartFile_images = multiRequest.getFiles("images");
+            String category = multiRequest.getParameter("category");
+            String subCategory = multiRequest.getParameter("subCategory");
 
             if (multipartFile != null && !multipartFile.isEmpty()) {
                 String fileName = multipartFile.getOriginalFilename();
@@ -82,6 +85,8 @@ public class BlogApiController {
                     requestDto.setDate(fileName.substring(0, 8));
                 }
                 requestDto.setFileName(fileName);
+                requestDto.setCategory(category);
+                requestDto.setSubCategory(subCategory);
 
                 System.out.println("fileName : " + fileName);
                 System.out.println("title : " + title);
@@ -110,7 +115,12 @@ public class BlogApiController {
     }
 
     @GetMapping("/get-article-list")
-    public List<ArticleListResponseDto> getArticleList() { return blogService.getArticleList(); }
+    public List<ArticleResponseDto> getArticleList() { return blogService.getArticleList(); }
+
+    @GetMapping("/get-article/{category}/{categoryId}")
+    public String getArticle(@PathVariable("category") String category, @PathVariable("categoryId") Long categoryId) {
+        return category+"_"+categoryId;
+    }
 
     @GetMapping(value = "image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getImage(@PathVariable("imageName") String imageName) throws IOException {

@@ -7,12 +7,10 @@ import io.github.parkjeongwoong.web.dto.MarkdownSaveRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +41,9 @@ public class FileService {
             imageId++;
         }
         requestDto.setContent(content);
+
+        long categoryId = articleRepository.countCategory(requestDto.getCategory()) + 1;
+        requestDto.setCategoryId(categoryId);
         imageNames.add(articleRepository.save(requestDto.toEntity()).getId().toString());
         return imageNames;
     }

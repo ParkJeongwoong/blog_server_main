@@ -98,12 +98,18 @@ var main = {
     upload : function () {
         var markdown = document.getElementById("markdown-upload");
         var images = document.getElementById("image-upload");
+        var category = document.getElementById("markdown-category");
+        var subCategory = document.getElementById("markdown-subCategory");
         var selectedMarkdown = markdown.files[0];
         var selectedImages = [...images.files];
 
         var markdownForm = new FormData();
         markdownForm.append("markdown", selectedMarkdown);
-        selectedImages.forEach(image=>markdownForm.append("images", image))
+        selectedImages.forEach(image=>markdownForm.append("images", image));
+        markdownForm.append("category", category.value);
+        markdownForm.append("subCategory", subCategory.value);
+        console.log(category.value)
+        console.log(subCategory.value)
 
         $.ajax({
             type: 'POST'
