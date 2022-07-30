@@ -82,9 +82,15 @@ public class BlogApiController {
                 requestDto.setTitle(title);
                 requestDto.setContent(streamToString);
                 if (fileName != null) {
+                    String fileDate = fileName.substring(0,8);
+                    if (!fileDate.matches("^[0-9]+$"))
+                        return "파일 이름의 첫 8자리는 작성일로 만들어주세요 (ex. 20220731_파일명)";
                     requestDto.setDate(fileName.substring(0, 8));
                 }
                 requestDto.setFileName(fileName);
+                if (category == null || category.length() == 0)
+                    return "카테고리를 입력해주세요";
+
                 requestDto.setCategory(category);
                 requestDto.setSubCategory(subCategory);
 
@@ -118,8 +124,8 @@ public class BlogApiController {
     public List<ArticleResponseDto> getArticleList() { return blogService.getArticleList(); }
 
     @GetMapping("/get-article/{category}/{categoryId}")
-    public String getArticle(@PathVariable("category") String category, @PathVariable("categoryId") Long categoryId) {
-        return category+"_"+categoryId;
+    public ArticleResponseDto getArticle(@PathVariable("category") String category, @PathVariable("categoryId") Long categoryId) {
+        return blogService.getArticle(category, categoryId);
     }
 
     @GetMapping(value = "image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
