@@ -2,10 +2,7 @@ package io.github.parkjeongwoong.service.blog;
 
 import io.github.parkjeongwoong.domain.blog.ArticleRepository;
 import io.github.parkjeongwoong.domain.blog.BlogRepository;
-import io.github.parkjeongwoong.web.dto.ArticleResponseDto;
-import io.github.parkjeongwoong.web.dto.PageVisitorsListResponseDto;
-import io.github.parkjeongwoong.web.dto.VisitorsSaveRequestDto;
-import io.github.parkjeongwoong.web.dto.VisitorsListResponseDto;
+import io.github.parkjeongwoong.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +63,16 @@ public class BlogService {
 
     public ArticleResponseDto getArticle(String category, Long categoryId) {
         return articleRepository.findByCategoryAndId(category, categoryId);
+    }
+
+    public CommonResponseDto deleteArticle(Long articleId) {
+        try {
+            articleRepository.deleteById(articleId);
+            return new CommonResponseDto("Delete ARticle", "Success", "게시글을 성공적으로 삭제했습니다.");
+        } catch(Exception e) {
+            System.out.println(e);
+            return new CommonResponseDto("Delete Article", "Failed", "게시글 삭제 중 문제가 발생했습니다.");
+        }
     }
 
     private Boolean isRecordable(String ip) {

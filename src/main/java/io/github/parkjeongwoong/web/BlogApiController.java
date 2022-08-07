@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +27,7 @@ public class BlogApiController {
     private final BlogService blogService;
     private final FileService fileService;
 
+    // Visit
     @PostMapping("/visited")
     public void visited(@RequestBody VisitorsSaveRequestDto requestDto) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -61,6 +61,7 @@ public class BlogApiController {
     @GetMapping("/first-visits")
     public List<PageVisitorsListResponseDto> countVisitors_firstPage() { return blogService.countVisitors_firstPage(); }
 
+    // Article
     @PostMapping("/upload")
     public String article_upload(MultipartHttpServletRequest multiRequest, MarkdownSaveRequestDto requestDto, ImageSaveRequestDto imageSaveRequestDto) {
         ArrayList<String> imageNames;
@@ -103,14 +104,15 @@ public class BlogApiController {
                     return "첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다";
                 }
 
+                // 이 부분은 save_images로 (이거 때매 return 값을 boolean에서 string으로 변경)
 //                if (!fileService.check_image(streamToString, imageSaveRequestDto)) {
 //                    return "문서의 이미지와 업로드한 이미지가 다릅니다";
 //                }
 
                 imageNames = fileService.save_markdown(requestDto);
 
-                imageSaveRequestDto.setArticle_id(Long.valueOf(imageNames.remove(imageNames.size()-1)));
-                if (!fileService.save_images(imageSaveRequestDto, multipartFile_images, imageNames)) return "이미지 저장에 실패했습니다";
+                String result_save_images = fileService.save_images(imageSaveRequestDto, multipartFile_images, imageNames);
+                if (!result_save_images.equals("이미지 저장에 성공했습니다")) return result_save_images;
             } else {
                 return "파일을 첨부해주세요";
             }
@@ -120,14 +122,26 @@ public class BlogApiController {
         return "등록되었습니다";
     }
 
-    @GetMapping("/get-article-list")
+    @GetMapping("/article-list")
     public List<ArticleResponseDto> getArticleList() { return blogService.getArticleList(); }
 
-    @GetMapping("/get-article/{category}/{categoryId}")
+    @GetMapping("/article/{category}/{categoryId}")
     public ArticleResponseDto getArticle(@PathVariable("category") String category, @PathVariable("categoryId") Long categoryId) {
         return blogService.getArticle(category, categoryId);
     }
 
+    // Todo - Controller쪽 코드를 Service로 옮기고 개발
+    @PutMapping("/article/{articleId}")
+    public CommonResponseDto updateArticle(@PathVariable("articleId") Long articleId) {
+        return null;
+    }
+
+    @DeleteMapping("/article/{articleId}")
+    public CommonResponseDto deleteArticle(@PathVariable("articleId") Long articleId) {
+        return blogService.deleteArticle(articleId);
+    }
+
+    // Media
     @GetMapping(value = "image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getImage(@PathVariable("imageName") String imageName) throws IOException {
         String[] imagePathList = imageName.split("/");

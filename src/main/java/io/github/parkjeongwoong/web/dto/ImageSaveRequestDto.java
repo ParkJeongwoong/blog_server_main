@@ -1,5 +1,7 @@
 package io.github.parkjeongwoong.web.dto;
 
+import io.github.parkjeongwoong.domain.blog.Article;
+import io.github.parkjeongwoong.domain.blog.ArticleRepository;
 import io.github.parkjeongwoong.domain.blog.Image;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,18 +12,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ImageSaveRequestDto {
-    private Long article_id;
+    private Article article;
     private String directory;
 
     @Builder
-    ImageSaveRequestDto(Long article_id, String directory) {
-        this.article_id = article_id;
+    ImageSaveRequestDto(Article article, String directory) {
+        this.article = article;
         this.directory = directory;
     }
 
     public Image toEntity() {
         return Image.builder()
-                .article_id(article_id)
+                .article(article)
                 .directory(directory)
                 .build();
     }

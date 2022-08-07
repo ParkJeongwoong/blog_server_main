@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class Article {
     @Column(length = 100, nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
     private Long categoryId;
 
     @Column(length = 20, nullable = false)
@@ -34,6 +36,9 @@ public class Article {
 
     @Column(length = 50, nullable = false)
     private String fileName;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    private final List<Image> images = new ArrayList<>();
 
     @Builder Article(String title, String content, String date, String fileName, Long categoryId, String category, String subCategory) {
         this.title = title;

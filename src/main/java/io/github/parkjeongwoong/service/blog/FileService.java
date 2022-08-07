@@ -1,6 +1,7 @@
 package io.github.parkjeongwoong.service.blog;
 
 import io.github.parkjeongwoong.domain.blog.ArticleRepository;
+import io.github.parkjeongwoong.domain.blog.Image;
 import io.github.parkjeongwoong.domain.blog.ImageRepository;
 import io.github.parkjeongwoong.web.dto.ImageSaveRequestDto;
 import io.github.parkjeongwoong.web.dto.MarkdownSaveRequestDto;
@@ -49,10 +50,13 @@ public class FileService {
     }
 
     @Transactional
-    public boolean save_images(ImageSaveRequestDto requestDto, List<MultipartFile> images, ArrayList<String> imageNames) {
-        boolean return_val = false;
+    public String save_images(ImageSaveRequestDto requestDto, List<MultipartFile> images, ArrayList<String> imageNames) {
+        String return_val = "이미지 저장에 실패했습니다";
         short result = -1;
         int imageIdx = 0;
+        Long imageArticleId = Long.valueOf(imageNames.remove(imageNames.size()-1));
+
+        requestDto.setArticle(articleRepository.findById(imageArticleId).orElse(null));
         try {
             String rootPath = System.getProperty("user.dir")
                     + File.separator + "src"
@@ -64,6 +68,8 @@ public class FileService {
             if (!folder.exists()) folder.mkdirs();
 
             System.out.println("이미지 저장 시작");
+            List<Image>ListImages = new ArrayList<>();
+
             for (MultipartFile image : images) {
                 File destination = new File(rootPath + File.separator + imageNames.get(imageIdx));
                 System.out.println("이미지 저장 위치 : " + destination.getPath());
@@ -78,7 +84,7 @@ public class FileService {
             System.out.println("에러 : " + e.getMessage());
         }
 
-        if (result == images.size() - 1) return_val = true;
+        if (result == images.size() - 1) return_val = "이미지 저장에 성공했습니다";
         return return_val;
     }
 

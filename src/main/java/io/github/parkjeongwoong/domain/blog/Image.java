@@ -14,15 +14,16 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long article_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_id")
+    private Article article;
 
     @Column(length = 500, nullable = false)
     private String directory;
 
     @Builder
-    Image(Long article_id, String directory) {
-        this.article_id = article_id;
+    Image(Article article, String directory) {
+        this.article = article;
         this.directory = directory;
     }
 }
