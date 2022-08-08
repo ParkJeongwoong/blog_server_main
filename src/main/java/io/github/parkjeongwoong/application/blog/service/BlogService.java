@@ -6,7 +6,10 @@ import io.github.parkjeongwoong.application.blog.repository.BlogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,6 +21,20 @@ public class BlogService {
 
     @Transactional
     public void visited(VisitorsSaveRequestDto requestDto) {
+        // ip 확인 작업 및 방문 데이터 저장
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        System.out.println("X-FORWARDED-FOR : " + ip);
+        if (ip == null) {
+            ip = request.getRemoteAddr();
+            System.out.println("getRemoteAddr : " + ip);
+        }
+        requestDto.setIp(ip);
+        requestDto.setJustVisited(true);
+        if (requestDto.getLastPage() != null)
+            requestDto.setJustVisited(false);
+
+        // 방문 등록
         System.out.println("Visitor just visited : " + requestDto.getUrl());
         System.out.println("Visitor's IP address is : " + requestDto.getIp());
         System.out.println("Current Time : " + new Date());

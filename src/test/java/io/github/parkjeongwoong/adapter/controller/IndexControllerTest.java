@@ -1,4 +1,4 @@
-package io.github.parkjeongwoong.web;
+package io.github.parkjeongwoong.adapter.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
