@@ -1,10 +1,13 @@
 package io.github.parkjeongwoong.application.blog.service;
 
+import io.github.parkjeongwoong.application.blog.dto.ArticleUpdateRequestDto;
+import io.github.parkjeongwoong.application.blog.dto.CommonResponseDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
+import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.entity.Image;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 import io.github.parkjeongwoong.application.blog.dto.ImageSaveRequestDto;
-import io.github.parkjeongwoong.application.blog.dto.MarkdownSaveRequestDto;
+import io.github.parkjeongwoong.application.blog.dto.ArticleSaveRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +25,12 @@ import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
-public class FileService {
+public class FileService implements FileUsecase {
     private final ArticleRepository articleRepository;
     private final ImageRepository imageRepository;
 
     @Transactional
-    public String articleUpload(MultipartHttpServletRequest multiRequest, MarkdownSaveRequestDto requestDto, ImageSaveRequestDto imageSaveRequestDto) {
+    public CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest, ArticleSaveRequestDto requestDto, ImageSaveRequestDto imageSaveRequestDto) {
         ArrayList<String> imageNames;
 
         try {
@@ -49,12 +52,12 @@ public class FileService {
                 if (fileName != null) {
                     String fileDate = fileName.substring(0,8);
                     if (!fileDate.matches("^[0-9]+$"))
-                        return "파일 이름의 첫 8자리는 작성일로 만들어주세요 (ex. 20220731_파일명)";
+                        return new CommonResponseDto("Save Article", "Failed", "파일 이름의 첫 8자리는 작성일로 만들어주세요 (ex. 20220731_파일명)");
                     requestDto.setDate(fileName.substring(0, 8));
                 }
                 requestDto.setFileName(fileName);
                 if (category == null || category.length() == 0)
-                    return "카테고리를 입력해주세요";
+                    return new CommonResponseDto("Save Article", "Failed", "카테고리를 입력해주세요");
 
                 requestDto.setCategory(category);
                 requestDto.setSubCategory(subCategory);
@@ -65,7 +68,7 @@ public class FileService {
                 System.out.println("업로드된 이미지 개수 : " + multipartFile_images.size());
                 System.out.println("파일의 이미지 개수 : " + count_image(streamToString));
                 if (multipartFile_images.size() != count_image(streamToString)) {
-                    return "첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다";
+                    return new CommonResponseDto("Save Article", "Failed", "첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다");
                 }
 
                 // 이 부분은 save_images로 (이거 때매 return 값을 boolean에서 string으로 변경)
@@ -76,18 +79,42 @@ public class FileService {
                 imageNames = save_markdown(requestDto);
 
                 String result_save_images = save_images(imageSaveRequestDto, multipartFile_images, imageNames);
-                if (!result_save_images.equals("이미지 저장에 성공했습니다")) return result_save_images;
+                if (!result_save_images.equals("이미지 저장에 성공했습니다")) {
+                    return new CommonResponseDto("Save Article", "Failed", result_save_images);
+                }
             } else {
-                return "파일을 첨부해주세요";
+                return new CommonResponseDto("Save Article", "Failed", "파일을 첨부해주세요");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "등록되었습니다";
+        return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
     }
 
     @Transactional
-    private ArrayList<String> save_markdown(MarkdownSaveRequestDto requestDto) {
+    public CommonResponseDto updateArticle(Long articleId, ArticleUpdateRequestDto requestDto) {
+        try {
+            String content = requestDto.getContent();
+            articleRepository.updateById(articleId, content);
+            return new CommonResponseDto("Update Article", "Success", "게시글을 성공적으로 수정했습니다.");
+        } catch (Exception e) {
+            System.out.println(e);
+            return new CommonResponseDto("Update Article", "Failed", "게시글 수정 중 문제가 발생했습니다.");
+        }
+    }
+
+    public CommonResponseDto deleteArticle(Long articleId) {
+        try {
+            articleRepository.deleteById(articleId);
+            return new CommonResponseDto("Delete Article", "Success", "게시글을 성공적으로 삭제했습니다.");
+        } catch(Exception e) {
+            System.out.println(e);
+            return new CommonResponseDto("Delete Article", "Failed", "게시글 삭제 중 문제가 발생했습니다.");
+        }
+    }
+
+    @Transactional
+    private ArrayList<String> save_markdown(ArticleSaveRequestDto requestDto) {
         String SERVER_ADDRESS = "https://dvlprjw.p-e.kr";
         Pattern imagePattern = Pattern.compile("!\\[(.*?)]\\((?!http)(.*?)\\)");
         Matcher image_in_articleData = imagePattern.matcher(requestDto.getContent());

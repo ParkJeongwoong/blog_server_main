@@ -14,6 +14,7 @@ public class VisitorsSaveRequestDto {
     private String ip;
     private String lastPage;
     private Boolean justVisited;
+
     @Builder
     public VisitorsSaveRequestDto(String url) {
         this.url = url;

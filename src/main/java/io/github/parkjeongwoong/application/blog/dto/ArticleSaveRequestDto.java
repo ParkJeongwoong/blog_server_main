@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MarkdownSaveRequestDto {
+public class ArticleSaveRequestDto {
     private String title;
     private String content;
     private String date;
@@ -19,7 +19,7 @@ public class MarkdownSaveRequestDto {
     private Long categoryId;
 
     @Builder
-    MarkdownSaveRequestDto(String title, String content, String date, String fileName, String category, String subCategory) {
+    ArticleSaveRequestDto(String title, String content, String date, String fileName, String category, String subCategory) {
         this.title = title;
         this.content = content;
         this.date = date;

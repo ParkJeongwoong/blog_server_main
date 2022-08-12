@@ -3,6 +3,7 @@ package io.github.parkjeongwoong.application.blog.repository;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.application.blog.dto.ArticleResponseDto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,4 +19,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query("SELECT COUNT(1) FROM Article A WHERE CATEGORY = :category")
     long countCategory(@Param("category") String category);
+
+    @Modifying
+    @Query("UPDATE Article a SET a.content = :content WHERE a.id = :articleId")
+    void updateById(@Param("articleId") Long articleId, @Param("content") String content);
+
 }

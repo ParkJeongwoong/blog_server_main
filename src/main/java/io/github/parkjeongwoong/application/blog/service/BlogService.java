@@ -3,6 +3,7 @@ package io.github.parkjeongwoong.application.blog.service;
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.BlogRepository;
+import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class BlogService {
+public class BlogService implements BlogUsecase {
     private final BlogRepository blogRepository;
     private final ArticleRepository articleRepository;
 
@@ -80,16 +81,6 @@ public class BlogService {
 
     public ArticleResponseDto getArticle(String category, Long categoryId) {
         return articleRepository.findByCategoryAndId(category, categoryId);
-    }
-
-    public CommonResponseDto deleteArticle(Long articleId) {
-        try {
-            articleRepository.deleteById(articleId);
-            return new CommonResponseDto("Delete ARticle", "Success", "게시글을 성공적으로 삭제했습니다.");
-        } catch(Exception e) {
-            System.out.println(e);
-            return new CommonResponseDto("Delete Article", "Failed", "게시글 삭제 중 문제가 발생했습니다.");
-        }
     }
 
     private Boolean isRecordable(String ip) {

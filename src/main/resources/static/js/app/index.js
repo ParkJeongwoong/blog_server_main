@@ -108,8 +108,8 @@ var main = {
         selectedImages.forEach(image=>markdownForm.append("images", image));
         markdownForm.append("category", category.value);
         markdownForm.append("subCategory", subCategory.value);
-        console.log(category.value)
-        console.log(subCategory.value)
+        console.log("category : " + category.value)
+        console.log("subCategory : " + subCategory.value)
 
         $.ajax({
             type: 'POST'
@@ -118,9 +118,11 @@ var main = {
           , contentType : false
           , data: markdownForm
         }).done(function(res) {
-            alert(res);
+            console.log(JSON.stringify(res));
+            alert(res.message);
         }).fail(function (error) {
-            alert(JSON.stringify(error));
+            console.log(JSON.stringify(error));
+            alert(error.message);
         });
     }
 
