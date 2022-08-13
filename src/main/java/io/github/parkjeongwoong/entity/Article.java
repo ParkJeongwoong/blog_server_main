@@ -34,7 +34,7 @@ public class Article {
     @Column(length = 8)
     private String date;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 100, nullable = false)
     private String fileName;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
