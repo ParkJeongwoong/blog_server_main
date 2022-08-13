@@ -10,12 +10,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ImageSaveRequestDto {
+public class ImageSaveDto {
     private Article article;
     private String directory;
 
     @Builder
-    ImageSaveRequestDto(Article article, String directory) {
+    ImageSaveDto(Article article, String directory) {
         this.article = article;
         this.directory = directory;
     }

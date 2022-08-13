@@ -6,8 +6,8 @@ import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.entity.Image;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
-import io.github.parkjeongwoong.application.blog.dto.ImageSaveRequestDto;
-import io.github.parkjeongwoong.application.blog.dto.ArticleSaveRequestDto;
+import io.github.parkjeongwoong.application.blog.dto.ImageSaveDto;
+import io.github.parkjeongwoong.application.blog.dto.ArticleSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,55 +30,58 @@ public class FileService implements FileUsecase {
     private final ImageRepository imageRepository;
 
     @Transactional
-    public CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest, ArticleSaveRequestDto requestDto, ImageSaveRequestDto imageSaveRequestDto) {
-        ArrayList<String> imageNames;
-
+    public CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest) {
         try {
             MultipartFile multipartFile = multiRequest.getFile("markdown");
-            List<MultipartFile> multipartFile_images = multiRequest.getFiles("images");
-            String category = multiRequest.getParameter("category");
-            String subCategory = multiRequest.getParameter("subCategory");
+            List<MultipartFile> imageFiles = multiRequest.getFiles("images");
 
             if (multipartFile != null && !multipartFile.isEmpty()) {
+                ArticleSaveDto articleSaveDto = new ArticleSaveDto();
+                ImageSaveDto imageSaveRequestDto = new ImageSaveDto();
+                ArrayList<String> imageNames;
+
+                String category = multiRequest.getParameter("category");
+                String subCategory = multiRequest.getParameter("subCategory");
                 String fileName = multipartFile.getOriginalFilename();
                 InputStream file = multipartFile.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(file);
-                Stream<String> streamOfString = new BufferedReader(inputStreamReader).lines();
-                String streamToString = streamOfString.collect(Collectors.joining("\n"));
-                String title = streamToString.split("\n", 2)[0].replace("# ", "");
+                String content = getContent(file);
+                String title = content.split("\n", 2)[0].replace("# ", "");
 
-                requestDto.setTitle(title);
-                requestDto.setContent(streamToString);
-                if (fileName != null) {
-                    String fileDate = fileName.substring(0,8);
-                    if (!fileDate.matches("^[0-9]+$"))
-                        return new CommonResponseDto("Save Article", "Failed", "파일 이름의 첫 8자리는 작성일로 만들어주세요 (ex. 20220731_파일명)");
-                    requestDto.setDate(fileName.substring(0, 8));
-                }
-                requestDto.setFileName(fileName);
+                if (fileName == null)
+                    return new CommonResponseDto("Save Article", "Failed", "파일명을 확인할 수 없습니다");
+                String fileDate = fileName.substring(0,8);
+                if (!fileDate.matches("^[0-9]+$"))
+                    return new CommonResponseDto("Save Article", "Failed", "파일 이름의 첫 8자리는 작성일로 만들어주세요 (ex. 20220731_파일명)");
                 if (category == null || category.length() == 0)
                     return new CommonResponseDto("Save Article", "Failed", "카테고리를 입력해주세요");
 
-                requestDto.setCategory(category);
-                requestDto.setSubCategory(subCategory);
+                long categoryId = articleRepository.countCategory(category) + 1;
+
+                articleSaveDto.setCategoryId(categoryId);
+                articleSaveDto.setTitle(title);
+                articleSaveDto.setContent(content);
+                articleSaveDto.setDate(fileName.substring(0, 8));
+                articleSaveDto.setFileName(fileName);
+                articleSaveDto.setCategory(category);
+                articleSaveDto.setSubCategory(subCategory);
 
                 System.out.println("fileName : " + fileName);
                 System.out.println("title : " + title);
 
-                System.out.println("업로드된 이미지 개수 : " + multipartFile_images.size());
-                System.out.println("파일의 이미지 개수 : " + count_image(streamToString));
-                if (multipartFile_images.size() != count_image(streamToString)) {
+                System.out.println("업로드된 이미지 개수 : " + imageFiles.size());
+                System.out.println("파일의 이미지 개수 : " + count_image(content));
+                if (imageFiles.size() != count_image(content)) {
                     return new CommonResponseDto("Save Article", "Failed", "첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다");
                 }
 
-                // 이 부분은 save_images로 (이거 때매 return 값을 boolean에서 string으로 변경)
+                // (이미지 이름 일치여부 확인) 이 부분은 save_images로 (이거 때매 return 값을 boolean에서 string으로 변경)
 //                if (!fileService.check_image(streamToString, imageSaveRequestDto)) {
 //                    return "문서의 이미지와 업로드한 이미지가 다릅니다";
 //                }
 
-                imageNames = save_markdown(requestDto);
+                imageNames = save_markdown(articleSaveDto);
 
-                String result_save_images = save_images(imageSaveRequestDto, multipartFile_images, imageNames);
+                String result_save_images = save_images(imageSaveRequestDto, imageFiles, imageNames);
                 if (!result_save_images.equals("이미지 저장에 성공했습니다")) {
                     return new CommonResponseDto("Save Article", "Failed", result_save_images);
                 }
@@ -103,6 +106,11 @@ public class FileService implements FileUsecase {
         }
     }
 
+    @Transactional
+    public CommonResponseDto updateArticle_markdown(Long articleId, MultipartHttpServletRequest multiRequest, ArticleSaveDto requestDto, ImageSaveDto imageSaveRequestDto) {
+        return null;
+    }
+
     public CommonResponseDto deleteArticle(Long articleId) {
         try {
             articleRepository.deleteById(articleId);
@@ -113,12 +121,18 @@ public class FileService implements FileUsecase {
         }
     }
 
+    private String getContent(InputStream file) {
+        InputStreamReader inputStreamReader = new InputStreamReader(file);
+        Stream<String> streamOfString = new BufferedReader(inputStreamReader).lines();
+        return streamOfString.collect(Collectors.joining("\n"));
+    }
+
     @Transactional
-    private ArrayList<String> save_markdown(ArticleSaveRequestDto requestDto) {
+    private ArrayList<String> save_markdown(ArticleSaveDto articleSaveDto) {
         String SERVER_ADDRESS = "https://dvlprjw.p-e.kr";
         Pattern imagePattern = Pattern.compile("!\\[(.*?)]\\((?!http)(.*?)\\)");
-        Matcher image_in_articleData = imagePattern.matcher(requestDto.getContent());
-        String content = requestDto.getContent();
+        Matcher image_in_articleData = imagePattern.matcher(articleSaveDto.getContent());
+        String content = articleSaveDto.getContent();
         ArrayList<String> imageNames = new ArrayList<>();
 
         long imageId = articleRepository.count() + 1;
@@ -126,22 +140,20 @@ public class FileService implements FileUsecase {
             String oldImageDirectory = image_in_articleData.group();
             String[] oldImageDirectoryList = oldImageDirectory.split("/");
             String newImageName = java.lang.System.currentTimeMillis() + "_" + oldImageDirectoryList[oldImageDirectoryList.length-1];
-            newImageName = newImageName.substring(0, newImageName.length()-1);
+            newImageName = newImageName.substring(0, newImageName.length() - 1); // 마지막에 붙는 닫는 괄호, ) 제거
             String newImageDirectory = oldImageDirectory.replace(oldImageDirectory.split("!\\[(.*?)]\\(")[1], SERVER_ADDRESS + "/blog-api/image/" + newImageName + ")");
             imageNames.add(newImageName);
             content = content.replace(oldImageDirectory, newImageDirectory);
             imageId++;
         }
-        requestDto.setContent(content);
+        articleSaveDto.setContent(content);
 
-        long categoryId = articleRepository.countCategory(requestDto.getCategory()) + 1;
-        requestDto.setCategoryId(categoryId);
-        imageNames.add(articleRepository.save(requestDto.toEntity()).getId().toString());
+        imageNames.add(articleRepository.save(articleSaveDto.toEntity()).getId().toString());
         return imageNames;
     }
 
     @Transactional
-    private String save_images(ImageSaveRequestDto requestDto, List<MultipartFile> images, ArrayList<String> imageNames) {
+    private String save_images(ImageSaveDto requestDto, List<MultipartFile> images, ArrayList<String> imageNames) {
         String return_val = "이미지 저장에 실패했습니다";
         short result = -1;
         int imageIdx = 0;
@@ -191,7 +203,7 @@ public class FileService implements FileUsecase {
     }
 
     // Todo - 파일명 맞는지 확인
-    private boolean check_image(String articleData, ImageSaveRequestDto requestDto) {
+    private boolean check_image(String articleData, ImageSaveDto requestDto) {
         return true;
     }
 
