@@ -37,8 +37,6 @@ public class FileService implements FileUsecase {
 
             if (multipartFile != null && !multipartFile.isEmpty()) {
                 ArticleSaveDto articleSaveDto = new ArticleSaveDto();
-                ImageSaveDto imageSaveRequestDto = new ImageSaveDto();
-                ArrayList<String> imageNames;
 
                 String category = multiRequest.getParameter("category");
                 String subCategory = multiRequest.getParameter("subCategory");
@@ -55,7 +53,7 @@ public class FileService implements FileUsecase {
                 if (category == null || category.length() == 0)
                     return new CommonResponseDto("Save Article", "Failed", "카테고리를 입력해주세요");
 
-                long categoryId = articleRepository.countCategory(category) + 1;
+                long categoryId = articleRepository.countCategory(category);
 
                 articleSaveDto.setCategoryId(categoryId);
                 articleSaveDto.setTitle(title);
@@ -79,19 +77,14 @@ public class FileService implements FileUsecase {
 //                    return "문서의 이미지와 업로드한 이미지가 다릅니다";
 //                }
 
-                imageNames = save_markdown(articleSaveDto);
-
-                String result_save_images = save_images(imageSaveRequestDto, imageFiles, imageNames);
-                if (!result_save_images.equals("이미지 저장에 성공했습니다")) {
-                    return new CommonResponseDto("Save Article", "Failed", result_save_images);
-                }
+                return save_markdown(articleSaveDto, imageFiles);
             } else {
                 return new CommonResponseDto("Save Article", "Failed", "파일을 첨부해주세요");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return new CommonResponseDto("Save Article", "Failed", "파일 저장 중 에러가 발생했습니다");
         }
-        return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
     }
 
     @Transactional
@@ -107,7 +100,7 @@ public class FileService implements FileUsecase {
     }
 
     @Transactional
-    public CommonResponseDto updateArticle_markdown(Long articleId, MultipartHttpServletRequest multiRequest, ArticleSaveDto requestDto, ImageSaveDto imageSaveRequestDto) {
+    public CommonResponseDto updateArticle_markdown(Long articleId, MultipartHttpServletRequest multiRequest) {
         return null;
     }
 
@@ -128,14 +121,13 @@ public class FileService implements FileUsecase {
     }
 
     @Transactional
-    private ArrayList<String> save_markdown(ArticleSaveDto articleSaveDto) {
+    private CommonResponseDto save_markdown(ArticleSaveDto articleSaveDto, List<MultipartFile> imageFiles) {
         String SERVER_ADDRESS = "https://dvlprjw.p-e.kr";
         Pattern imagePattern = Pattern.compile("!\\[(.*?)]\\((?!http)(.*?)\\)");
         Matcher image_in_articleData = imagePattern.matcher(articleSaveDto.getContent());
         String content = articleSaveDto.getContent();
         ArrayList<String> imageNames = new ArrayList<>();
 
-        long imageId = articleRepository.count() + 1;
         while (image_in_articleData.find()) {
             String oldImageDirectory = image_in_articleData.group();
             String[] oldImageDirectoryList = oldImageDirectory.split("/");
@@ -144,22 +136,27 @@ public class FileService implements FileUsecase {
             String newImageDirectory = oldImageDirectory.replace(oldImageDirectory.split("!\\[(.*?)]\\(")[1], SERVER_ADDRESS + "/blog-api/image/" + newImageName + ")");
             imageNames.add(newImageName);
             content = content.replace(oldImageDirectory, newImageDirectory);
-            imageId++;
         }
         articleSaveDto.setContent(content);
 
         imageNames.add(articleRepository.save(articleSaveDto.toEntity()).getId().toString());
-        return imageNames;
+
+        String result_save_images = save_images(imageFiles, imageNames);
+        if (!result_save_images.equals("이미지 저장에 성공했습니다")) {
+            return new CommonResponseDto("Save Article", "Failed", result_save_images);
+        }
+        return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
     }
 
     @Transactional
-    private String save_images(ImageSaveDto requestDto, List<MultipartFile> images, ArrayList<String> imageNames) {
+    private String save_images(List<MultipartFile> imageFiles, ArrayList<String> imageNames) {
+        ImageSaveDto imageSaveDto = new ImageSaveDto();
         String return_val = "이미지 저장에 실패했습니다";
         short result = -1;
         int imageIdx = 0;
         Long imageArticleId = Long.valueOf(imageNames.remove(imageNames.size()-1));
 
-        requestDto.setArticle(articleRepository.findById(imageArticleId).orElse(null));
+        imageSaveDto.setArticle(articleRepository.findById(imageArticleId).orElse(null));
         try {
             String rootPath = System.getProperty("user.dir")
                     + File.separator + "src"
@@ -173,12 +170,12 @@ public class FileService implements FileUsecase {
             System.out.println("이미지 저장 시작");
             List<Image>ListImages = new ArrayList<>();
 
-            for (MultipartFile image : images) {
+            for (MultipartFile imageFile : imageFiles) {
                 File destination = new File(rootPath + File.separator + imageNames.get(imageIdx));
                 System.out.println("이미지 저장 위치 : " + destination.getPath());
-                image.transferTo(destination);
-                requestDto.setDirectory(destination.getPath());
-                imageRepository.save(requestDto.toEntity());
+                imageFile.transferTo(destination);
+                imageSaveDto.setDirectory(destination.getPath());
+                imageRepository.save(imageSaveDto.toEntity());
                 result++;
                 imageIdx++;
             }
@@ -187,7 +184,7 @@ public class FileService implements FileUsecase {
             System.out.println("에러 : " + e.getMessage());
         }
 
-        if (result == images.size() - 1) return_val = "이미지 저장에 성공했습니다";
+        if (result == imageFiles.size() - 1) return_val = "이미지 저장에 성공했습니다";
         return return_val;
     }
 
