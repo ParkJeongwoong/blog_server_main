@@ -2,7 +2,7 @@ package io.github.parkjeongwoong.application.blog.service;
 
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
-import io.github.parkjeongwoong.application.blog.repository.BlogRepository;
+import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class BlogService implements BlogUsecase {
-    private final BlogRepository blogRepository;
+    private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
 
     @Transactional
@@ -41,34 +41,34 @@ public class BlogService implements BlogUsecase {
         System.out.println("Current Time : " + new Date());
 
         // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
-        if (isRecordable(requestDto.getIp())) {
-            return ;
-        }
-        blogRepository.save(requestDto.toEntity());
+//        if (isRecordable(requestDto.getIp())) {
+//            return ;
+//        }
+        visitorRepository.save(requestDto.toEntity());
     }
 
     @Transactional
     public long countVisitors() {
-        return blogRepository.findAllDesc().size();
+        return visitorRepository.count();
     }
 
     @Transactional(readOnly = true)
     public List<VisitorsListResponseDto> history() {
-        return blogRepository.findAllDesc().stream()
+        return visitorRepository.findAllByOrderByIdDesc().stream()
                 .map(VisitorsListResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<PageVisitorsListResponseDto> countVisitors_page() {
-        return blogRepository.countVisitors_page().stream()
+        return visitorRepository.countVisitors_page().stream()
                 .map(PageVisitorsListResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<PageVisitorsListResponseDto> countVisitors_firstPage() {
-        return blogRepository.countVisitors_firstPage().stream()
+        return visitorRepository.countVisitors_firstPage().stream()
                 .map(PageVisitorsListResponseDto::new)
                 .collect(Collectors.toList());
     }

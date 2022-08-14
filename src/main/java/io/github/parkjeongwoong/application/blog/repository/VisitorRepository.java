@@ -1,16 +1,15 @@
 package io.github.parkjeongwoong.application.blog.repository;
 
-import io.github.parkjeongwoong.entity.Visitors;
+import io.github.parkjeongwoong.entity.Visitor;
 import io.github.parkjeongwoong.application.blog.dto.PageVisitorsListResponseDtoInterface;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BlogRepository extends JpaRepository<Visitors, Long> {
+public interface VisitorRepository extends JpaRepository<Visitor, Long> {
 
-    @Query("SELECT v FROM Visitors v ORDER BY v.id DESC")
-    List<Visitors> findAllDesc();
+    List<Visitor> findAllByOrderByIdDesc();
 
     @Query("SELECT url as url, COUNT(1) as count FROM Visitors GROUP BY URL ORDER BY 2 DESC")
     List<PageVisitorsListResponseDtoInterface> countVisitors_page();

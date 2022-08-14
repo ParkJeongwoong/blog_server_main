@@ -1,6 +1,6 @@
 package io.github.parkjeongwoong.application.blog.dto;
 
-import io.github.parkjeongwoong.entity.Visitors;
+import io.github.parkjeongwoong.entity.Visitor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +20,8 @@ public class VisitorsSaveRequestDto {
         this.url = url;
     }
 
-    public Visitors toEntity() {
-        return Visitors.builder()
+    public Visitor toEntity() {
+        return Visitor.builder()
                 .url(url)
                 .ip(ip)
                 .lastPage(lastPage)

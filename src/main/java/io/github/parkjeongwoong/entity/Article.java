@@ -49,4 +49,8 @@ public class Article {
         this.date = date;
         this.fileName = fileName;
     }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

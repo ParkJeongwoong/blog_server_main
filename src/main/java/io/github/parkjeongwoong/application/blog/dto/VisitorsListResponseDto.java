@@ -1,6 +1,6 @@
 package io.github.parkjeongwoong.application.blog.dto;
 
-import io.github.parkjeongwoong.entity.Visitors;
+import io.github.parkjeongwoong.entity.Visitor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ public class VisitorsListResponseDto {
     private final LocalDateTime visitedDate;
     private final String lastPage;
 
-    public VisitorsListResponseDto(Visitors entity) {
+    public VisitorsListResponseDto(Visitor entity) {
         this.id = entity.getId();
         this.url = entity.getUrl();
         this.ip = entity.getIp();

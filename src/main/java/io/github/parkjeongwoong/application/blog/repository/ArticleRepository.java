@@ -20,8 +20,4 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Query("SELECT COUNT(1) FROM Article A WHERE CATEGORY = :category")
     long countCategory(@Param("category") String category);
 
-    @Modifying
-    @Query("UPDATE Article a SET a.content = :content WHERE a.id = :articleId")
-    void updateById(@Param("articleId") Long articleId, @Param("content") String content);
-
 }

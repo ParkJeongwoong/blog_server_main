@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Visitors extends BaseTimeEntity {
+public class Visitor extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +27,7 @@ public class Visitors extends BaseTimeEntity {
     private boolean justVisited;
 
     @Builder
-    public Visitors(String url, String ip, String lastPage, Boolean justVisited) {
+    public Visitor(String url, String ip, String lastPage, Boolean justVisited) {
         this.url = url;
         this.ip = ip;
         this.lastPage = lastPage;

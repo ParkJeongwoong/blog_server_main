@@ -4,6 +4,7 @@ import io.github.parkjeongwoong.application.blog.dto.ArticleUpdateRequestDto;
 import io.github.parkjeongwoong.application.blog.dto.CommonResponseDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
+import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.Image;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 import io.github.parkjeongwoong.application.blog.dto.ImageSaveDto;
@@ -89,14 +90,9 @@ public class FileService implements FileUsecase {
 
     @Transactional
     public CommonResponseDto updateArticle(Long articleId, ArticleUpdateRequestDto requestDto) {
-        try {
-            String content = requestDto.getContent();
-            articleRepository.updateById(articleId, content);
-            return new CommonResponseDto("Update Article", "Success", "게시글을 성공적으로 수정했습니다.");
-        } catch (Exception e) {
-            System.out.println(e);
-            return new CommonResponseDto("Update Article", "Failed", "게시글 수정 중 문제가 발생했습니다.");
-        }
+        Article article = articleRepository.findById(articleId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. articleId = "+ articleId));
+        article.update(requestDto.getContent());
+        return new CommonResponseDto("Update Article", "Success", "게시글을 성공적으로 수정했습니다.");
     }
 
     @Transactional
@@ -105,13 +101,9 @@ public class FileService implements FileUsecase {
     }
 
     public CommonResponseDto deleteArticle(Long articleId) {
-        try {
-            articleRepository.deleteById(articleId);
-            return new CommonResponseDto("Delete Article", "Success", "게시글을 성공적으로 삭제했습니다.");
-        } catch(Exception e) {
-            System.out.println(e);
-            return new CommonResponseDto("Delete Article", "Failed", "게시글 삭제 중 문제가 발생했습니다.");
-        }
+        Article article = articleRepository.findById(articleId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. articleId = "+ articleId));
+        articleRepository.delete(article);
+        return new CommonResponseDto("Delete Article", "Success", "게시글을 성공적으로 삭제했습니다.");
     }
 
     private String getContent(InputStream file) {
@@ -139,9 +131,9 @@ public class FileService implements FileUsecase {
         }
         articleSaveDto.setContent(content);
 
-        imageNames.add(articleRepository.save(articleSaveDto.toEntity()).getId().toString());
+        Long articleId = articleRepository.save(articleSaveDto.toEntity()).getId();
 
-        String result_save_images = save_images(imageFiles, imageNames);
+        String result_save_images = save_images(imageFiles, imageNames, articleId);
         if (!result_save_images.equals("이미지 저장에 성공했습니다")) {
             return new CommonResponseDto("Save Article", "Failed", result_save_images);
         }
@@ -149,14 +141,13 @@ public class FileService implements FileUsecase {
     }
 
     @Transactional
-    private String save_images(List<MultipartFile> imageFiles, ArrayList<String> imageNames) {
+    private String save_images(List<MultipartFile> imageFiles, ArrayList<String> imageNames, Long articleId) {
         ImageSaveDto imageSaveDto = new ImageSaveDto();
         String return_val = "이미지 저장에 실패했습니다";
         short result = -1;
         int imageIdx = 0;
-        Long imageArticleId = Long.valueOf(imageNames.remove(imageNames.size()-1));
 
-        imageSaveDto.setArticle(articleRepository.findById(imageArticleId).orElse(null));
+        imageSaveDto.setArticle(articleRepository.findById(articleId).orElse(null));
         try {
             String rootPath = System.getProperty("user.dir")
                     + File.separator + "src"
