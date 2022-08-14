@@ -21,7 +21,7 @@ public class BlogService implements BlogUsecase {
     private final ArticleRepository articleRepository;
 
     @Transactional
-    public void visited(VisitorsSaveRequestDto requestDto) {
+    public void visited(VisitorSaveRequestDto requestDto) {
         // ip 확인 작업 및 방문 데이터 저장
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ip = request.getHeader("X-FORWARDED-FOR");
@@ -48,28 +48,28 @@ public class BlogService implements BlogUsecase {
     }
 
     @Transactional
-    public long countVisitors() {
+    public long countVisitor() {
         return visitorRepository.count();
     }
 
     @Transactional(readOnly = true)
-    public List<VisitorsListResponseDto> history() {
+    public List<VisitorListResponseDto> history() {
         return visitorRepository.findAllByOrderByIdDesc().stream()
-                .map(VisitorsListResponseDto::new)
+                .map(VisitorListResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<PageVisitorsListResponseDto> countVisitors_page() {
-        return visitorRepository.countVisitors_page().stream()
-                .map(PageVisitorsListResponseDto::new)
+    public List<PageVisitorListResponseDto> countVisitor_page() {
+        return visitorRepository.countVisitor_page().stream()
+                .map(PageVisitorListResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<PageVisitorsListResponseDto> countVisitors_firstPage() {
-        return visitorRepository.countVisitors_firstPage().stream()
-                .map(PageVisitorsListResponseDto::new)
+    public List<PageVisitorListResponseDto> countVisitor_firstPage() {
+        return visitorRepository.countVisitor_firstPage().stream()
+                .map(PageVisitorListResponseDto::new)
                 .collect(Collectors.toList());
     }
 

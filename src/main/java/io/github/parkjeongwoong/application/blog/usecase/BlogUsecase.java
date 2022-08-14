@@ -5,11 +5,11 @@ import io.github.parkjeongwoong.application.blog.dto.*;
 import java.util.List;
 
 public interface BlogUsecase {
-    void visited(VisitorsSaveRequestDto requestDto);
-    long countVisitors();
-    List<VisitorsListResponseDto> history();
-    List<PageVisitorsListResponseDto> countVisitors_page();
-    List<PageVisitorsListResponseDto> countVisitors_firstPage();
+    void visited(VisitorSaveRequestDto requestDto);
+    long countVisitor();
+    List<VisitorListResponseDto> history();
+    List<PageVisitorListResponseDto> countVisitor_page();
+    List<PageVisitorListResponseDto> countVisitor_firstPage();
     List<ArticleResponseDto> getArticleList();
     ArticleResponseDto getArticle(String category, Long categoryId);
 }

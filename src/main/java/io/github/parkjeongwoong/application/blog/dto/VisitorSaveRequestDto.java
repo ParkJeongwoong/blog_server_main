@@ -9,14 +9,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class VisitorsSaveRequestDto {
+public class VisitorSaveRequestDto {
     private String url;
     private String ip;
     private String lastPage;
     private Boolean justVisited;
 
     @Builder
-    public VisitorsSaveRequestDto(String url) {
+    public VisitorSaveRequestDto(String url) {
         this.url = url;
     }
 

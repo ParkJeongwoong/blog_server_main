@@ -6,14 +6,14 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class VisitorsListResponseDto {
+public class VisitorListResponseDto {
     private final Long id;
     private final String url;
     private final String ip;
     private final LocalDateTime visitedDate;
     private final String lastPage;
 
-    public VisitorsListResponseDto(Visitor entity) {
+    public VisitorListResponseDto(Visitor entity) {
         this.id = entity.getId();
         this.url = entity.getUrl();
         this.ip = entity.getIp();

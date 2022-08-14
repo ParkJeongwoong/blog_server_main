@@ -21,23 +21,23 @@ public class BlogApiController {
 
     // Visit
     @PostMapping("/visited")
-    public void visited(@RequestBody VisitorsSaveRequestDto requestDto) { blogUsecase.visited(requestDto); }
+    public void visited(@RequestBody VisitorSaveRequestDto requestDto) { blogUsecase.visited(requestDto); }
 
-    @GetMapping("/count-visitors")
-    public long count_visitors() {
-        return blogUsecase.countVisitors();
+    @GetMapping("/count-visitor")
+    public long count_visitor() {
+        return blogUsecase.countVisitor();
     }
 
     @GetMapping("/history")
-    public List<VisitorsListResponseDto> history() {
+    public List<VisitorListResponseDto> history() {
         return blogUsecase.history();
     }
 
-    @GetMapping("/page-visitors")
-    public List<PageVisitorsListResponseDto> count_visitors_page() { return blogUsecase.countVisitors_page(); }
+    @GetMapping("/page-visitor")
+    public List<PageVisitorListResponseDto> count_visitor_page() { return blogUsecase.countVisitor_page(); }
 
     @GetMapping("/first-visits")
-    public List<PageVisitorsListResponseDto> count_visitors_firstPage() { return blogUsecase.countVisitors_firstPage(); }
+    public List<PageVisitorListResponseDto> count_visitor_firstPage() { return blogUsecase.countVisitor_firstPage(); }
 
     // Article
     @PostMapping("/upload")
