@@ -13,8 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class IndexControllerTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+//    @Autowired
+//    private TestRestTemplate restTemplate;
 
 //    @Test
 //    public void 메인페이지_로딩() {
