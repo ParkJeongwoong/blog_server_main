@@ -3,7 +3,6 @@ package io.github.parkjeongwoong.application.blog.repository;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.application.blog.dto.ArticleResponseDto;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

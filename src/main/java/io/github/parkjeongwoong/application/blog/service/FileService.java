@@ -5,7 +5,6 @@ import io.github.parkjeongwoong.application.blog.dto.CommonResponseDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.entity.Article;
-import io.github.parkjeongwoong.entity.Image;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 import io.github.parkjeongwoong.application.blog.dto.ImageSaveDto;
 import io.github.parkjeongwoong.application.blog.dto.ArticleSaveDto;
@@ -141,35 +140,21 @@ public class FileService implements FileUsecase {
     }
 
     @Transactional
-    private String save_images(List<MultipartFile> imageFiles, ArrayList<String> imageNames, Long articleId) {
-        ImageSaveDto imageSaveDto = new ImageSaveDto();
+    private String save_images(List<MultipartFile> imageFiles, List<String> imageNames, Long articleId) {
         String return_val = "이미지 저장에 실패했습니다";
         short result = -1;
         int imageIdx = 0;
+        ImageSaveDto imageSaveDto = new ImageSaveDto();
 
-        imageSaveDto.setArticle(articleRepository.findById(articleId).orElse(null));
         try {
-            String rootPath = System.getProperty("user.dir")
-                    + File.separator + "src"
-                    + File.separator + "main"
-                    + File.separator + "resources"
-                    + File.separator + "article_images";
-            System.out.println("rootPath : " + rootPath);
-            File folder = new File(rootPath);
-            if (!folder.exists()) folder.mkdirs();
-
-            System.out.println("이미지 저장 시작");
-            List<Image>ListImages = new ArrayList<>();
-
+            imageSaveDto.setRootPath();
             for (MultipartFile imageFile : imageFiles) {
-                File destination = new File(rootPath + File.separator + imageNames.get(imageIdx));
-                System.out.println("이미지 저장 위치 : " + destination.getPath());
-                imageFile.transferTo(destination);
-                imageSaveDto.setDirectory(destination.getPath());
-                imageRepository.save(imageSaveDto.toEntity());
+                String directory = imageSaveDto.saveImage(imageFile, imageNames.get(imageIdx));
+                imageRepository.save(ImageSaveDto.builder().article(articleRepository.findById(articleId).orElse(null)).directory(directory).build().toEntity());
                 result++;
                 imageIdx++;
             }
+
             System.out.println("이미지 저장 완료");
         } catch (Exception e) {
             System.out.println("에러 : " + e.getMessage());

@@ -18,12 +18,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -50,6 +52,7 @@ public class BlogApiControllerTest {
         Visitor visitor2 = Visitor.builder()
                 .url("https://github.com/ParkJeongwoong/")
                 .ip("127.0.0.1")
+                .lastPage("https://www.test.com")
                 .justVisited(false).build();
 
         visitorRepository.save(visitor1);
@@ -107,6 +110,46 @@ public class BlogApiControllerTest {
     }
 
     @Test
+    public void test_history() throws Exception {
+        // Given
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now);
+        String url = "http://localhost:" + port + "/blog-api/history";
+        String localAddress = "127.0.0.1";
+        String testUrl1 = "https://www.test.com";
+        String testUrl2 = "https://github.com/ParkJeongwoong/";
+
+        visitors_setup();
+
+        // When & Then
+        MvcResult mvcResult = mvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].url", is(testUrl2)))
+                .andExpect(jsonPath("$[0].ip", is(localAddress)))
+                .andExpect(jsonPath("$[0].visitedDate",
+                        matchesPattern(now.getYear() + "-"
+                                + String.format("%02d", now.getMonthValue()) + "-"
+                                + String.format("%02d", now.getDayOfMonth()) + "T"
+                                + String.format("%02d", now.getHour()) + ":"
+                                + String.format("%02d", now.getMinute()) + ".*"))) // 주의 : 밀리초가 넘어가면서 초, 분, 시, 일이 넘어가 now와 차이날 수 있음
+                .andExpect(jsonPath("$[0].lastPage", is(testUrl1)))
+                .andExpect(jsonPath("$[1].url", is(testUrl1)))
+                .andExpect(jsonPath("$[1].ip", is(localAddress)))
+                .andExpect(jsonPath("$[1].visitedDate",
+                        matchesPattern(now.getYear() + "-"
+                                + String.format("%02d", now.getMonthValue()) + "-"
+                                + String.format("%02d", now.getDayOfMonth()) + "T"
+                                + String.format("%02d", now.getHour()) + ":"
+                                + String.format("%02d", now.getMinute()) + ".*"))) // 주의 : 밀리초가 넘어가면서 초, 분, 시, 일이 넘어가 now와 차이날 수 있음
+                .andExpect(jsonPath("$[1].lastPage").doesNotExist())
+                .andReturn();
+        String content = mvcResult.getResponse().getContentAsString();
+        System.out.println(content);
+    }
+
+    @Test
     public void test_count_visitor() throws Exception {
         // Given
         String url = "http://localhost:" + port + "/blog-api/count-visitor";
@@ -121,5 +164,42 @@ public class BlogApiControllerTest {
         // Then
         String content = mvcResult.getResponse().getContentAsString();
         assertThat(content).isEqualTo("2");
+    }
+
+    @Test
+    public void test_count_visitor_page() throws Exception {
+        // Given
+        String url = "http://localhost:" + port + "/blog-api/page-visitor";
+        String testUrl1 = "https://www.test.com";
+        String testUrl2 = "https://github.com/ParkJeongwoong/";
+        visitors_setup();
+
+        // When
+        mvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].url", is(testUrl2)))
+                .andExpect(jsonPath("$[0].count", is(1)))
+                .andExpect(jsonPath("$[1].url", is(testUrl1)))
+                .andExpect(jsonPath("$[1].count", is(1)));
+    }
+
+    @Test
+    public void test_count_visitor_firstPage() throws Exception {
+        // Given
+        String url = "http://localhost:" + port + "/blog-api/first-visits";
+        String testUrl1 = "https://www.test.com";
+        String testUrl2 = "https://github.com/ParkJeongwoong/";
+        visitors_setup();
+
+        // When
+        mvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].url", is(testUrl1)))
+                .andExpect(jsonPath("$[0].count", is(1)))
+                .andExpect(jsonPath("$[1].url").doesNotExist());
     }
 }

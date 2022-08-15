@@ -23,14 +23,12 @@ public class BlogApiController {
     @PostMapping("/visited")
     public void visited(@RequestBody VisitorSaveRequestDto requestDto) { blogUsecase.visited(requestDto); }
 
+    @GetMapping("/history")
+    public List<VisitorListResponseDto> history() { return blogUsecase.history(); }
+
     @GetMapping("/count-visitor")
     public long count_visitor() {
         return blogUsecase.countVisitor();
-    }
-
-    @GetMapping("/history")
-    public List<VisitorListResponseDto> history() {
-        return blogUsecase.history();
     }
 
     @GetMapping("/page-visitor")
