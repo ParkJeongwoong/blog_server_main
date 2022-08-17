@@ -28,36 +28,36 @@ public class VisitorRepositoryTest {
         String url1 = "https://www.test.com";
         String ip1 = "127.0.0.1";
         boolean justVisited1 = true;
+        Visitor visitor_set1 = Visitor.builder()
+                .url(url1)
+                .build();
+        visitor_set1.setData();
 
         String url2 = "https://github.com/ParkJeongwoong/";
         String ip2 = "127.0.0.1";
         String lastPage2 = "https://www.test.com";
         boolean justVisited2 = false;
-
-        visitorRepository.save(Visitor.builder()
-                .url(url1)
-                .ip(ip1)
-                .justVisited(justVisited1)
-                .build());
-        visitorRepository.save(Visitor.builder()
+        Visitor visitor_set2 = Visitor.builder()
                 .url(url2)
-                .ip(ip2)
                 .lastPage(lastPage2)
-                .justVisited(justVisited2)
-                .build());
+                .build();
+        visitor_set2.setData();
+
+        visitorRepository.save(visitor_set1);
+        visitorRepository.save(visitor_set2);
 
         // When
         List<Visitor> visitorList = visitorRepository.findAllByOrderByIdDesc();
 
         // Then
-        Visitor visitor1 = visitorList.get(0);
-        Visitor visitor2 = visitorList.get(1);
+        Visitor visitor_get1 = visitorList.get(0);
+        Visitor visitor_get2 = visitorList.get(1);
 
-        assertThat(visitor2.getUrl()).isEqualTo(url1);
-        assertThat(visitor2.getIp()).isEqualTo(ip1);
-        assertThat(visitor2.getLastPage()).isEqualTo(null);
-        assertThat(visitor1.getUrl()).isEqualTo(url2);
-        assertThat(visitor1.getIp()).isEqualTo(ip2);
-        assertThat(visitor1.getLastPage()).isEqualTo(lastPage2);
+        assertThat(visitor_get2.getUrl()).isEqualTo(url1);
+        assertThat(visitor_get2.getIp()).isEqualTo(ip1);
+        assertThat(visitor_get2.getLastPage()).isEqualTo(null);
+        assertThat(visitor_get1.getUrl()).isEqualTo(url2);
+        assertThat(visitor_get1.getIp()).isEqualTo(ip2);
+        assertThat(visitor_get1.getLastPage()).isEqualTo(lastPage2);
     }
 }

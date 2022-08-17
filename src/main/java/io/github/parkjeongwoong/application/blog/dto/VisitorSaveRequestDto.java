@@ -11,12 +11,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 @Getter
-@NoArgsConstructor
 public class VisitorSaveRequestDto {
-    private String url;
-    private String ip;
-    private String lastPage;
-    private Boolean justVisited;
+    private final String url;
+    private final String lastPage;
 
     @Builder
     public VisitorSaveRequestDto(String url, String lastPage) {
@@ -27,34 +24,7 @@ public class VisitorSaveRequestDto {
     public Visitor toEntity() {
         return Visitor.builder()
                 .url(url)
-                .ip(ip)
                 .lastPage(lastPage)
-                .justVisited(justVisited)
                 .build();
-    }
-
-    public void setData() {
-        setIp();
-        setJustVisited();
-    }
-
-    private void setIp() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String ip = request.getHeader("X-FORWARDED-FOR");
-        System.out.println("X-FORWARDED-FOR : " + ip);
-        if (ip == null) {
-            ip = request.getRemoteAddr();
-            System.out.println("getRemoteAddr : " + ip);
-        }
-        this.ip = ip;
-    }
-
-    private void setJustVisited() {
-        if (this.lastPage == null) {
-            this.justVisited = true;
-        }
-        else {
-            this.justVisited = false;
-        }
     }
 }

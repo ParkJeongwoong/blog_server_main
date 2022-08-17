@@ -3,8 +3,11 @@ package io.github.parkjeongwoong.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.persistence.*;
+import javax.servlet.http.HttpServletRequest;
 
 @Getter
 @NoArgsConstructor
@@ -27,10 +30,28 @@ public class Visitor extends BaseTimeEntity {
     private boolean justVisited;
 
     @Builder
-    public Visitor(String url, String ip, String lastPage, Boolean justVisited) {
+    public Visitor(String url, String lastPage) {
         this.url = url;
-        this.ip = ip;
         this.lastPage = lastPage;
-        this.justVisited = justVisited;
+    }
+
+    public void setData() {
+        setIp();
+        setJustVisited();
+    }
+
+    private void setIp() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        System.out.println("X-FORWARDED-FOR : " + ip);
+        if (ip == null) {
+            ip = request.getRemoteAddr();
+            System.out.println("getRemoteAddr : " + ip);
+        }
+        this.ip = ip;
+    }
+
+    private void setJustVisited() {
+        this.justVisited = this.lastPage == null;
     }
 }

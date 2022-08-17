@@ -3,8 +3,11 @@ package io.github.parkjeongwoong.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import java.io.File;
+import java.io.IOException;
 
 @Getter
 @NoArgsConstructor
@@ -25,5 +28,25 @@ public class Image {
     Image(Article article, String directory) {
         this.article = article;
         this.directory = directory;
+    }
+
+    private String rootPath;
+
+    public void setRootPath() {
+        this.rootPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "article_images";
+        File folder = new File(rootPath);
+        boolean isDirectoryCreated = false;
+        if (!folder.exists()) isDirectoryCreated = folder.mkdirs();
+        if (!isDirectoryCreated) System.out.println("이미지 저장 폴더를 생성했습니다");
+    }
+
+    public String saveImage(MultipartFile imageFile, String imageName) throws IOException {
+        if (rootPath == null) {
+            System.out.println("저장 경로가 지정되지 않았습니다");
+            return null;
+        }
+        File destination = new File(rootPath + File.separator + imageName);
+        imageFile.transferTo(destination);
+        return destination.getPath();
     }
 }

@@ -6,8 +6,8 @@ import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
-import io.github.parkjeongwoong.application.blog.dto.ImageSaveDto;
 import io.github.parkjeongwoong.application.blog.dto.ArticleSaveDto;
+import io.github.parkjeongwoong.entity.Image;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -144,13 +144,13 @@ public class FileService implements FileUsecase {
         String return_val = "이미지 저장에 실패했습니다";
         short result = -1;
         int imageIdx = 0;
-        ImageSaveDto imageSaveDto = new ImageSaveDto();
+        Image image = new Image();
 
         try {
-            imageSaveDto.setRootPath();
+            image.setRootPath();
             for (MultipartFile imageFile : imageFiles) {
-                String directory = imageSaveDto.saveImage(imageFile, imageNames.get(imageIdx));
-                imageRepository.save(ImageSaveDto.builder().article(articleRepository.findById(articleId).orElse(null)).directory(directory).build().toEntity());
+                String directory = image.saveImage(imageFile, imageNames.get(imageIdx));
+                imageRepository.save(Image.builder().article(articleRepository.findById(articleId).orElse(null)).directory(directory).build());
                 result++;
                 imageIdx++;
             }
@@ -176,7 +176,7 @@ public class FileService implements FileUsecase {
     }
 
     // Todo - 파일명 맞는지 확인
-    private boolean check_image(String articleData, ImageSaveDto requestDto) {
+    private boolean check_image(String articleData) {
         return true;
     }
 

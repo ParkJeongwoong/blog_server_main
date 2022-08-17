@@ -1,5 +1,6 @@
-package io.github.parkjeongwoong.application.blog.dto;
+package io.github.parkjeongwoong.entity;
 
+import io.github.parkjeongwoong.application.blog.dto.VisitorSaveRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class VisitorSaveRequestDtoTest {
+public class VisitorTest {
 
     @Autowired
     MockHttpServletRequest request;
@@ -22,30 +23,30 @@ public class VisitorSaveRequestDtoTest {
     }
 
     @Test
-    public void test_setData() throws Exception {
+    public void test_setData() {
         // Given
         String testUrl1 = "https://www.test.com";
         String testUrl2 = "https://github.com/ParkJeongwoong/";
-        VisitorSaveRequestDto requestDto1 = VisitorSaveRequestDto.builder()
+        Visitor visitor1 = Visitor.builder()
                 .url(testUrl1)
                 .build();
-        VisitorSaveRequestDto requestDto2 = VisitorSaveRequestDto.builder()
+        Visitor visitor2 = Visitor.builder()
                 .url(testUrl2)
                 .lastPage(testUrl1)
                 .build();
 
         // When
-        requestDto1.setData();
-        requestDto2.setData();
+        visitor1.setData();
+        visitor2.setData();
 
         // Then
-        assertThat(requestDto1.getIp()).isEqualTo("127.0.0.1");
-        assertThat(requestDto1.getUrl()).isEqualTo(testUrl1);
-        assertThat(requestDto1.getLastPage()).isEqualTo(null);
-        assertThat(requestDto1.getJustVisited()).isEqualTo(true);
-        assertThat(requestDto2.getIp()).isEqualTo("127.0.0.1");
-        assertThat(requestDto2.getUrl()).isEqualTo(testUrl2);
-        assertThat(requestDto2.getLastPage()).isEqualTo(testUrl1);
-        assertThat(requestDto2.getJustVisited()).isEqualTo(false);
+        assertThat(visitor1.getIp()).isEqualTo("127.0.0.1");
+        assertThat(visitor1.getUrl()).isEqualTo(testUrl1);
+        assertThat(visitor1.getLastPage()).isEqualTo(null);
+        assertThat(visitor1.isJustVisited()).isEqualTo(true);
+        assertThat(visitor2.getIp()).isEqualTo("127.0.0.1");
+        assertThat(visitor2.getUrl()).isEqualTo(testUrl2);
+        assertThat(visitor2.getLastPage()).isEqualTo(testUrl1);
+        assertThat(visitor2.isJustVisited()).isEqualTo(false);
     }
 }

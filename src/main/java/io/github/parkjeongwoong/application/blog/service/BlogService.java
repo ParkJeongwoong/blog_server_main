@@ -4,6 +4,7 @@ import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
+import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +20,14 @@ public class BlogService implements BlogUsecase {
 
     @Transactional
     public void visited(VisitorSaveRequestDto requestDto) {
-        requestDto.setData();
-        System.out.println("Visitor just visited : " + requestDto.getUrl());
-        System.out.println("Visitor's IP address is : " + requestDto.getIp());
+        Visitor visitor = requestDto.toEntity();
+        visitor.setData();
+        System.out.println("Visitor just visited : " + visitor.getUrl());
+        System.out.println("Visitor's IP address is : " + visitor.getIp());
         System.out.println("Current Time : " + new Date());
 
-        if (isRecordable(requestDto.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
-        visitorRepository.save(requestDto.toEntity());
+        if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
+        visitorRepository.save(visitor);
     }
 
     @Transactional
