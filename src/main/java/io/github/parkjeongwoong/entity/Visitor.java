@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 public class Visitor extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(length = 100)
     private String url;

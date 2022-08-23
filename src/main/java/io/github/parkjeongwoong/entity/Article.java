@@ -14,13 +14,13 @@ import java.util.List;
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(length = 100, nullable = false)
     private String title;
 
     @Column(nullable = false)
-    private Long categoryId;
+    private long categoryId;
 
     @Column(length = 20, nullable = false)
     private String category;
@@ -40,7 +40,7 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private final List<Image> images = new ArrayList<>();
 
-    @Builder Article(String title, String content, String date, String fileName, Long categoryId, String category, String subCategory) {
+    @Builder Article(String title, String content, String date, String fileName, long categoryId, String category, String subCategory) {
         this.title = title;
         this.categoryId = categoryId;
         this.category = category;

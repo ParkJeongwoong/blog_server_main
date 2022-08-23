@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class ArticleResponseDto {
-    private final Long id;
+    private final long id;
     private final String title;
     private final String category;
     private final String subCategory;

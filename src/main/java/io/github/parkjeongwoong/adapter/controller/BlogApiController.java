@@ -52,12 +52,12 @@ public class BlogApiController {
     }
 
     @PutMapping("/article/{articleId}")
-    public CommonResponseDto update_article(@PathVariable("articleId") Long articleId, @RequestBody ArticleUpdateRequestDto requestDto) {
+    public CommonResponseDto update_article(@PathVariable("articleId") long articleId, @RequestBody ArticleUpdateRequestDto requestDto) {
         return fileUsecase.updateArticle(articleId, requestDto);
     }
 
     @DeleteMapping("/article/{articleId}")
-    public CommonResponseDto delete_article(@PathVariable("articleId") Long articleId) { return fileUsecase.deleteArticle(articleId); }
+    public CommonResponseDto delete_article(@PathVariable("articleId") long articleId) { return fileUsecase.deleteArticle(articleId); }
 
     // Media
     @GetMapping(value = "image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)

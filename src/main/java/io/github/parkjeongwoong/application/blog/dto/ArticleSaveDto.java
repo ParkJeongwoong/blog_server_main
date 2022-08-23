@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class ArticleSaveDto {
     private String title;
-    private Long categoryId;
+    private long categoryId;
     private String category;
     private String subCategory;
     private String content;

@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class PostsResponseDto {
 
-    private final Long id;
+    private final long id;
     private final String title;
     private final String content;
     private final String author;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class PageVisitorListResponseDto {
     private final String url;
-    private final Long count;
+    private final long count;
 
     public PageVisitorListResponseDto(PageVisitorListResponseDtoInterface entity) {
         this.url = entity.getUrl();

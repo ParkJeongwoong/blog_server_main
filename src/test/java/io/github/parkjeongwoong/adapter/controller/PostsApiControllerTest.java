@@ -64,7 +64,7 @@ public class PostsApiControllerTest {
 //        String url = "http://localhost:" + port + "/api/v1/posts";
 //
 //        // When
-////        ResponseEntity<Long> responseEntity = restTemplate.postForEntity(url, requestDto, Long.class);
+////        ResponseEntity<long> responseEntity = restTemplate.postForEntity(url, requestDto, long.class);
 //        mvc.perform(post(url)
 //                .contentType(MediaType.APPLICATION_JSON)
 //                .content(new ObjectMapper().writeValueAsString(requestDto)))
@@ -89,7 +89,7 @@ public class PostsApiControllerTest {
 //            .author("author")
 //            .build());
 //
-//        Long updateId = savedPosts.getId();
+//        long updateId = savedPosts.getId();
 //        String expectedTitle = "title2";
 //        String expectedContent = "content2";
 //
@@ -103,7 +103,7 @@ public class PostsApiControllerTest {
 ////        HttpEntity<PostsUpdateRequestDto> requestEntity = new HttpEntity<>(requestDto);
 //
 //        // When
-////        ResponseEntity<Long> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Long.class);
+////        ResponseEntity<long> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, long.class);
 //        mvc.perform(put(url)
 //                .contentType(MediaType.APPLICATION_JSON)
 //                .content(new ObjectMapper().writeValueAsString(requestDto)))

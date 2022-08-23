@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class VisitorListResponseDto {
-    private final Long id;
+    private final long id;
     private final String url;
     private final String ip;
     private final LocalDateTime visitedDate;

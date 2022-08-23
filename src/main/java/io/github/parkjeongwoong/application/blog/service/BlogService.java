@@ -66,7 +66,7 @@ public class BlogService implements BlogUsecase {
         return articleRepository.findByCategoryAndId(category, categoryId);
     }
 
-    private Boolean isRecordable(String ip) {
+    private boolean isRecordable(String ip) {
         String[] notRecordableArray = {"58.140.57.190" // 공덕 ip
                                  , "118.221.44.132" // 양평동 ip1
                                  , "39.115.83.55" // 양평동 ip2
