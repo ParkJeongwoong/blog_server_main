@@ -40,7 +40,7 @@ public class Image {
         if (!isDirectoryCreated) System.out.println("이미지 저장 폴더를 생성했습니다");
     }
 
-    public String saveImage(MultipartFile imageFile, String imageName) throws IOException {
+    public String saveImageFile(MultipartFile imageFile, String imageName) throws IOException {
         if (rootPath == null) {
             System.out.println("저장 경로가 지정되지 않았습니다");
             return null;

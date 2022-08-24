@@ -53,7 +53,7 @@ public class BlogApiController {
 
     @PutMapping("/article/{articleId}")
     public CommonResponseDto update_article(@PathVariable("articleId") long articleId, @RequestBody ArticleUpdateRequestDto requestDto) {
-        return fileUsecase.updateArticle(articleId, requestDto);
+        return fileUsecase.updateArticle_string(articleId, requestDto);
     }
 
     @DeleteMapping("/article/{articleId}")

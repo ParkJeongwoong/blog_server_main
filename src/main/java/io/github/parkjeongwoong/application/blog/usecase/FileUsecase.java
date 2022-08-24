@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface FileUsecase {
     CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest);
-    CommonResponseDto updateArticle(Long articleId, ArticleUpdateRequestDto requestDto);
+    CommonResponseDto updateArticle_string(Long articleId, ArticleUpdateRequestDto requestDto);
     CommonResponseDto updateArticle_markdown(Long articleId, MultipartHttpServletRequest multiRequest);
     CommonResponseDto deleteArticle(Long articleId);
     byte[] getImage(String imageName) throws IOException;
