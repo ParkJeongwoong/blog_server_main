@@ -38,14 +38,11 @@ public class FileService implements FileUsecase {
 
             Article article = new Article(multipartFile, category, subCategory, categoryId);
 
-            System.out.println("업로드된 이미지 개수 : " + imageFiles.size());
-            System.out.println("파일의 이미지 개수 : " + article.countImage());
-            if (imageFiles.size() != article.countImage()) throw new InputMismatchException("첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다");
-
+            if (compareImageCnt(imageFiles.size(), article.countImage())) throw new InputMismatchException("첨부한 이미지 개수가 파일의 이미지 개수와 일치하지 않습니다");
             ArrayList<String> changedImageNames = article.changeImageDirectory();
+
             long articleId = articleRepository.save(article).getId();
             save_images(imageFiles, changedImageNames, articleId);
-
             return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,6 +68,12 @@ public class FileService implements FileUsecase {
         Article article = articleRepository.findById(articleId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. articleId = "+ articleId));
         articleRepository.delete(article);
         return new CommonResponseDto("Delete Article", "Success", "게시글을 성공적으로 삭제했습니다.");
+    }
+
+    private boolean compareImageCnt(int uploadedImageCnt, int articleImageCnt) throws InputMismatchException {
+        System.out.println("업로드된 이미지 개수 : " + uploadedImageCnt);
+        System.out.println("파일의 이미지 개수 : " + articleImageCnt);
+        return uploadedImageCnt != articleImageCnt;
     }
 
     private void save_images(List<MultipartFile> imageFiles, List<String> imageNames, Long articleId) {
