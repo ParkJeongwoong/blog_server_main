@@ -28,8 +28,10 @@ public class DataService implements DataUsecase {
         File dFile = new File(filePath, filename);
 
         int fSize = (int) dFile.length();
+        System.out.println(fSize);
 
         if (fSize > 0) {
+            System.out.println("0");
             String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(filename, "UTF-8");
             response.setContentType("application/octet-stream; charset=utf-8");
             response.setHeader("Content-Dispotition", encodedFilename);
