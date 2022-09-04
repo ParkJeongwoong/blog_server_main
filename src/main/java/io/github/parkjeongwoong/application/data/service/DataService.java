@@ -24,6 +24,7 @@ public class DataService implements DataUsecase {
         }
 
         String filePath = default_filePath + filename;
+        System.out.println("File Path : " + filePath);
         File dFile = new File(filePath);
         if (!dFile.exists()) {
             System.out.println("Find file again");
