@@ -29,6 +29,7 @@ public class DataService implements DataUsecase {
 
         int fSize = (int) dFile.length();
         System.out.println(fSize);
+        System.out.println(dFile.exists());
 
         if (fSize > 0) {
             System.out.println("0");
