@@ -4,6 +4,7 @@ import io.github.parkjeongwoong.application.data.usecase.DataUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,15 @@ public class DataService implements DataUsecase {
         System.out.println(filePath);
         System.out.println(filename);
         File dFile = new File(filePath, filename);
+        if (!dFile.exists()) {
+            filePath = System.getProperty("user.dir")
+                    + File.separator + "src"
+                    + File.separator + "main"
+                    + File.separator + "resources"
+                    + File.separator + "downloadable"
+                    + File.separator + filename;
+            dFile = new File(filePath);
+        }
 
         int fSize = (int) dFile.length();
         System.out.println(fSize);
