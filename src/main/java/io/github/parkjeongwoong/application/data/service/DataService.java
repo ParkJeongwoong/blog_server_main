@@ -15,7 +15,7 @@ import java.net.URLEncoder;
 @Service
 public class DataService implements DataUsecase {
     @Value("${download.path}")
-    String filePath;
+    String default_filePath;
 
     @Override
     public void download(HttpServletRequest request, HttpServletResponse response, String filename) throws IOException {
@@ -23,8 +23,11 @@ public class DataService implements DataUsecase {
             return ;
         }
 
-        File dFile = new File(filePath, filename);
+        String filePath = default_filePath + filename;
+        File dFile = new File(filePath);
         if (!dFile.exists()) {
+            System.out.println("Find file again");
+
             filePath = System.getProperty("user.dir")
                     + File.separator + "src"
                     + File.separator + "main"
@@ -32,7 +35,7 @@ public class DataService implements DataUsecase {
                     + File.separator + "downloadable"
                     + File.separator + filename;
             dFile = new File(filePath);
-        }
+        } else {System.out.println("Find file");}
 
         System.out.println(filename);
         System.out.println(filePath);
