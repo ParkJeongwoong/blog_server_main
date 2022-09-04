@@ -17,15 +17,12 @@ public class DataService implements DataUsecase {
     @Value("${download.path}")
     String filePath;
 
-    // 출처 : https://kitty-geno.tistory.com/105
     @Override
     public void download(HttpServletRequest request, HttpServletResponse response, String filename) throws IOException {
         if (filename == null || filename.equals("")) {
             return ;
         }
 
-        System.out.println(filePath);
-        System.out.println(filename);
         File dFile = new File(filePath, filename);
         if (!dFile.exists()) {
             filePath = System.getProperty("user.dir")
@@ -37,12 +34,12 @@ public class DataService implements DataUsecase {
             dFile = new File(filePath);
         }
 
+        System.out.println(filename);
+        System.out.println(filePath);
+
         int fSize = (int) dFile.length();
-        System.out.println(fSize);
-        System.out.println(dFile.exists());
 
         if (fSize > 0) {
-            System.out.println("0");
             String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(filename, "UTF-8");
             response.setContentType("application/octet-stream; charset=utf-8");
             response.setHeader("Content-Dispotition", encodedFilename);
@@ -55,18 +52,15 @@ public class DataService implements DataUsecase {
             out = new BufferedOutputStream(response.getOutputStream());
 
             try {
-                System.out.println("1");
                 byte[] buffer = new byte[4096];
                 int bytesRead;
 
                 while ((bytesRead = in.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesRead);
                 }
-                System.out.println("2");
 
                 out.flush();
             } finally {
-                System.out.println("3");
                 in.close();
                 out.close();
             }
