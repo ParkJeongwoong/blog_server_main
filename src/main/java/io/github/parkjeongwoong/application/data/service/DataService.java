@@ -42,15 +42,18 @@ public class DataService implements DataUsecase {
             out = new BufferedOutputStream(response.getOutputStream());
 
             try {
+                System.out.println("1");
                 byte[] buffer = new byte[4096];
                 int bytesRead;
 
                 while ((bytesRead = in.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesRead);
                 }
+                System.out.println("2");
 
                 out.flush();
             } finally {
+                System.out.println("3");
                 in.close();
                 out.close();
             }
