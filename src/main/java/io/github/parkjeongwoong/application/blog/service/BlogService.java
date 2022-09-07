@@ -6,6 +6,9 @@ import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,9 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Transactional
     public void visited(VisitorSaveRequestDto requestDto) {
@@ -63,7 +69,13 @@ public class BlogService implements BlogUsecase {
     }
 
     public ArticleResponseDto getArticle(String category, Long categoryId) {
-        return articleRepository.findByCategoryAndId(category, categoryId);
+        String redis_key = category+categoryId;
+        ArticleResponseDto redis_data = articleRepository.findByCategoryAndId(category, categoryId);
+
+        ValueOperations<String, ArticleResponseDto> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set(redis_key, redis_data);
+        return valueOperations.get(redis_key);
+//        return articleRepository.findByCategoryAndId(category, categoryId);
     }
 
     private boolean isRecordable(String ip) {
