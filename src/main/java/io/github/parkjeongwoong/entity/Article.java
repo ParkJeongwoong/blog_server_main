@@ -76,7 +76,7 @@ public class Article {
     }
 
     public ArrayList<String> changeImageDirectory() {
-        String SERVER_ADDRESS = "https://dvlprjw.p-e.kr";
+        String SERVER_ADDRESS = "https://dvlprjw.kro.kr";
         Pattern imagePattern = Pattern.compile("!\\[(.*?)]\\((?!http)(.*?)\\)");
         Matcher image_in_articleData = imagePattern.matcher(content);
         ArrayList<String> imageNames = new ArrayList<>();

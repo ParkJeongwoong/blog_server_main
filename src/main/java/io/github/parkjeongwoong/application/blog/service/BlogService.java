@@ -7,10 +7,18 @@ import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +28,9 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
+
+    @Value("${backup.server}")
+    String backupServer;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -34,6 +45,26 @@ public class BlogService implements BlogUsecase {
 
         if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         visitorRepository.save(visitor);
+
+        // Backup
+        if (backupServer != null && backupServer.length() != 0) {
+            String backupUrl = backupServer + "/blog-api/visited";
+            HttpHeaders httpHeaders = new HttpHeaders();
+            MultiValueMap<String, String> httpBody = new LinkedMultiValueMap<>();
+            httpBody.add("url", requestDto.getUrl());
+            httpBody.add("lastPage", requestDto.getLastPage());
+            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(httpBody, httpHeaders);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    backupUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
+
+            System.out.println("Backup Result : " + responseEntity.getBody());
+        }
     }
 
     @Transactional
