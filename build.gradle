@@ -46,5 +46,8 @@ dependencies {
 
     // Redis
     implementation('org.springframework.boot:spring-boot-starter-data-redis')
+
+    // WebClient
+    implementation ('org.springframework.boot:spring-boot-starter-webflux')
 }
 targetCompatibility = JavaVersion.VERSION_1_9

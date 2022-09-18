@@ -10,17 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,12 +34,17 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
+    private WebClient webClient;
 
     @Value("${backup.server}")
     String backupServer;
-
     @Autowired
     private final RedisTemplate redisTemplate;
+
+    @PostConstruct
+    public void initWebClient() {
+        webClient = WebClient.create(backupServer);
+    }
 
     @Transactional
     public void visited(VisitorSaveRequestDto requestDto) {
@@ -48,8 +53,6 @@ public class BlogService implements BlogUsecase {
         System.out.println("Visitor just visited : " + visitor.getUrl());
         System.out.println("Visitor's IP address is : " + visitor.getIp());
         System.out.println("Current Time : " + new Date());
-        System.out.println("backupServer ? : " + backupServer);
-        System.out.println("backupServer ? : " + backupServer.length());
 
         if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         visitorRepository.save(visitor);
@@ -57,22 +60,17 @@ public class BlogService implements BlogUsecase {
         // Backup
         if (backupServer != null && backupServer.length() != 0) {
             String backupUrl = backupServer + "/blog-api/visited";
-            System.out.println("Backup To : " + backupUrl);
-            HttpHeaders httpHeaders = new HttpHeaders();
             MultiValueMap<String, String> httpBody = new LinkedMultiValueMap<>();
             httpBody.add("url", requestDto.getUrl());
             httpBody.add("lastPage", requestDto.getLastPage());
-            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(httpBody, httpHeaders);
-
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> responseEntity = restTemplate.exchange(
-                    backupUrl,
-                    HttpMethod.POST,
-                    httpEntity,
-                    String.class
-            );
-
-            System.out.println("Backup Result : " + responseEntity.getBody());
+            String response = webClient.post()
+                            .uri("/blog-api/visited")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(BodyInserters.fromValue(httpBody))
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+            System.out.println("Backup Result : " + response);
         }
     }
 
