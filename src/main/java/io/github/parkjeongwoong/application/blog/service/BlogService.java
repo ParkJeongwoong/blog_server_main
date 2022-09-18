@@ -18,9 +18,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -33,7 +39,7 @@ public class BlogService implements BlogUsecase {
     String backupServer;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private final RedisTemplate redisTemplate;
 
     @Transactional
     public void visited(VisitorSaveRequestDto requestDto) {
@@ -100,13 +106,35 @@ public class BlogService implements BlogUsecase {
     }
 
     public ArticleResponseDto getArticle(String category, Long categoryId) {
-        String redis_key = category+categoryId;
-        ArticleResponseDto redis_data = articleRepository.findByCategoryAndId(category, categoryId);
-
         ValueOperations<String, ArticleResponseDto> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(redis_key, redis_data);
-        return valueOperations.get(redis_key);
-//        return articleRepository.findByCategoryAndId(category, categoryId);
+        String redis_key = "a"+category+categoryId;
+        ArticleResponseDto article = valueOperations.get(redis_key);
+        if (article == null) {
+            article = articleRepository.findByCategoryAndId(category, categoryId);
+            valueOperations.set(redis_key, article, 7, TimeUnit.DAYS);
+        }
+        return article;
+    }
+
+    public byte[] getImage(String imageName) throws IOException {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        String[] imagePath_split = imageName.split("/");
+        String imagePath = String.join(File.separator, imagePath_split);
+        String redis_key = "i"+imagePath;
+        String image_string = valueOperations.get(redis_key);
+        if (image_string == null || image_string.length() == 0) {
+            InputStream imageStream = new FileInputStream(System.getProperty("user.dir")
+                    + File.separator + "src"
+                    + File.separator + "main"
+                    + File.separator + "resources"
+                    + File.separator + "article_images"
+                    + File.separator + imageName);
+            byte[] image = StreamUtils.copyToByteArray(imageStream);
+            image_string = Base64.getEncoder().encodeToString(image);
+            imageStream.close();
+            valueOperations.set(redis_key, image_string, 3, TimeUnit.DAYS);
+        }
+        return Base64.getDecoder().decode(image_string);
     }
 
     private boolean isRecordable(String ip) {
