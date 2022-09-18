@@ -2,15 +2,19 @@ package io.github.parkjeongwoong.application.blog.dto;
 
 import io.github.parkjeongwoong.entity.Article;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Getter
-public class ArticleResponseDto {
-    private final long id;
-    private final String title;
-    private final String category;
-    private final String subCategory;
-    private final String content;
-    private final String date;
+@NoArgsConstructor
+public class ArticleResponseDto implements Serializable {
+    private long id;
+    private String title;
+    private String category;
+    private String subCategory;
+    private String content;
+    private String date;
 
     public ArticleResponseDto(Article entity) {
         this.id = entity.getId();

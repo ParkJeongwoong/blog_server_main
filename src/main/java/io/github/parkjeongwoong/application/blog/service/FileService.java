@@ -98,21 +98,4 @@ public class FileService implements FileUsecase {
 
         if (imageIdx != imageFiles.size()) throw new RuntimeException("이미지 저장 중 문제가 발생했습니다");
     }
-
-    public byte[] getImage(String imageName) throws IOException {
-        String[] imagePathList = imageName.split("/");
-        String imagePath = String.join(File.separator, imagePathList);
-        System.out.println(imagePath);
-
-        InputStream imageStream = new FileInputStream(System.getProperty("user.dir")
-                + File.separator + "src"
-                + File.separator + "main"
-                + File.separator + "resources"
-                + File.separator + "article_images"
-                + File.separator + imageName);
-        byte[] imageByteArray = StreamUtils.copyToByteArray(imageStream);
-        imageStream.close();
-
-        return imageByteArray;
-    }
 }

@@ -11,9 +11,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 @Getter
+@NoArgsConstructor
 public class VisitorSaveRequestDto {
-    private final String url;
-    private final String lastPage;
+    private String url;
+    private String lastPage;
 
     @Builder
     public VisitorSaveRequestDto(String url, String lastPage) {

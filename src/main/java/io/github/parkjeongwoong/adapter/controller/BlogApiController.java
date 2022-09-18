@@ -61,5 +61,5 @@ public class BlogApiController {
 
     // Media
     @GetMapping(value = "image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public byte[] get_image(@PathVariable("imageName") String imageName) throws IOException { return fileUsecase.getImage(imageName); }
+    public byte[] get_image(@PathVariable("imageName") String imageName) throws IOException { return blogUsecase.getImage(imageName); }
 }

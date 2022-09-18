@@ -43,5 +43,8 @@ dependencies {
     // DB
     implementation("org.springframework.session:spring-session-jdbc")
     implementation("org.mariadb.jdbc:mariadb-java-client")
+
+    // Redis
+    implementation('org.springframework.boot:spring-boot-starter-data-redis')
 }
 targetCompatibility = JavaVersion.VERSION_1_9
