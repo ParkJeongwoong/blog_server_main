@@ -1,11 +1,14 @@
 package io.github.parkjeongwoong.application.blog.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
+import org.h2.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,7 +46,7 @@ public class BlogService implements BlogUsecase {
 
     @PostConstruct
     public void initWebClient() {
-        webClient = WebClient.create(backupServer);
+        webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
     }
 
     @Transactional
@@ -60,17 +63,20 @@ public class BlogService implements BlogUsecase {
         // Backup
         if (backupServer != null && backupServer.length() != 0) {
             String backupUrl = backupServer + "/blog-api/visited";
-            MultiValueMap<String, String> httpBody = new LinkedMultiValueMap<>();
-            httpBody.add("url", requestDto.getUrl());
-            httpBody.add("lastPage", requestDto.getLastPage());
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = null;
+            try {
+                jsonString = mapper.writeValueAsString(requestDto);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
             String response = webClient.post()
-                            .uri("/blog-api/visited")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(BodyInserters.fromValue(httpBody))
+                            .uri(backupUrl)
+                            .body(BodyInserters.fromValue(jsonString))
                             .retrieve()
                             .bodyToMono(String.class)
                             .block();
-            System.out.println("Backup Result : " + response);
+            System.out.println("Backup To : " + backupServer);
         }
     }
 
