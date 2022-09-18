@@ -48,13 +48,13 @@ public class BlogService implements BlogUsecase {
         System.out.println("Visitor just visited : " + visitor.getUrl());
         System.out.println("Visitor's IP address is : " + visitor.getIp());
         System.out.println("Current Time : " + new Date());
+        System.out.println("backupServer ? : " + backupServer);
+        System.out.println("backupServer ? : " + backupServer.length());
 
         if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         visitorRepository.save(visitor);
 
         // Backup
-        System.out.println("backupServer ? : " + backupServer);
-        System.out.println("backupServer ? : " + backupServer.length());
         if (backupServer != null && backupServer.length() != 0) {
             String backupUrl = backupServer + "/blog-api/visited";
             System.out.println("Backup To : " + backupUrl);
