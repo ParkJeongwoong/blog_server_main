@@ -53,8 +53,11 @@ public class BlogService implements BlogUsecase {
         visitorRepository.save(visitor);
 
         // Backup
+        System.out.println("backupServer ? : " + backupServer);
+        System.out.println("backupServer ? : " + backupServer.length());
         if (backupServer != null && backupServer.length() != 0) {
             String backupUrl = backupServer + "/blog-api/visited";
+            System.out.println("Backup To : " + backupUrl);
             HttpHeaders httpHeaders = new HttpHeaders();
             MultiValueMap<String, String> httpBody = new LinkedMultiValueMap<>();
             httpBody.add("url", requestDto.getUrl());
