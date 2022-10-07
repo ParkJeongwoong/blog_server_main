@@ -22,7 +22,7 @@ public interface VisitorRepository extends JpaRepository<Visitor, Long> {
     @Query("SELECT url as url, COUNT(1) as count FROM Visitor WHERE just_visited = True GROUP BY URL ORDER BY 2 DESC")
     List<PageVisitorResponseDtoInterface> countVisitor_firstPage();
 
-    @Query("SELECT CAST(created_date AS LocalDate) as date, COUNT(1) as count FROM Visitor GROUP BY CAST(created_date AS LocalDate) ORDER BY 2 DESC")
+    @Query("SELECT CAST(created_date AS LocalDate) as date, COUNT(1) as count FROM Visitor GROUP BY CAST(created_date AS LocalDate) ORDER BY 1 DESC")
     List<DailyVisitorResponseDtoInterface> countDailyVisitor();
 
     @Query("SELECT ip as ip, count(1) as count FROM Visitor GROUP BY IP ORDER BY 2 DESC")
