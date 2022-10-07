@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class BlogApiController {
     public void visited(@RequestBody VisitorSaveRequestDto requestDto) { blogUsecase.visited(requestDto); }
 
     @GetMapping("/history")
-    public List<VisitorListResponseDto> history() { return blogUsecase.history(); }
+    public List<VisitorResponseDto> history() { return blogUsecase.history(); }
 
     @GetMapping("/count-visitor")
     public long count_visitor() {
@@ -32,10 +33,21 @@ public class BlogApiController {
     }
 
     @GetMapping("/page-visitor")
-    public List<PageVisitorListResponseDto> count_visitor_page() { return blogUsecase.countVisitor_page(); }
+    public List<PageVisitorResponseDto> count_visitor_page() { return blogUsecase.countVisitor_page(); }
 
     @GetMapping("/first-visits")
-    public List<PageVisitorListResponseDto> count_visitor_firstPage() { return blogUsecase.countVisitor_firstPage(); }
+    public List<PageVisitorResponseDto> count_visitor_firstPage() { return blogUsecase.countVisitor_firstPage(); }
+
+    @GetMapping("/daily-visitor")
+    public List<DailyVisitorResponseDto> count_daily_visitor() { return blogUsecase.countDailyVisitor(); }
+
+    @GetMapping("/visitor-rank")
+    public List<VisitorCountResponseDto> count_visitor_rank() { return blogUsecase.countVisitorRank(); }
+
+    @GetMapping("/visitor-rank/{startDate}/{endDate}")
+    public List<VisitorCountResponseDto> count_visitor_rank_date(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate) {
+        return blogUsecase.countVisitorRank_date(startDate, endDate);
+    }
 
     // Article
     @PostMapping("/upload")

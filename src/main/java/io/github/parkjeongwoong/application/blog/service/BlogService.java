@@ -8,7 +8,6 @@ import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
-import org.h2.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,10 +15,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -28,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -86,23 +83,42 @@ public class BlogService implements BlogUsecase {
     }
 
     @Transactional(readOnly = true)
-    public List<VisitorListResponseDto> history() {
+    public List<VisitorResponseDto> history() {
         return visitorRepository.findAllByOrderByIdDesc().stream()
-                .map(VisitorListResponseDto::new)
+                .map(VisitorResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<PageVisitorListResponseDto> countVisitor_page() {
+    public List<PageVisitorResponseDto> countVisitor_page() {
         return visitorRepository.countVisitor_page().stream()
-                .map(PageVisitorListResponseDto::new)
+                .map(PageVisitorResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<PageVisitorListResponseDto> countVisitor_firstPage() {
+    public List<PageVisitorResponseDto> countVisitor_firstPage() {
         return visitorRepository.countVisitor_firstPage().stream()
-                .map(PageVisitorListResponseDto::new)
+                .map(PageVisitorResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<DailyVisitorResponseDto> countDailyVisitor() {
+//        return null;
+        return visitorRepository.countDailyVisitor().stream()
+                .map(DailyVisitorResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<VisitorCountResponseDto> countVisitorRank() {
+        return visitorRepository.countVisitor().stream()
+                .map(VisitorCountResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<VisitorCountResponseDto> countVisitorRank_date(String startDate, String endDate) {
+        return visitorRepository.countVisitor_date(startDate, endDate+"T23:59:59.99").stream()
+                .map(VisitorCountResponseDto::new)
                 .collect(Collectors.toList());
     }
 

@@ -1,6 +1,6 @@
 package io.github.parkjeongwoong.application.blog.dto;
 
-public interface PageVisitorListResponseDtoInterface {
+public interface PageVisitorResponseDtoInterface {
     String getUrl();
     long getCount();
 }
