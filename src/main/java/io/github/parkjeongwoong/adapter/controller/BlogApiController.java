@@ -63,6 +63,9 @@ public class BlogApiController {
         return blogUsecase.getArticle(category, categoryId);
     }
 
+    @GetMapping("/search/article/{word}")
+    public List<ArticleResponseDto> search_by_word(@PathVariable("word") String word) { return blogUsecase.searchArticleByWord(word); }
+
     @PutMapping("/article/{articleId}")
     public CommonResponseDto update_article(@PathVariable("articleId") long articleId, @RequestBody ArticleUpdateRequestDto requestDto) {
         return fileUsecase.updateArticle_string(articleId, requestDto);

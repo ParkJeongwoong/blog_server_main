@@ -139,6 +139,12 @@ public class BlogService implements BlogUsecase {
         return article;
     }
 
+    public List<ArticleResponseDto> searchArticleByWord(String word) {
+        return articleRepository.searchByWord(word).stream()
+                .map(ArticleResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
     public byte[] getImage(String imageName) throws IOException {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         String[] imagePath_split = imageName.split("/");
