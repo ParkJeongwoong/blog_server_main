@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
+import io.github.parkjeongwoong.application.blog.repository.QueryDSL.ArticleRepositoryCustom;
 import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
+    private final ArticleRepositoryCustom QarticleRepository;
     private WebClient webClient;
 
     @Value("${backup.server}")
@@ -140,9 +142,17 @@ public class BlogService implements BlogUsecase {
     }
 
     public List<ArticleResponseDto> searchArticleByWord(String word) {
-        return articleRepository.searchByWord(word).stream()
-                .map(ArticleResponseDto::new)
+        String[] wordArray = word.split(" ");
+        List<String> searchList = new ArrayList<>(Arrays.asList(wordArray)).stream()
+                .filter(str->str!=null&&!str.equals(""))
+                .map(str->"%"+str+"%")
                 .collect(Collectors.toList());
+
+        return QarticleRepository.searchByWords(searchList);
+
+//        return articleRepository.searchByWord(word).stream()
+//                .map(ArticleResponseDto::new)
+//                .collect(Collectors.toList());
     }
 
     public byte[] getImage(String imageName) throws IOException {

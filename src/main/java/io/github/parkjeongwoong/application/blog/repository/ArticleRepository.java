@@ -18,7 +18,4 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query("SELECT COUNT(1) FROM Article A WHERE CATEGORY = :category")
     long countCategory(@Param("category") String category);
-
-    @Query("Select a From Article a WHERE a.title LIKE %:word% OR a.content LIKE %:word%")
-    List<Article> searchByWord(@Param("word") String word);
 }
