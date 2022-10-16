@@ -141,18 +141,15 @@ public class BlogService implements BlogUsecase {
         return article;
     }
 
-    public List<ArticleResponseDto> searchArticleByWord(String word) {
-        String[] wordArray = word.split(" ");
+    public List<ArticleSearchResultDto> searchArticleByWord(String words, long offset) {
+        String[] wordArray = words.split(" ");
         List<String> searchList = new ArrayList<>(Arrays.asList(wordArray)).stream()
                 .filter(str->str!=null&&!str.equals(""))
                 .map(str->"%"+str+"%")
                 .collect(Collectors.toList());
-
-        return QarticleRepository.searchByWords(searchList);
-
-//        return articleRepository.searchByWord(word).stream()
-//                .map(ArticleResponseDto::new)
-//                .collect(Collectors.toList());
+        List<ArticleSearchResultDto> searchResult = QarticleRepository.searchByWords(searchList, offset);
+        searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord(wordArray));
+        return searchResult;
     }
 
     public byte[] getImage(String imageName) throws IOException {

@@ -64,7 +64,11 @@ public class BlogApiController {
     }
 
     @GetMapping("/search/article/{word}")
-    public List<ArticleResponseDto> search_by_word(@PathVariable("word") String word) { return blogUsecase.searchArticleByWord(word); }
+    public List<ArticleSearchResultDto> search_by_word(@PathVariable("word") String words) { return blogUsecase.searchArticleByWord(words, 0); }
+    @GetMapping("/search/article/{word}/{offset}")
+    public List<ArticleSearchResultDto> search_by_word_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
+        return blogUsecase.searchArticleByWord(words, offset);
+    }
 
     @PutMapping("/article/{articleId}")
     public CommonResponseDto update_article(@PathVariable("articleId") long articleId, @RequestBody ArticleUpdateRequestDto requestDto) {

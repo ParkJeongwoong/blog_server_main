@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Getter
 @NoArgsConstructor
-public class ArticleResponseDto implements Serializable {
+public class ArticleResponseDto implements Serializable { // Redis에서 Bit 배열로 저장하기 때문에 사용
     private long id;
     private String title;
     private String category;

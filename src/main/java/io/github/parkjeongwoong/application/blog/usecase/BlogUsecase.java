@@ -17,6 +17,6 @@ public interface BlogUsecase {
     List<VisitorCountResponseDto> countVisitorRank_date(String star, String end);
     List<ArticleResponseDto> getArticleList();
     ArticleResponseDto getArticle(String category, Long categoryId);
-    List<ArticleResponseDto> searchArticleByWord(String word);
+    List<ArticleSearchResultDto> searchArticleByWord(String words, long offset);
     byte[] getImage(String imageName) throws IOException;
 }
