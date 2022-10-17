@@ -25,7 +25,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         words.forEach(word->builder.or(article.content.like(word)).or(article.title.like(word)));
 
         return jpaQueryFactory.selectFrom(article)
-                .where(builder).limit(10).offset(offset)
+                .where(builder).limit(11).offset(offset)
                 .fetch()
                 .stream().map(ArticleSearchResultDto::new)
                 .collect(Collectors.toList());
