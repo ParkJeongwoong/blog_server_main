@@ -149,6 +149,7 @@ public class BlogService implements BlogUsecase {
                 .collect(Collectors.toList());
         List<ArticleSearchResultDto> searchResult = QarticleRepository.searchByWords(searchList, offset);
         searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord(wordArray));
+        System.out.println("6666");
         return searchResult;
     }
 
