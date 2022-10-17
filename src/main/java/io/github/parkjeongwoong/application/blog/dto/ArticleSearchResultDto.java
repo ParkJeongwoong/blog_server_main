@@ -56,6 +56,7 @@ public class ArticleSearchResultDto {
 
         refineContent();
 
+        System.out.println(category + categoryId+ title);
         // 일치하는 단어 찾아서 True 설정
         for (int i=0;i<this.content.length();i++)
             this.matchWords.add(false);
@@ -89,13 +90,18 @@ public class ArticleSearchResultDto {
     }
 
     private void findIndexes(String word) {
+        System.out.println("1");
         int index = this.content.indexOf(word);
+        System.out.println("2");
 
         while(index != -1) {
+            System.out.println("index : " + index);
             for (int i=0;i<word.length();i++) {
                 this.matchWords.set(index+i, true);
             }
             index = this.content.indexOf(word, index+word.length());
+            System.out.println("3");
         }
+        System.out.println("4");
     }
 }
