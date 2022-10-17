@@ -5,24 +5,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public class ArticleSearchResultDto {
-    private long id;
     private String title;
     private String category;
+    private long categoryId;
     private String subCategory;
     private String content;
     private String date;
 
     public ArticleSearchResultDto(Article entity) {
-        this.id = entity.getId();
         this.title = entity.getTitle();
         this.category = entity.getCategory();
+        this.categoryId = entity.getCategoryId();
         this.subCategory = entity.getSubCategory();
         this.content = entity.getContent();
         this.date = entity.getDate();
