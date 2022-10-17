@@ -1,10 +1,7 @@
 package io.github.parkjeongwoong.application.blog.repository.QueryDSL;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPQLOps;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.github.parkjeongwoong.application.blog.dto.ArticleResponseDto;
 import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
 import io.github.parkjeongwoong.entity.QArticle;
 import lombok.RequiredArgsConstructor;

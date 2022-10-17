@@ -4,6 +4,7 @@ import io.github.parkjeongwoong.entity.Article;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ public class ArticleSearchResultDto {
     private String subCategory;
     private String content;
     private String date;
+    private List<Boolean> matchWords = new ArrayList<>();
 
     public ArticleSearchResultDto(Article entity) {
         this.title = entity.getTitle();
@@ -45,7 +47,7 @@ public class ArticleSearchResultDto {
             }
 
             if (start_index+300 > content.length()) {
-                this.content = "...@$_%!^" + content.substring(content.length()-300).trim();
+                this.content = "...@$_%!^" + content.substring(content.length()-300);
             }
             else {
                 this.content = content.substring(start_index, start_index+300) + "...@$_%!^";
@@ -53,10 +55,15 @@ public class ArticleSearchResultDto {
         }
 
         refineContent();
+
+        // 일치하는 단어 찾아서 True 설정
+        for (int i=0;i<this.content.length();i++)
+            this.matchWords.add(false);
+        Arrays.stream(words).forEach(this::findIndexes);
     }
 
     private void preprocessContent() {
-        this.content = content.replaceAll("#"," ")
+        this.content = content.replaceAll("#","")
                 .replaceAll("\n"," ")
                 .replaceAll("\t", " ")
                 .replaceAll("\\*", "")
@@ -79,5 +86,16 @@ public class ArticleSearchResultDto {
                 .replaceAll("]\\((.*?)\\)","]")
                 .replace("@$_%!^","")
                 .trim();
+    }
+
+    private void findIndexes(String word) {
+        int index = this.content.indexOf(word);
+
+        while(index != -1) {
+            for (int i=0;i<word.length();i++) {
+                this.matchWords.set(index+i, true);
+            }
+            index = this.content.indexOf(word, index+word.length());
+        }
     }
 }
