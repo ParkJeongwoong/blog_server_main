@@ -28,6 +28,8 @@ public class ArticleSearchResultDto {
     }
 
     public void findWord(String[] words) {
+        preprocessContent();
+
         if (this.content.length() > 300) {
             List<Integer> indexes = Arrays.stream(words).map(word->content.indexOf(word)).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
             int start_index = indexes.get(0);
@@ -53,11 +55,25 @@ public class ArticleSearchResultDto {
         refineContent();
     }
 
-    private void refineContent() {
+    private void preprocessContent() {
         this.content = content.replaceAll("#"," ")
                 .replaceAll("\n"," ")
                 .replaceAll("\t", " ")
-                .replaceAll("!\\[(.*?)\\.\\.\\.@\\$_%!\\^","[이미지]...")
+                .replaceAll("\\*", "")
+                .replaceAll("---", "")
+                .replaceAll("`", "")
+                .replaceAll("<u>", "")
+                .replaceAll("</u>", "")
+                .replaceAll("\\|", "")
+                .replaceAll(":", "")
+                .replaceAll("<br>", "")
+                .replaceAll("!\\[(.*?)]\\((.*?)\\)","[이미지]")
+                .replaceAll("]\\((.*?)\\)","]")
+                .trim();
+    }
+
+    private void refineContent() {
+        this.content = content.replaceAll("!\\[(.*?)\\.\\.\\.@\\$_%!\\^","[이미지]...")
                 .replaceAll("]\\((.*?)\\.\\.\\.@\\$_%!\\^","]...")
                 .replaceAll("!\\[(.*?)]\\((.*?)\\)","[이미지]")
                 .replaceAll("]\\((.*?)\\)","]")
