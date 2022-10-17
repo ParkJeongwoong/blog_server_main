@@ -33,8 +33,13 @@ public class ArticleSearchResultDto {
         preprocessContent();
 
         if (this.content.length() > 300) {
+            System.out.println(title);
+            System.out.println("aaaa");
             List<Integer> indexes = Arrays.stream(words).map(word->content.indexOf(word)).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
+            System.out.println("bbbb");
+            System.out.println(indexes.toString());
             int start_index = indexes.get(0);
+            System.out.println("cccc");
             int blankCount = 0;
 
             while (start_index > 0) {
