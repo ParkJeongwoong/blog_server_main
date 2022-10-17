@@ -61,6 +61,7 @@ public class ArticleSearchResultDto {
         for (int i=0;i<this.content.length();i++)
             this.matchWords.add(false);
         Arrays.stream(words).forEach(this::findIndexes);
+        System.out.println("55555555555");
     }
 
     private void preprocessContent() {
