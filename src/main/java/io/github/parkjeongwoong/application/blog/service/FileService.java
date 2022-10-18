@@ -81,7 +81,6 @@ public class FileService implements FileUsecase {
         int imageIdx = 0;
 
         try {
-            image.setRootPath();
             for (MultipartFile imageFile : imageFiles) {
                 imageRepository.save(
                         Image.builder()
