@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Getter
@@ -33,13 +34,9 @@ public class ArticleSearchResultDto {
         preprocessContent();
 
         if (this.content.length() > 300) {
-            System.out.println(title);
-            System.out.println("aaaa");
-            List<Integer> indexes = Arrays.stream(words).map(word->content.indexOf(word)).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
-            System.out.println("bbbb");
-            System.out.println(indexes.toString());
+            String lowercase_content = this.content.toLowerCase(Locale.ROOT);
+            List<Integer> indexes = Arrays.stream(words).map(lowercase_content::indexOf).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
             int start_index = indexes.get(0);
-            System.out.println("cccc");
             int blankCount = 0;
 
             while (start_index > 0) {
@@ -61,12 +58,10 @@ public class ArticleSearchResultDto {
 
         refineContent();
 
-        System.out.println(category + categoryId+ title);
         // 일치하는 단어 찾아서 True 설정
         for (int i=0;i<this.content.length();i++)
             this.matchWords.add(false);
         Arrays.stream(words).forEach(this::findIndexes);
-        System.out.println("55555555555");
     }
 
     private void preprocessContent() {
@@ -96,18 +91,13 @@ public class ArticleSearchResultDto {
     }
 
     private void findIndexes(String word) {
-        System.out.println("1");
         int index = this.content.indexOf(word);
-        System.out.println("2");
 
         while(index != -1) {
-            System.out.println("index : " + index);
             for (int i=0;i<word.length();i++) {
                 this.matchWords.set(index+i, true);
             }
             index = this.content.indexOf(word, index+word.length());
-            System.out.println("3");
         }
-        System.out.println("4");
     }
 }
