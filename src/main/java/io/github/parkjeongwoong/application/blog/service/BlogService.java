@@ -145,11 +145,10 @@ public class BlogService implements BlogUsecase {
         String[] wordArray = words.split(" ");
         List<String> searchList = new ArrayList<>(Arrays.asList(wordArray)).stream()
                 .filter(str->str!=null&&!str.equals(""))
-                .map(str->"%"+str+"%")
                 .collect(Collectors.toList());
         List<ArticleSearchResultDto> searchResult = QarticleRepository.searchByWords(searchList, offset);
         searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord(wordArray));
-        Collections.sort(searchList);
+        Collections.sort(searchResult);
         return searchResult;
     }
 

@@ -17,7 +17,7 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
     private String content;
     private String date;
     private List<Boolean> matchWords = new ArrayList<>();
-    private long matchCount = 0;
+    private int matchCount = 0;
 
     public ArticleSearchResultDto(Article entity) {
         this.title = entity.getTitle();
@@ -29,6 +29,7 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
     }
 
     public void findWord(String[] words) {
+        Arrays.stream(words).forEach(this::matchingWord);
         preprocessContent();
 
         if (this.content.length() > 300) {
@@ -90,23 +91,32 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
 
     private void findIndexes(String word) {
         int index = this.content.indexOf(word);
-        this.matchCount += 1;
 
         while(index != -1) {
             for (int i=0;i<word.length();i++) {
                 this.matchWords.set(index+i, true);
             }
             index = this.content.indexOf(word, index+word.length());
-            this.matchCount += 1;
         }
+    }
+
+    private void matchingWord(String word) {
+        int index_title = this.title.indexOf(word);
+        int index = this.content.indexOf(word);
+
+        while (index_title != -1) {
+            this.matchCount += 5;
+            index_title = this.title.indexOf(word, index_title+word.length());
+        }
+        while(index != -1) {
+            this.matchCount += 1;
+            index = this.content.indexOf(word, index+word.length());
+        }
+
     }
 
     @Override
     public int compareTo(ArticleSearchResultDto articleSearchResultDto) {
-        if (this.matchCount < articleSearchResultDto.matchCount)
-            return 1;
-        else if (this.matchCount > articleSearchResultDto.matchCount)
-            return -1;
-        return 0;
+        return articleSearchResultDto.getMatchCount() - this.matchCount;
     }
 }

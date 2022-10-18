@@ -1,6 +1,8 @@
 package io.github.parkjeongwoong.application.blog.repository.QueryDSL;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
 import io.github.parkjeongwoong.entity.QArticle;
@@ -19,7 +21,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     public List<ArticleSearchResultDto> searchByWords(List<String> words, Long offset) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
-        words.forEach(word->builder.or(article.content.like(word)).or(article.title.like(word)));
+        words.forEach(word->builder.or(article.content.lower().contains(word)).or(article.title.lower().contains(word)));
 
         return jpaQueryFactory.selectFrom(article)
                 .where(builder).limit(11).offset(offset)
