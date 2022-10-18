@@ -4,15 +4,12 @@ import io.github.parkjeongwoong.entity.Article;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class ArticleSearchResultDto {
+public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto> {
     private String title;
     private String category;
     private long categoryId;
@@ -20,6 +17,7 @@ public class ArticleSearchResultDto {
     private String content;
     private String date;
     private List<Boolean> matchWords = new ArrayList<>();
+    private long matchCount = 0;
 
     public ArticleSearchResultDto(Article entity) {
         this.title = entity.getTitle();
@@ -92,12 +90,23 @@ public class ArticleSearchResultDto {
 
     private void findIndexes(String word) {
         int index = this.content.indexOf(word);
+        this.matchCount += 1;
 
         while(index != -1) {
             for (int i=0;i<word.length();i++) {
                 this.matchWords.set(index+i, true);
             }
             index = this.content.indexOf(word, index+word.length());
+            this.matchCount += 1;
         }
+    }
+
+    @Override
+    public int compareTo(ArticleSearchResultDto articleSearchResultDto) {
+        if (this.matchCount < articleSearchResultDto.matchCount)
+            return 1;
+        else if (this.matchCount > articleSearchResultDto.matchCount)
+            return -1;
+        return 0;
     }
 }
