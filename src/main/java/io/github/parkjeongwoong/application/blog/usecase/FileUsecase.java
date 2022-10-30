@@ -4,8 +4,6 @@ import io.github.parkjeongwoong.application.blog.dto.ArticleUpdateRequestDto;
 import io.github.parkjeongwoong.application.blog.dto.CommonResponseDto;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.IOException;
-
 public interface FileUsecase {
     CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest);
     CommonResponseDto updateArticle_string(Long articleId, ArticleUpdateRequestDto requestDto);

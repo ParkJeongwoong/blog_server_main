@@ -3,7 +3,6 @@ package io.github.parkjeongwoong.application.blog.usecase;
 import io.github.parkjeongwoong.application.blog.dto.*;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 public interface BlogUsecase {
