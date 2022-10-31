@@ -47,7 +47,6 @@ public class BlogService implements BlogUsecase {
         webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
     }
 
-    @Transactional
     public void visited(VisitorSaveRequestDto requestDto) {
         Visitor visitor = requestDto.toEntity();
         visitor.setData();

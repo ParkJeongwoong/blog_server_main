@@ -1,5 +1,6 @@
 package io.github.parkjeongwoong.application.blog.dto;
 
+import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
 import io.github.parkjeongwoong.entity.Article;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +31,7 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
 
     public void findWord(String[] words) {
         Arrays.stream(words).forEach(this::matchingWord);
-        preprocessContent();
+        this.content = TextRefining.preprocessingContent(this.content);
 
         if (this.content.length() > 300) {
             String lowercase_content = this.content.toLowerCase(Locale.ROOT);
@@ -55,38 +56,12 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
             }
         }
 
-        refineContent();
+        this.content = TextRefining.postprocessingContent(this.content);
 
         // 일치하는 단어 찾아서 True 설정
         for (int i=0;i<this.content.length();i++)
             this.matchWords.add(false);
         Arrays.stream(words).forEach(this::findIndexes);
-    }
-
-    private void preprocessContent() {
-        this.content = content.replaceAll("#","")
-                .replaceAll("\n"," ")
-                .replaceAll("\t", " ")
-                .replaceAll("\\*", "")
-                .replaceAll("---", "")
-                .replaceAll("`", "")
-                .replaceAll("<u>", "")
-                .replaceAll("</u>", "")
-                .replaceAll("\\|", "")
-                .replaceAll(":", "")
-                .replaceAll("<br>", "")
-                .replaceAll("!\\[(.*?)]\\((.*?)\\)","[이미지]")
-                .replaceAll("]\\((.*?)\\)","]")
-                .trim();
-    }
-
-    private void refineContent() {
-        this.content = content.replaceAll("!\\[(.*?)\\.\\.\\.@\\$_%!\\^","[이미지]...")
-                .replaceAll("]\\((.*?)\\.\\.\\.@\\$_%!\\^","]...")
-                .replaceAll("!\\[(.*?)]\\((.*?)\\)","[이미지]")
-                .replaceAll("]\\((.*?)\\)","]")
-                .replace("@$_%!^","")
-                .trim();
     }
 
     private void findIndexes(String word) {
