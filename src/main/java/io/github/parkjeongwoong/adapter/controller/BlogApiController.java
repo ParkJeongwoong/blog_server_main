@@ -64,16 +64,16 @@ public class BlogApiController {
         return blogUsecase.getArticle(category, categoryId);
     }
 
-    @GetMapping("/search/old/article/{word}")
+    @GetMapping("/search/article/{word}")
     public List<ArticleSearchResultDto> search_by_word(@PathVariable("word") String words) { return blogUsecase.searchArticleByWord(words, 0); }
-    @GetMapping("/search/old/article/{word}/{offset}")
+    @GetMapping("/search/article/{word}/{offset}")
     public List<ArticleSearchResultDto> search_by_word_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
         return blogUsecase.searchArticleByWord(words, offset);
     }
 
-    @GetMapping("/search/article/{word}")
+    @GetMapping("/search/test/article/{word}")
     public List<ArticleSearchResultDto> search_article(@PathVariable("word") String words) { return searchUsecase.searchArticle(words, 0); }
-    @GetMapping("/search/article/{word}/{offset}")
+    @GetMapping("/search/test/article/{word}/{offset}")
     public List<ArticleSearchResultDto> search_article_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
         return searchUsecase.searchArticle(words, offset);
     }
