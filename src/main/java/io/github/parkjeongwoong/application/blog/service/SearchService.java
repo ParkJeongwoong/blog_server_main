@@ -28,8 +28,8 @@ public class SearchService implements SearchUsecase {
                 .collect(Collectors.toList());
         List<ArticleSearchResultDto> searchResult = QinvertedIndexRepository.searchArticle(searchList, offset);
         searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord(wordArray));
-        if (searchResult.size()>10) {
-            searchResult.get(10).setMatchCount(-1);
+        if (searchResult.size()>100) {
+            searchResult.get(100).setMatchCount(-1);
         }
         searchResult.sort(Collections.reverseOrder());
         return searchResult;

@@ -24,15 +24,15 @@ public class InvertedIndexRepositoryImpl implements InvertedIndexRepositoryCusto
         words.forEach(word->builder.or(invertedIndex.term.contains(word)));
 
         return jpaQueryFactory.select(invertedIndex.documentId)
-                                .from(invertedIndex)
-                                .where(builder).limit(101).offset(offset)
-                                .groupBy(invertedIndex.documentId)
-                                .orderBy(invertedIndex.priorityScore.sum().desc())
-                                .fetch()
-                                .stream().map(documentId->new ArticleSearchResultDto(
-                                        articleRepository.findById(documentId)
-                                                .orElseThrow(()->new RuntimeException("역색인 테이블의 게시글 번호가 게시글 테이블에 존재하지 않습니다."))))
-                                .collect(Collectors.toList());
+                .from(invertedIndex)
+                .where(builder).limit(101).offset(offset)
+                .groupBy(invertedIndex.documentId)
+                .orderBy(invertedIndex.priorityScore.sum().desc())
+                .fetch()
+                .stream().map(documentId->new ArticleSearchResultDto(
+                        articleRepository.findById(documentId)
+                                .orElseThrow(()->new RuntimeException("역색인 테이블의 게시글 번호가 게시글 테이블에 존재하지 않습니다."))))
+                .collect(Collectors.toList());
     }
 
 }
