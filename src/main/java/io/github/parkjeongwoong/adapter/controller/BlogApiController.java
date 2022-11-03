@@ -3,6 +3,7 @@ package io.github.parkjeongwoong.adapter.controller;
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
+import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class BlogApiController {
 
     private final BlogUsecase blogUsecase;
     private final FileUsecase fileUsecase;
+    private final SearchUsecase searchUsecase;
 
     // Visit
     @PostMapping("/visited")
@@ -67,6 +69,13 @@ public class BlogApiController {
     @GetMapping("/search/article/{word}/{offset}")
     public List<ArticleSearchResultDto> search_by_word_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
         return blogUsecase.searchArticleByWord(words, offset);
+    }
+
+    @GetMapping("/search/new/article/{word}")
+    public List<ArticleSearchResultDto> search_article(@PathVariable("word") String words) { return searchUsecase.searchArticle(words, 0); }
+    @GetMapping("/search/new/article/{word}/{offset}")
+    public List<ArticleSearchResultDto> search_article_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
+        return searchUsecase.searchArticle(words, offset);
     }
 
     @PutMapping("/article/{articleId}")

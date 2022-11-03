@@ -4,6 +4,6 @@ import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
 
 import java.util.List;
 
-public interface ArticleRepositoryCustom {
-    List<ArticleSearchResultDto> searchByWords(List<String> words, Long offset);
+public interface InvertedIndexRepositoryCustom {
+    List<ArticleSearchResultDto> searchArticle(List<String> words, Long offset);
 }

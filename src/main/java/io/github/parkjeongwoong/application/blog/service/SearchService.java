@@ -1,6 +1,9 @@
 package io.github.parkjeongwoong.application.blog.service;
 
+import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
+import io.github.parkjeongwoong.application.blog.repository.QueryDSL.ArticleRepositoryCustom;
+import io.github.parkjeongwoong.application.blog.repository.QueryDSL.InvertedIndexRepositoryCustom;
 import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
@@ -16,6 +19,21 @@ import java.util.stream.Collectors;
 public class SearchService implements SearchUsecase {
 
     private final InvertedIndexRepository invertedIndexRepository;
+    private final InvertedIndexRepositoryCustom QinvertedIndexRepository;
+
+    public List<ArticleSearchResultDto> searchArticle(String words, long offset) {
+        String[] wordArray = words.split(" ");
+        List<String> searchList = new ArrayList<>(Arrays.asList(wordArray)).stream()
+                .filter(str->str!=null&&!str.equals(""))
+                .collect(Collectors.toList());
+        List<ArticleSearchResultDto> searchResult = QinvertedIndexRepository.searchArticle(searchList, offset);
+        searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord(wordArray));
+        if (searchResult.size()>10) {
+            searchResult.get(10).setMatchCount(-1);
+        }
+        searchResult.sort(Collections.reverseOrder());
+        return searchResult;
+    }
 
     public void makeInvertedIndex(Article article) {
         Map<String, InvertedIndex> processedData = new HashMap<>();
