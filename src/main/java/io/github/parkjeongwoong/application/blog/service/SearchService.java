@@ -1,6 +1,7 @@
 package io.github.parkjeongwoong.application.blog.service;
 
 import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
+import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
 import io.github.parkjeongwoong.application.blog.repository.QueryDSL.ArticleRepositoryCustom;
 import io.github.parkjeongwoong.application.blog.repository.QueryDSL.InvertedIndexRepositoryCustom;
@@ -10,6 +11,7 @@ import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.InvertedIndex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ public class SearchService implements SearchUsecase {
 
     private final InvertedIndexRepository invertedIndexRepository;
     private final InvertedIndexRepositoryCustom QinvertedIndexRepository;
+    private final ArticleRepository articleRepository;
 
     public List<ArticleSearchResultDto> searchArticle(String words, long offset) {
         String[] wordArray = words.split(" ");
@@ -35,6 +38,13 @@ public class SearchService implements SearchUsecase {
         return searchResult;
     }
 
+    @Transactional
+    public void invertedIndexProcess() {
+        invertedIndexRepository.deleteAll();
+        articleRepository.findAll().forEach(this::makeInvertedIndex);
+    }
+
+    @Transactional
     public void makeInvertedIndex(Article article) {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};

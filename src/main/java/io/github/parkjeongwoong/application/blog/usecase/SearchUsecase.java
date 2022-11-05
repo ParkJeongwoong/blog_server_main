@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface SearchUsecase {
     List<ArticleSearchResultDto> searchArticle(String words, long offset);
+    void invertedIndexProcess();
     void makeInvertedIndex(Article article);
 }
