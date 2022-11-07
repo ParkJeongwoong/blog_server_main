@@ -20,19 +20,21 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
     private String content;
     private String date;
     private List<Boolean> matchWords = new ArrayList<>();
-    private int matchCount = 0;
+    private int matchCount = 0; // 삭제 예정
+    private long priorityScore;
 
-    public ArticleSearchResultDto(Article entity) {
+    public ArticleSearchResultDto(Article entity, Long priorityScore) {
         this.title = entity.getTitle();
         this.category = entity.getCategory();
         this.categoryId = entity.getCategoryId();
         this.subCategory = entity.getSubCategory();
         this.content = entity.getContent();
         this.date = entity.getDate();
+        this.priorityScore = priorityScore;
     }
 
     public void findWord(String[] words) {
-        Arrays.stream(words).forEach(this::matchingWord);
+//        Arrays.stream(words).forEach(this::matchingWord); // 삭제 예쩡
         this.content = TextRefining.preprocessingContent(this.content);
 
         if (this.content.length() > 300) {
@@ -77,6 +79,7 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
         }
     }
 
+    // 삭제 예정
     private void matchingWord(String word) {
         int index_title = this.title.indexOf(word);
         int index = this.content.indexOf(word);
@@ -92,6 +95,7 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
 
     }
 
+    // 삭제 예정
     @Override
     public int compareTo(ArticleSearchResultDto articleSearchResultDto) {
         return articleSearchResultDto.getMatchCount() - this.matchCount;

@@ -34,7 +34,7 @@ public class SearchService implements SearchUsecase {
         if (searchResult.size()>100) {
             searchResult.get(100).setMatchCount(-1);
         }
-        searchResult.sort(Collections.reverseOrder());
+//        searchResult.sort(Collections.reverseOrder()); // 삭제 예정
         return searchResult;
     }
 

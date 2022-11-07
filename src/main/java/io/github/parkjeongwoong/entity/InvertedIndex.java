@@ -38,7 +38,7 @@ public class InvertedIndex {
     public void addPriorityScore(String textType) {
         switch (textType) {
             case "title":
-                this.priorityScore += 5;
+                this.priorityScore += 20;
             case "content":
                 this.priorityScore += 1;
         }
