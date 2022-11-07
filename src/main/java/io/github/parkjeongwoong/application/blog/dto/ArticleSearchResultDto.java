@@ -23,6 +23,17 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
     private int matchCount = 0; // 삭제 예정
     private long priorityScore;
 
+    // 삭제 예정
+    public ArticleSearchResultDto(Article entity) {
+        this.title = entity.getTitle();
+        this.category = entity.getCategory();
+        this.categoryId = entity.getCategoryId();
+        this.subCategory = entity.getSubCategory();
+        this.content = entity.getContent();
+        this.date = entity.getDate();
+        this.priorityScore = priorityScore;
+    }
+
     public ArticleSearchResultDto(Article entity, Long priorityScore) {
         this.title = entity.getTitle();
         this.category = entity.getCategory();
