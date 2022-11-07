@@ -64,9 +64,9 @@ public class BlogApiController {
         return blogUsecase.getArticle(category, categoryId);
     }
 
-    @GetMapping("/search/article/{word}")
+    @GetMapping("/search/old/article/{word}")
     public List<ArticleSearchResultDto> search_by_word(@PathVariable("word") String words) { return blogUsecase.searchArticleByWord(words, 0); }
-    @GetMapping("/search/article/{word}/{offset}")
+    @GetMapping("/search/old/article/{word}/{offset}")
     public List<ArticleSearchResultDto> search_by_word_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
         return blogUsecase.searchArticleByWord(words, offset);
     }
@@ -74,9 +74,9 @@ public class BlogApiController {
     @PutMapping("/search/make-inverted-index")
     public void make_inverted_index() { searchUsecase.invertedIndexProcess(); }
 
-    @GetMapping("/search/test/article/{word}")
+    @GetMapping("/search/article/{word}")
     public List<ArticleSearchResultDto> search_article(@PathVariable("word") String words) { return searchUsecase.searchArticle(words, 0); }
-    @GetMapping("/search/test/article/{word}/{offset}")
+    @GetMapping("/search/article/{word}/{offset}")
     public List<ArticleSearchResultDto> search_article_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
         return searchUsecase.searchArticle(words, offset);
     }
