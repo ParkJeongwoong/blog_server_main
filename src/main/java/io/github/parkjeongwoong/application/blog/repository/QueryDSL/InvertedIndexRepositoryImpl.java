@@ -27,7 +27,7 @@ public class InvertedIndexRepositoryImpl implements InvertedIndexRepositoryCusto
                 .from(invertedIndex)
                 .where(builder).limit(101).offset(offset)
                 .groupBy(invertedIndex.documentId)
-                .orderBy(invertedIndex.priorityScore.sum().desc())
+                .orderBy(invertedIndex.priorityScore.sum().asc())
                 .fetch()
                 .stream().map(result->new ArticleSearchResultDto(
                         articleRepository.findById(result.get(invertedIndex.documentId))
