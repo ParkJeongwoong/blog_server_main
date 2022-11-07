@@ -14,16 +14,16 @@ public class InvertedIndex {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
+    @Column(length = 20, nullable = false)
     private String term;
 
-    @Column
+    @Column(nullable = false)
     private long documentId;
 
     @Column
     private long firstPosition;
 
-    @Column
+    @Column(nullable = false)
     private long priorityScore;
 
     @Builder
