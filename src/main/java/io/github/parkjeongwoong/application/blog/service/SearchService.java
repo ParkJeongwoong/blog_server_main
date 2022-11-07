@@ -61,6 +61,7 @@ public class SearchService implements SearchUsecase {
 
         // InvertedIndex 생성 - title
         titleWords.forEach(word->{
+            if (word.length() > 20) return;
             if (processedData.containsKey(word)) {
                 processedData.get(word).addPriorityScore("title");
             }
