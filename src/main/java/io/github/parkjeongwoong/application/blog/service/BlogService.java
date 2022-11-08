@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
-import io.github.parkjeongwoong.application.blog.repository.QueryDSL.ArticleRepositoryCustom;
 import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
@@ -34,7 +33,6 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
-    private final ArticleRepositoryCustom QarticleRepository;
     private WebClient webClient;
 
     @Value("${backup.server}")
@@ -137,20 +135,6 @@ public class BlogService implements BlogUsecase {
             valueOperations.set(redis_key, article, 7, TimeUnit.DAYS);
         }
         return article;
-    }
-
-    public List<ArticleSearchResultDto> searchArticleByWord(String words, long offset) {
-        String[] wordArray = words.split(" ");
-        List<String> searchList = new ArrayList<>(Arrays.asList(wordArray)).stream()
-                .filter(str->str!=null&&!str.equals(""))
-                .collect(Collectors.toList());
-        List<ArticleSearchResultDto> searchResult = QarticleRepository.searchByWords(searchList, offset);
-        searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord(wordArray));
-        if (searchResult.size()>10) {
-            searchResult.get(10).setMatchCount(-1);
-        }
-        searchResult.sort(Collections.reverseOrder());
-        return searchResult;
     }
 
     public byte[] getImage(String imageName) throws IOException {

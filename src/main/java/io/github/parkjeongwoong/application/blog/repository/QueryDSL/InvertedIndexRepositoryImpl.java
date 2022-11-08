@@ -27,12 +27,12 @@ public class InvertedIndexRepositoryImpl implements InvertedIndexRepositoryCusto
                 .from(invertedIndex)
                 .where(builder).limit(101).offset(offset)
                 .groupBy(invertedIndex.documentId)
-                .orderBy(invertedIndex.priorityScore.sum().asc())
                 .fetch()
                 .stream().map(result->new ArticleSearchResultDto(
                         articleRepository.findById(result.get(invertedIndex.documentId))
                                 .orElseThrow(()->new RuntimeException("역색인 테이블의 게시글 번호가 게시글 테이블에 존재하지 않습니다."))
-                       , result.get(invertedIndex.priorityScore.sum())))
+                        , result.get(invertedIndex.priorityScore.sum())
+                        , words))
                 .collect(Collectors.toList());
     }
 

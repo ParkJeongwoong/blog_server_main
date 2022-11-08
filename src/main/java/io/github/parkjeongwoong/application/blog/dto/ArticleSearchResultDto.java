@@ -1,9 +1,7 @@
 package io.github.parkjeongwoong.application.blog.dto;
 
-import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
 import io.github.parkjeongwoong.entity.Article;
-import io.github.parkjeongwoong.entity.InvertedIndex;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,11 +18,10 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
     private String content;
     private String date;
     private List<Boolean> matchWords = new ArrayList<>();
-    private int matchCount = 0; // 삭제 예정
     private long priorityScore;
+    private List<String> searchWords;
 
-    // 삭제 예정
-    public ArticleSearchResultDto(Article entity) {
+    public ArticleSearchResultDto(Article entity, Long priorityScore, List<String> searchWords) {
         this.title = entity.getTitle();
         this.category = entity.getCategory();
         this.categoryId = entity.getCategoryId();
@@ -32,25 +29,15 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
         this.content = entity.getContent();
         this.date = entity.getDate();
         this.priorityScore = priorityScore;
+        this.searchWords = searchWords;
     }
 
-    public ArticleSearchResultDto(Article entity, Long priorityScore) {
-        this.title = entity.getTitle();
-        this.category = entity.getCategory();
-        this.categoryId = entity.getCategoryId();
-        this.subCategory = entity.getSubCategory();
-        this.content = entity.getContent();
-        this.date = entity.getDate();
-        this.priorityScore = priorityScore;
-    }
-
-    public void findWord(String[] words) {
-//        Arrays.stream(words).forEach(this::matchingWord); // 삭제 예쩡
+    public void findWord() {
         this.content = TextRefining.preprocessingContent(this.content);
+        String lowercase_content = this.content.toLowerCase(Locale.ROOT);
 
         if (this.content.length() > 300) {
-            String lowercase_content = this.content.toLowerCase(Locale.ROOT);
-            List<Integer> indexes = Arrays.stream(words).map(lowercase_content::indexOf).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
+            List<Integer> indexes = this.searchWords.stream().map(lowercase_content::indexOf).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
             int start_index = indexes.get(0);
             int blankCount = 0;
 
@@ -76,39 +63,22 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
         // 일치하는 단어 찾아서 True 설정
         for (int i=0;i<this.content.length();i++)
             this.matchWords.add(false);
-        Arrays.stream(words).forEach(this::findIndexes);
+        searchWords.forEach(word->findIndexes(word, lowercase_content));
     }
 
-    private void findIndexes(String word) {
-        int index = this.content.indexOf(word);
+    private void findIndexes(String word, String lowercase_content) {
+        int index = lowercase_content.indexOf(word);
 
         while(index != -1) {
             for (int i=0;i<word.length();i++) {
                 this.matchWords.set(index+i, true);
             }
-            index = this.content.indexOf(word, index+word.length());
+            index = lowercase_content.indexOf(word, index+word.length());
         }
     }
 
-    // 삭제 예정
-    private void matchingWord(String word) {
-        int index_title = this.title.indexOf(word);
-        int index = this.content.indexOf(word);
-
-        while (index_title != -1) {
-            this.matchCount += 5;
-            index_title = this.title.indexOf(word, index_title+word.length());
-        }
-        while(index != -1) {
-            this.matchCount += 1;
-            index = this.content.indexOf(word, index+word.length());
-        }
-
-    }
-
-    // 삭제 예정
     @Override
     public int compareTo(ArticleSearchResultDto articleSearchResultDto) {
-        return articleSearchResultDto.getMatchCount() - this.matchCount;
+        return (int) (articleSearchResultDto.getPriorityScore() - this.priorityScore);
     }
 }

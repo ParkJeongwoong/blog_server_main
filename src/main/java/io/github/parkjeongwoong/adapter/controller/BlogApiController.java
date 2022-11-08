@@ -64,13 +64,6 @@ public class BlogApiController {
         return blogUsecase.getArticle(category, categoryId);
     }
 
-    @GetMapping("/search/old/article/{word}")
-    public List<ArticleSearchResultDto> search_by_word(@PathVariable("word") String words) { return blogUsecase.searchArticleByWord(words, 0); }
-    @GetMapping("/search/old/article/{word}/{offset}")
-    public List<ArticleSearchResultDto> search_by_word_offset(@PathVariable("word") String words, @PathVariable("offset") Long offset) {
-        return blogUsecase.searchArticleByWord(words, offset);
-    }
-
     @PutMapping("/search/make-inverted-index")
     public void make_inverted_index() { searchUsecase.invertedIndexProcess(); }
 

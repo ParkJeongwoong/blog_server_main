@@ -3,7 +3,6 @@ package io.github.parkjeongwoong.application.blog.service;
 import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
-import io.github.parkjeongwoong.application.blog.repository.QueryDSL.ArticleRepositoryCustom;
 import io.github.parkjeongwoong.application.blog.repository.QueryDSL.InvertedIndexRepositoryCustom;
 import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
@@ -28,13 +27,14 @@ public class SearchService implements SearchUsecase {
         String[] wordArray = words.split(" ");
         List<String> searchList = new ArrayList<>(Arrays.asList(wordArray)).stream()
                 .filter(str->str!=null&&!str.equals(""))
+                .map(String::toLowerCase)
                 .collect(Collectors.toList());
         List<ArticleSearchResultDto> searchResult = QinvertedIndexRepository.searchArticle(searchList, offset);
-        searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord(wordArray));
+        searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord());
         if (searchResult.size()>100) {
-            searchResult.get(100).setMatchCount(-1);
+            searchResult.get(100).setPriorityScore(-1);
         }
-//        searchResult.sort(Collections.reverseOrder()); // 삭제 예정
+        searchResult.sort(Collections.reverseOrder()); // 삭제 예정
         return searchResult;
     }
 
