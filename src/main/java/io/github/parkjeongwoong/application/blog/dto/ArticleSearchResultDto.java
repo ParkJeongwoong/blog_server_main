@@ -34,10 +34,9 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
 
     public void findWord() {
         this.content = TextRefining.preprocessingContent(this.content);
-        String lowercase_content = this.content.toLowerCase(Locale.ROOT);
 
         if (this.content.length() > 300) {
-            List<Integer> indexes = this.searchWords.stream().map(lowercase_content::indexOf).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
+            List<Integer> indexes = this.searchWords.stream().map(this.content.toLowerCase(Locale.ROOT)::indexOf).filter(index->!index.equals(-1)).sorted().collect(Collectors.toList());
             int start_index = indexes.get(0);
             int blankCount = 0;
 
@@ -61,9 +60,8 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
         this.content = TextRefining.postprocessingContent(this.content);
 
         // 일치하는 단어 찾아서 True 설정
-        for (int i=0;i<this.content.length();i++)
-            this.matchWords.add(false);
-        searchWords.forEach(word->findIndexes(word, lowercase_content));
+        for (int i=0;i<this.content.length();i++) this.matchWords.add(false);
+        searchWords.forEach(word->findIndexes(word, this.content.toLowerCase(Locale.ROOT)));
     }
 
     private void findIndexes(String word, String lowercase_content) {
