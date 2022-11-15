@@ -1,9 +1,11 @@
 package io.github.parkjeongwoong.adapter.controller;
 
 import io.github.parkjeongwoong.application.blog.dto.*;
+import io.github.parkjeongwoong.application.blog.service.RecommendationService;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
+import io.github.parkjeongwoong.entity.SimilarityIndex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -85,4 +87,12 @@ public class BlogApiController {
     // Media
     @GetMapping(value = "image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] get_image(@PathVariable("imageName") String imageName) throws IOException { return blogUsecase.getImage(imageName); }
+
+    private final RecommendationService recommendationService;
+    @GetMapping(value = "test0")
+    public void test0() { searchUsecase.invertedIndexProcess(); }
+    @GetMapping(value = "test1")
+    public void test1() { recommendationService.saveSimilarArticle(1); }
+    @GetMapping(value = "test2")
+    public List<SimilarityIndex> test2() { return recommendationService.get5SimilarArticle(1); }
 }

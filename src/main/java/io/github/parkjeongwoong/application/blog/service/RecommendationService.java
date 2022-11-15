@@ -4,19 +4,20 @@ import io.github.parkjeongwoong.application.blog.repository.InvertedIndexReposit
 import io.github.parkjeongwoong.application.blog.repository.SimilarityRepository;
 import io.github.parkjeongwoong.entity.InvertedIndex;
 import io.github.parkjeongwoong.entity.SimilarityIndex;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class RecommendationService {
 
-    private InvertedIndexRepository invertedIndexRepository;
-    private SimilarityRepository similarityRepository;
+    private final InvertedIndexRepository invertedIndexRepository;
+    private final SimilarityRepository similarityRepository;
 
-    private void get5MostUsedWords(long documentId) {
-
+    public List<SimilarityIndex> get5SimilarArticle(long documentId) {
+        return similarityRepository.findTop5ByDocumentIdOrderBySimilarityScoreDesc(documentId);
     }
 
     public void saveSimilarArticle(long documentId) {
