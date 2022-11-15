@@ -8,6 +8,7 @@ import io.github.parkjeongwoong.entity.InvertedIndex;
 import io.github.parkjeongwoong.entity.SimilarityIndex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,11 +24,16 @@ public class RecommendationService implements RecommendationUsecase {
         return similarityRepository.findTop5ByDocumentIdOrderBySimilarityScoreDesc(documentId);
     }
 
-    public void makeSimilarityIndex() {
-        articleRepository.findAll().forEach(article -> saveSimilarArticle(article.getId()));
+    @Transactional
+    public void makeSimilarityIndex(long offset) {
+        articleRepository.findAll().forEach(article -> {
+            if (article.getId() >= offset)
+                saveSimilarArticle(article.getId());
+        });
     }
 
-    private void saveSimilarArticle(long documentId) {
+    @Transactional
+    public void saveSimilarArticle(long documentId) {
         // invertedIndex에서 동일한 term을 가진 두 문서의 priorityScore를 곱해서 유사도 점수를 파악
         List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
         invertedIndexList.forEach(invertedIndex -> {

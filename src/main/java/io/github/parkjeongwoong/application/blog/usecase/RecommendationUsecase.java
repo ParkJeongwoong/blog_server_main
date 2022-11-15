@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface RecommendationUsecase {
     List<SimilarityIndex> get5SimilarArticle(long documentId);
-    void makeSimilarityIndex();
+    void makeSimilarityIndex(long offset);
+    void saveSimilarArticle(long documentId);
 }

@@ -92,7 +92,9 @@ public class BlogApiController {
 
     // Recommendation
     @PutMapping("/recommend/make-similarity-index")
-    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndex(); }
+    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndex(0); }
+    @PutMapping("/recommend/make-similarity-index/{offset}")
+    public void make_similarity_index_offset(@PathVariable("offset") Long offset) { recommendationUsecase.makeSimilarityIndex(offset); }
 
     @GetMapping(value = "/recommend/get-5-similar-article/{articleId}")
     public List<SimilarityIndex> get_5_similar_article(@PathVariable("articleId") long articleId) {
