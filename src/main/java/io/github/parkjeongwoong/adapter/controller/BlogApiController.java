@@ -1,9 +1,9 @@
 package io.github.parkjeongwoong.adapter.controller;
 
 import io.github.parkjeongwoong.application.blog.dto.*;
-import io.github.parkjeongwoong.application.blog.service.RecommendationService;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
+import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.SimilarityIndex;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +22,7 @@ public class BlogApiController {
     private final BlogUsecase blogUsecase;
     private final FileUsecase fileUsecase;
     private final SearchUsecase searchUsecase;
+    private final RecommendationUsecase recommendationUsecase;
 
     // Visit
     @PostMapping("/visited")
@@ -66,6 +67,7 @@ public class BlogApiController {
         return blogUsecase.getArticle(category, categoryId);
     }
 
+    // Search
     @PutMapping("/search/make-inverted-index")
     public void make_inverted_index() { searchUsecase.invertedIndexProcess(); }
 
@@ -88,11 +90,12 @@ public class BlogApiController {
     @GetMapping(value = "image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] get_image(@PathVariable("imageName") String imageName) throws IOException { return blogUsecase.getImage(imageName); }
 
-    private final RecommendationService recommendationService;
-    @GetMapping(value = "test0")
-    public void test0() { searchUsecase.invertedIndexProcess(); }
-    @GetMapping(value = "test1")
-    public void test1() { recommendationService.saveSimilarArticle(1); }
-    @GetMapping(value = "test2")
-    public List<SimilarityIndex> test2() { return recommendationService.get5SimilarArticle(1); }
+    // Recommendation
+    @PutMapping("/recommend/make-similarity-index")
+    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndex(); }
+
+    @GetMapping(value = "/recommend/get-5-similar-article/{articleId}")
+    public List<SimilarityIndex> get_5_similar_article(@PathVariable("articleId") long articleId) {
+        return recommendationUsecase.get5SimilarArticle(articleId);
+    }
 }
