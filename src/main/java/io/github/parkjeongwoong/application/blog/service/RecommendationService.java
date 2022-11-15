@@ -27,11 +27,21 @@ public class RecommendationService implements RecommendationUsecase {
     @Transactional
     public void makeSimilarityIndex(long offset) {
         articleRepository.findAll().forEach(article -> {
-            if (article.getId() >= offset) {
-                System.out.println(article.getId() + "유사도 분석 시작");
-                saveSimilarArticle(article.getId());
-                System.out.println(article.getId() + "유사도 분석 완료");
-            }
+            if (article.getId() < offset) return;
+            System.out.println(article.getId() + "유사도 분석 시작");
+            saveSimilarArticle(article.getId());
+            System.out.println(article.getId() + "유사도 분석 완료");
+        });
+    }
+
+    @Transactional
+    public void makeSimilarityIndex(long offset, long endpoint) {
+        articleRepository.findAll().forEach(article -> {
+            if (article.getId() < offset) return;
+            if (article.getId() > endpoint) return;
+            System.out.println(article.getId() + "유사도 분석 시작");
+            saveSimilarArticle(article.getId());
+            System.out.println(article.getId() + "유사도 분석 완료");
         });
     }
 
