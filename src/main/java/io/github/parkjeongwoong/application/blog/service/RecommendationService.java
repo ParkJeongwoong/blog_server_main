@@ -4,6 +4,7 @@ import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
 import io.github.parkjeongwoong.application.blog.repository.SimilarityRepository;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
+import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.CompositeKey.SimilarityIndexKey;
 import io.github.parkjeongwoong.entity.InvertedIndex;
 import io.github.parkjeongwoong.entity.SimilarityIndex;
@@ -27,17 +28,21 @@ public class RecommendationService implements RecommendationUsecase {
 
     @Transactional
     public void makeSimilarityIndex(long offset) {
-        articleRepository.findAllDesc().forEach(article -> {
+        List<Article> articleList = articleRepository.findAllDesc();
+        System.out.println("ARTICLE SIZE : " + articleList.size());
+        articleList.forEach(article -> {
             if (article.getId() < offset) return;
             System.out.println(article.getId() + " 유사도 분석 시작");
             saveSimilarArticle(article.getId());
-            System.out.println(article.getId() + " 유사도 분석 완료");
+            System.out.println(article.getId() + " 유사도 분석 완료//");
         });
     }
 
     @Transactional
     public void makeSimilarityIndex(long offset, long endpoint) {
-        articleRepository.findAllDesc().forEach(article -> {
+        List<Article> articleList = articleRepository.findAllDesc();
+        System.out.println("ARTICLE SIZE : " + articleList.size());
+        articleList.forEach(article -> {
             if (article.getId() < offset) return;
             if (article.getId() > endpoint) return;
             System.out.println(article.getId() + " 유사도 분석 시작");
@@ -48,6 +53,7 @@ public class RecommendationService implements RecommendationUsecase {
 
     @Transactional
     public void saveSimilarArticle(long documentId) {
+        System.out.println("Log. Document # " + documentId);
         // Todo : 성능 개선
         // invertedIndex에서 동일한 term을 가진 두 문서의 priorityScore를 곱해서 유사도 점수를 파악
         List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
