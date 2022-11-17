@@ -1,5 +1,6 @@
 package io.github.parkjeongwoong.entity;
 
+import io.github.parkjeongwoong.entity.CompositeKey.SimilarityIndexKey;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,15 +10,12 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Entity
+@IdClass(SimilarityIndexKey.class)
 public class SimilarityIndex {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(nullable = false)
     private long documentId;
 
-    @Column(nullable = false)
+    @Id
     private long counterDocumentId;
 
     @Column(nullable = false)
