@@ -1,7 +1,5 @@
 package io.github.parkjeongwoong.application.blog.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
@@ -16,7 +14,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.PostConstruct;
@@ -54,25 +51,6 @@ public class BlogService implements BlogUsecase {
 
         if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         visitorRepository.save(visitor);
-
-        // Backup
-        if (backupServer != null && backupServer.length() != 0) {
-            String backupUrl = backupServer + "/blog-api/visited";
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonString = null;
-            try {
-                jsonString = mapper.writeValueAsString(requestDto);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            String response = webClient.post()
-                            .uri(backupUrl)
-                            .body(BodyInserters.fromValue(jsonString))
-                            .retrieve()
-                            .bodyToMono(String.class)
-                            .block();
-            System.out.println("Backup To : " + backupServer);
-        }
     }
 
     @Transactional
@@ -160,8 +138,6 @@ public class BlogService implements BlogUsecase {
 
     private boolean isRecordable(String ip) {
         String[] notRecordableArray = {"58.140.57.190" // 공덕 ip
-                                 , "118.221.44.132" // 양평동 ip1
-                                 , "39.115.83.55" // 양평동 ip2
                                  , "222.110.245.239"}; // 키움증권 ip
         ArrayList<String> notRecordableList = new ArrayList<>(Arrays.asList(notRecordableArray));
         return notRecordableList.contains(ip) || Objects.equals(ip.substring(0,6), "66.249"); // 구글 봇

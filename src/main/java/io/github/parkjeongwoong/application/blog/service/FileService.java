@@ -4,8 +4,6 @@ import io.github.parkjeongwoong.application.blog.dto.ArticleUpdateRequestDto;
 import io.github.parkjeongwoong.application.blog.dto.CommonResponseDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
-import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
-import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 import io.github.parkjeongwoong.entity.Image;
@@ -13,11 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -27,8 +23,6 @@ import java.util.List;
 public class FileService implements FileUsecase {
     private final ArticleRepository articleRepository;
     private final ImageRepository imageRepository;
-    private final SearchUsecase searchUsecase;
-    private final RecommendationUsecase recommendationUsecase;
 
     @Transactional
     public CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest) {
@@ -47,8 +41,6 @@ public class FileService implements FileUsecase {
 
             long articleId = articleRepository.save(article).getId();
             save_images(imageFiles, changedImageNames, articleId);
-            searchUsecase.makeInvertedIndex(article);
-            recommendationUsecase.saveSimilarArticle(articleId);
             return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
