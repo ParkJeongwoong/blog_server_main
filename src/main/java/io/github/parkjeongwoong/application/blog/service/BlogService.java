@@ -6,17 +6,11 @@ import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,17 +24,9 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
-    private WebClient webClient;
 
     @Value("${backup.server}")
     String backupServer;
-    @Autowired
-    private final RedisTemplate redisTemplate;
-
-    @PostConstruct
-    public void initWebClient() {
-        webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
-    }
 
     public void visited(VisitorSaveRequestDto requestDto) {
         Visitor visitor = requestDto.toEntity();
@@ -105,34 +91,19 @@ public class BlogService implements BlogUsecase {
     }
 
     public ArticleResponseDto getArticle(String category, Long categoryId) {
-        ValueOperations<String, ArticleResponseDto> valueOperations = redisTemplate.opsForValue();
-        String redis_key = "a"+category+categoryId;
-        ArticleResponseDto article = valueOperations.get(redis_key);
-        if (article == null) {
-            article = articleRepository.findByCategoryAndId(category, categoryId);
-            valueOperations.set(redis_key, article, 7, TimeUnit.DAYS);
-        }
-        return article;
+        return articleRepository.findByCategoryAndId(category, categoryId);
     }
 
     public byte[] getImage(String imageName) throws IOException {
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        String[] imagePath_split = imageName.split("/");
-        String imagePath = String.join(File.separator, imagePath_split);
-        String redis_key = "i"+imagePath;
-        String image_string = valueOperations.get(redis_key);
-        if (image_string == null || image_string.length() == 0) {
-            InputStream imageStream = new FileInputStream(System.getProperty("user.dir")
-                    + File.separator + "src"
-                    + File.separator + "main"
-                    + File.separator + "resources"
-                    + File.separator + "article_images"
-                    + File.separator + imageName);
-            byte[] image = StreamUtils.copyToByteArray(imageStream);
-            image_string = Base64.getEncoder().encodeToString(image);
-            imageStream.close();
-            valueOperations.set(redis_key, image_string, 3, TimeUnit.DAYS);
-        }
+        InputStream imageStream = new FileInputStream(System.getProperty("user.dir")
+                + File.separator + "src"
+                + File.separator + "main"
+                + File.separator + "resources"
+                + File.separator + "article_images"
+                + File.separator + imageName);
+        byte[] image = StreamUtils.copyToByteArray(imageStream);
+        String image_string = Base64.getEncoder().encodeToString(image);
+        imageStream.close();
         return Base64.getDecoder().decode(image_string);
     }
 
