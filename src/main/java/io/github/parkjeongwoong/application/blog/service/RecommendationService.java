@@ -1,5 +1,6 @@
 package io.github.parkjeongwoong.application.blog.service;
 
+import io.github.parkjeongwoong.application.blog.dto.RecommendedArticleResponseDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
 import io.github.parkjeongwoong.application.blog.repository.SimilarityRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -22,8 +24,12 @@ public class RecommendationService implements RecommendationUsecase {
     private final InvertedIndexRepository invertedIndexRepository;
     private final SimilarityRepository similarityRepository;
 
-    public List<SimilarityIndex> get5SimilarArticle(long documentId) {
-        return similarityRepository.findTop5ByDocumentIdOrderBySimilarityScoreDesc(documentId);
+    public List<RecommendedArticleResponseDto> get5SimilarArticle(long documentId) {
+        return similarityRepository.findTop5ByDocumentIdOrderBySimilarityScoreDesc(documentId)
+                .stream().map(entity-> new RecommendedArticleResponseDto(
+                        articleRepository.findById(entity.getCounterDocumentId())
+                                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. articleId = " + entity.getDocumentId()))))
+                .collect(Collectors.toList());
     }
 
     @Transactional

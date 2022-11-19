@@ -5,7 +5,6 @@ import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
-import io.github.parkjeongwoong.entity.SimilarityIndex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -99,7 +98,7 @@ public class BlogApiController {
     public void make_similarity_index_offset(@PathVariable("offset") Long offset, @PathVariable("endpoint") Long endpoint) { recommendationUsecase.makeSimilarityIndex(offset, endpoint); }
 
     @GetMapping(value = "/recommend/get-5-similar-article/{articleId}")
-    public List<SimilarityIndex> get_5_similar_article(@PathVariable("articleId") long articleId) {
+    public List<RecommendedArticleResponseDto> get_5_similar_article(@PathVariable("articleId") long articleId) {
         return recommendationUsecase.get5SimilarArticle(articleId);
     }
 }
