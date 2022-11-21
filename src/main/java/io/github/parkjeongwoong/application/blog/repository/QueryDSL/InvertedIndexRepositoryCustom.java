@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface InvertedIndexRepositoryCustom {
     List<ArticleSearchResultDto> searchArticle(List<String> words, Long offset);
+    long getDocumentFrequency(String term);
 }

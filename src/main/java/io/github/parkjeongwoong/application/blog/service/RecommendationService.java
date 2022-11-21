@@ -62,10 +62,12 @@ public class RecommendationService implements RecommendationUsecase {
         System.out.println("Log. Document # " + documentId);
         // Todo : 성능 개선
         // invertedIndex에서 동일한 term을 가진 두 문서의 priorityScore를 곱해서 유사도 점수를 파악
+        similarityRepository.deleteAllByDocumentId(documentId);
+
         List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
         invertedIndexList.forEach(invertedIndex -> {
             String term = invertedIndex.getTerm();
-            long termScore = invertedIndex.getPriorityScore();
+            long termScore = (long) invertedIndex.getPriorityScore();
             
             invertedIndexRepository.findAllByTerm(term).forEach(index -> {
                 if (documentId == index.getDocumentId()) return;
@@ -75,7 +77,7 @@ public class RecommendationService implements RecommendationUsecase {
                                                                 .documentId(documentId)
                                                                 .counterDocumentId(index.getDocumentId())
                                                                 .build();
-                long multipledScore = termScore * index.getPriorityScore();
+                long multipledScore = (long) (termScore * index.getPriorityScore());
                 similarityIndex.addScore(multipledScore);
                 similarityRepository.save(similarityIndex);
             });

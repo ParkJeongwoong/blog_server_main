@@ -8,6 +8,8 @@ import java.util.List;
 
 
 public interface SimilarityRepository extends JpaRepository<SimilarityIndex, SimilarityIndexKey> {
+
     List<SimilarityIndex> findTop5ByDocumentIdOrderBySimilarityScoreDesc(long documentId);
+    void deleteAllByDocumentId(long documentId);
 
 }

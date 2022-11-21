@@ -18,10 +18,10 @@ public class ArticleSearchResultDto implements Comparable<ArticleSearchResultDto
     private String content;
     private String date;
     private List<Boolean> matchWords = new ArrayList<>();
-    private long priorityScore;
+    private double priorityScore;
     private List<String> searchWords;
 
-    public ArticleSearchResultDto(Article entity, Long priorityScore, List<String> searchWords) {
+    public ArticleSearchResultDto(Article entity, double priorityScore, List<String> searchWords) {
         this.title = entity.getTitle();
         this.category = entity.getCategory();
         this.categoryId = entity.getCategoryId();

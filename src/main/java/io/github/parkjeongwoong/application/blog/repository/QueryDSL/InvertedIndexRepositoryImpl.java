@@ -36,4 +36,11 @@ public class InvertedIndexRepositoryImpl implements InvertedIndexRepositoryCusto
                 .collect(Collectors.toList());
     }
 
+    public long getDocumentFrequency(String term) {
+        QInvertedIndex invertedIndex = QInvertedIndex.invertedIndex;
+        return jpaQueryFactory.selectFrom(invertedIndex)
+                .where(invertedIndex.term.eq(term))
+                .fetchCount();
+    }
+
 }

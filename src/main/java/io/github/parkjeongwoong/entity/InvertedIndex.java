@@ -24,23 +24,34 @@ public class InvertedIndex {
     private long firstPosition;
 
     @Column(nullable = false)
-    private long priorityScore;
+    private long termFrequency;
+
+    @Column(nullable = false)
+    private double priorityScore;
 
     @Builder
     public InvertedIndex(String term, long documentId, long firstPosition, String textType) {
         this.term = term;
         this.documentId = documentId;
         this.firstPosition = firstPosition;
+        this.termFrequency = 0;
         this.priorityScore = 0;
-        addPriorityScore(textType);
+        addTermFrequency(textType);
     }
 
-    public void addPriorityScore(String textType) {
+    public void addTermFrequency(String textType) {
         switch (textType) {
             case "title":
-                this.priorityScore += 20;
+                this.termFrequency += 20;
             case "content":
-                this.priorityScore += 1;
+                this.termFrequency += 1;
         }
+        this.priorityScore = termFrequency;
+    }
+
+    public void TFIDF(double df, long totalArticleNumber) {
+        double tf = this.termFrequency;
+        double idf = Math.log(totalArticleNumber / df);
+        this.priorityScore = tf * idf;
     }
 }

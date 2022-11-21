@@ -30,7 +30,7 @@ public class SearchService implements SearchUsecase {
                 .map(String::toLowerCase)
                 .collect(Collectors.toList());
         List<ArticleSearchResultDto> searchResult = QinvertedIndexRepository.searchArticle(searchList, offset);
-        searchResult.forEach(articleSearchResultDto -> articleSearchResultDto.findWord());
+        searchResult.forEach(ArticleSearchResultDto::findWord);
         if (searchResult.size()>100) {
             searchResult.get(100).setPriorityScore(-1);
         }
@@ -42,6 +42,10 @@ public class SearchService implements SearchUsecase {
     public void invertedIndexProcess() {
         invertedIndexRepository.deleteAll();
         articleRepository.findAll().forEach(this::makeInvertedIndex);
+        invertedIndexRepository.findAll().forEach(invertedIndex -> invertedIndex.TFIDF(
+                QinvertedIndexRepository.getDocumentFrequency(invertedIndex.getTerm()),
+                articleRepository.count()
+        ));
     }
 
     @Transactional
@@ -63,7 +67,7 @@ public class SearchService implements SearchUsecase {
         titleWords.forEach(word->{
             if (word.length() > 20) return;
             if (processedData.containsKey(word)) {
-                processedData.get(word).addPriorityScore("title");
+                processedData.get(word).addTermFrequency("title");
             }
             else {
                 processedData.put(word, InvertedIndex.builder()
@@ -80,7 +84,7 @@ public class SearchService implements SearchUsecase {
         contentWords.forEach(word->{
             if (word.length() > 20) return;
             if (processedData.containsKey(word)) {
-                processedData.get(word).addPriorityScore("content");
+                processedData.get(word).addTermFrequency("content");
             }
             else {
                 processedData.put(word, InvertedIndex.builder()
