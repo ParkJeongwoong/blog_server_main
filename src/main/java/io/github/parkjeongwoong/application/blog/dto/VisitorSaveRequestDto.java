@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 public class VisitorSaveRequestDto {
     private String url;
     private String lastPage;
+    private String ip;
 
     @Builder
     public VisitorSaveRequestDto(String url, String lastPage) {
@@ -22,10 +23,23 @@ public class VisitorSaveRequestDto {
         this.lastPage = lastPage;
     }
 
+    private void setIp() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        System.out.println("X-FORWARDED-FOR : " + ip);
+        if (ip == null) {
+            ip = request.getRemoteAddr();
+            System.out.println("getRemoteAddr : " + ip);
+        }
+        this.ip = ip;
+    }
+
     public Visitor toEntity() {
+        if (this.ip == null) setIp();
         return Visitor.builder()
                 .url(url)
                 .lastPage(lastPage)
+                .ip(ip)
                 .build();
     }
 }

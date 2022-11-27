@@ -1,7 +1,5 @@
 package io.github.parkjeongwoong.application.blog.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
@@ -9,17 +7,12 @@ import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,46 +26,20 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
-    private WebClient webClient;
+    private final ServerSynchronizingService serverSynchronizingService;
 
-    @Value("${backup.server}")
-    String backupServer;
     @Autowired
     private final RedisTemplate redisTemplate;
 
-    @PostConstruct
-    public void initWebClient() {
-        webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
-    }
-
     public void visited(VisitorSaveRequestDto requestDto) {
         Visitor visitor = requestDto.toEntity();
-        visitor.setData();
         System.out.println("Visitor just visited : " + visitor.getUrl());
         System.out.println("Visitor's IP address is : " + visitor.getIp());
         System.out.println("Current Time : " + new Date());
 
         if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         visitorRepository.save(visitor);
-
-        // Backup
-        if (backupServer != null && backupServer.length() != 0) {
-            String backupUrl = backupServer + "/blog-api/visited";
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonString = null;
-            try {
-                jsonString = mapper.writeValueAsString(requestDto);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            String response = webClient.post()
-                            .uri(backupUrl)
-                            .body(BodyInserters.fromValue(jsonString))
-                            .retrieve()
-                            .bodyToMono(String.class)
-                            .block();
-            System.out.println("Backup To : " + backupServer);
-        }
+        serverSynchronizingService.visitRequest(requestDto);// Backup
     }
 
     @Transactional

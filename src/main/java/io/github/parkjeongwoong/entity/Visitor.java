@@ -30,14 +30,11 @@ public class Visitor extends BaseTimeEntity {
     private boolean justVisited;
 
     @Builder
-    public Visitor(String url, String lastPage) {
+    public Visitor(String url, String lastPage, String ip) {
         this.url = url;
         this.lastPage = lastPage;
-    }
-
-    public void setData() {
-        setIp();
-        setJustVisited();
+        this.ip = ip;
+        this.justVisited = this.lastPage == null;
     }
 
     private void setIp() {
