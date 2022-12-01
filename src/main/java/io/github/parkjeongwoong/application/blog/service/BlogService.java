@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -33,13 +35,15 @@ public class BlogService implements BlogUsecase {
 
     public void visited(VisitorSaveRequestDto requestDto) {
         Visitor visitor = requestDto.toEntity();
+        LocalDateTime currentTime = LocalDateTime.now();
         System.out.println("Visitor just visited : " + visitor.getUrl());
         System.out.println("Visitor's IP address is : " + visitor.getIp());
-        System.out.println("Current Time : " + new Date());
+        System.out.println("Current Time : " + currentTime);
 
-        if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
+//        if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
+        if (isStrangeAccess(visitor.getIp(), currentTime)) return ;
         visitorRepository.save(visitor);
-        serverSynchronizingService.visitRequest(requestDto);// Backup
+//        serverSynchronizingService.visitSync(requestDto);// Backup
     }
 
     @Transactional
@@ -69,7 +73,6 @@ public class BlogService implements BlogUsecase {
     }
 
     public List<DailyVisitorResponseDto> countDailyVisitor() {
-//        return null;
         return visitorRepository.countDailyVisitor().stream()
                 .map(DailyVisitorResponseDto::new)
                 .collect(Collectors.toList());
@@ -132,5 +135,16 @@ public class BlogService implements BlogUsecase {
                                  , "222.110.245.239"}; // 키움증권 ip
         ArrayList<String> notRecordableList = new ArrayList<>(Arrays.asList(notRecordableArray));
         return notRecordableList.contains(ip) || Objects.equals(ip.substring(0,6), "66.249"); // 구글 봇
+    }
+
+    private boolean isStrangeAccess(String ip, LocalDateTime date) {
+        Visitor lastVisitor = visitorRepository.findTop1ByOrderByIdDesc();
+        if (lastVisitor == null || !Objects.equals(lastVisitor.getIp(), ip)) return false;
+        Duration duration = Duration.between(lastVisitor.getCreatedDate(), date);
+        if (duration.getSeconds() < 1 && duration.getNano() < 700000000) {
+            System.out.println("Warning Too Fast Access! Duration : " + duration.getSeconds() + "." + String.format("%09d",duration.getNano()) + "s");
+            return true;
+        }
+        return false;
     }
 }

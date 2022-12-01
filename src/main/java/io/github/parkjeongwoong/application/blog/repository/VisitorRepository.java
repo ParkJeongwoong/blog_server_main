@@ -30,4 +30,6 @@ public interface VisitorRepository extends JpaRepository<Visitor, Long> {
 
     @Query("SELECT ip as ip, count(1) as count FROM Visitor WHERE CREATED_DATE BETWEEN :startDate AND :endDate GROUP BY IP ORDER BY 2 DESC")
     List<VisitorCountResponseDtoInterface> countVisitor_date(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    Visitor findTop1ByOrderByIdDesc();
 }

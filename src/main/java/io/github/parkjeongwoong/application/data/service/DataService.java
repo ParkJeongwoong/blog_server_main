@@ -22,23 +22,7 @@ public class DataService implements DataUsecase {
             return ;
         }
 
-        String filePath = default_filePath + filename;
-        System.out.println("File Path : " + filePath);
-        File dFile = new File(filePath);
-        if (!dFile.exists()) {
-            System.out.println("Find file again");
-
-            filePath = System.getProperty("user.dir")
-                    + File.separator + "src"
-                    + File.separator + "main"
-                    + File.separator + "resources"
-                    + File.separator + "downloadable"
-                    + File.separator + filename;
-            dFile = new File(filePath);
-        } else {System.out.println("Find file");}
-
-        System.out.println(filename);
-        System.out.println(filePath);
+        File dFile = getFilePath(filename);
 
         int fSize = (int) dFile.length();
 
@@ -70,4 +54,51 @@ public class DataService implements DataUsecase {
         }
 
     }
+
+    public boolean backupDB(String dbUsername, String dbPassword, String dbName, String outputFile) throws IOException, InterruptedException {
+
+        String command = String.format("mysqldump -u %s -p %s --add-drop-table --databases %s -r %s",
+                dbUsername, dbPassword, dbName, outputFile);
+        Process process = Runtime.getRuntime().exec(command);
+        int processComplete = process.waitFor();
+        return processComplete == 0;
+
+    }
+
+    public boolean restoreDB(String dbUsername, String dbPassword, String dbName, String sourceFile)
+            throws IOException, InterruptedException {
+
+        String[] command = new String[]{
+                "mysql",
+                "-u " + dbUsername,
+                "-p " + dbPassword,
+                "-e",
+                " source " + sourceFile,
+                dbName
+        };
+        Process runtimeProcess = Runtime.getRuntime().exec(command);
+        int processComplete = runtimeProcess.waitFor();
+        return processComplete == 0;
+
+    }
+
+    private File getFilePath(String filename) {
+        String filePath = default_filePath + filename;
+        File dFile = new File(filePath);
+        if (!dFile.exists()) {
+            System.out.println("Find file again");
+
+            filePath = System.getProperty("user.dir")
+                    + File.separator + "src"
+                    + File.separator + "main"
+                    + File.separator + "resources"
+                    + File.separator + "downloadable"
+                    + File.separator + filename;
+            dFile = new File(filePath);
+        } else {System.out.println("Find file");}
+
+        System.out.println("File Path : " + filePath);
+        return dFile;
+    }
+
 }

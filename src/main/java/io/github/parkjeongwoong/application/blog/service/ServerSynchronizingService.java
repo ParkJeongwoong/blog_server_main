@@ -2,6 +2,7 @@ package io.github.parkjeongwoong.application.blog.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.parkjeongwoong.application.blog.dto.SendArticleSyncDto;
 import io.github.parkjeongwoong.application.blog.dto.VisitorSaveRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,34 +26,56 @@ public class ServerSynchronizingService {
         webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
     }
 
-    public void visitRequest(VisitorSaveRequestDto requestDto) {
+    public void visitSync(VisitorSaveRequestDto requestDto) {
         if (isBackupServerNotExist()) return;
 
         String BACKUP_URL = backupServer + "/blog-api/visited";
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = null;
 
-        try { jsonString = mapper.writeValueAsString(requestDto); }
-        catch (JsonProcessingException e) { e.printStackTrace(); }
+        try {
+            String jsonString = mapper.writeValueAsString(requestDto);
 
-        String response = webClient.post()
-                .uri(BACKUP_URL)
-                .body(BodyInserters.fromValue(jsonString))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        System.out.println("Backup To : " + backupServer);
+            webClient.post()
+                    .uri(BACKUP_URL)
+                    .body(BodyInserters.fromValue(jsonString))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            System.out.println("Backup To : " + backupServer);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void saveArticleRequest() {
+    public void sendArticleSync(SendArticleSyncDto requestDto) {
+        if (isBackupServerNotExist()) return;
+
+        String BACKUP_URL = backupServer + "/blog-api/upload";
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            String jsonString = mapper.writeValueAsString(requestDto);
+
+            webClient.post()
+                    .uri(BACKUP_URL)
+                    .body(BodyInserters.fromValue(jsonString))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            System.out.println("Backup To : " + backupServer);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public void updateArticleRequest() {
+    public void updateArticleSync() {
 
     }
 
-    public void deleteArticleRequest() {
+    public void deleteArticleSync() {
 
     }
 
