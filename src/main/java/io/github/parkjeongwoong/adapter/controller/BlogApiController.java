@@ -7,6 +7,7 @@ import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -50,6 +51,11 @@ public class BlogApiController {
     @GetMapping("/visitor-rank/{startDate}/{endDate}")
     public List<VisitorCountResponseDto> count_visitor_rank_date(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate) {
         return blogUsecase.countVisitorRank_date(startDate, endDate);
+    }
+
+    @GetMapping("/visitor-timeline/{startDate}/{endDate}")
+    public List<VisitorTimelineDto> get_visitor_timeline(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate) {
+        return blogUsecase.getVisitorTimeline(startDate, endDate);
     }
 
     // Article

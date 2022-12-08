@@ -128,6 +128,12 @@ public class BlogService implements BlogUsecase {
         return Base64.getDecoder().decode(image_string);
     }
 
+    public List<VisitorTimelineDto> getVisitorTimeline(String startDate, String endDate) {
+        return visitorRepository.getVisitorTimeline(startDate, endDate+"T23:59:59.99").stream()
+                .map(VisitorTimelineDto::new)
+                .collect(Collectors.toList());
+    }
+
     private boolean isRecordable(String ip) {
         String[] notRecordableArray = {"58.140.57.190" // 공덕 ip
                                  , "118.221.44.132" // 양평동 ip1

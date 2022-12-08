@@ -26,10 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BlogServiceTest {
 
     @Autowired
-    private VisitorRepository visitorRepository;
+    VisitorRepository visitorRepository;
 
     @Autowired
-    private BlogService blogService;
+    BlogService blogService;
 
     @Autowired
     MockHttpServletRequest request;
@@ -45,7 +45,7 @@ public class BlogServiceTest {
     public void cleanup() { visitorRepository.deleteAll(); }
 
     @Test
-    public void test_visited() throws Exception {
+    public void test_visited() {
         // Given
         String localAddress = "127.0.0.1";
         String testUrl1 = "https://www.test.com";

@@ -23,7 +23,7 @@ public class VisitorTest {
     }
 
     @Test
-    public void test_setData() {
+    public void test_setIp() {
         // Given
         String testUrl1 = "https://www.test.com";
         String testUrl2 = "https://github.com/ParkJeongwoong/";
@@ -35,9 +35,9 @@ public class VisitorTest {
                 .lastPage(testUrl1)
                 .build();
 
-        // When
-        visitor1.setData();
-        visitor2.setData();
+        // When -- setData 메서드가 없어짐
+//        visitor1.setData();
+//        visitor2.setData();
 
         // Then
         assertThat(visitor1.getIp()).isEqualTo("127.0.0.1");

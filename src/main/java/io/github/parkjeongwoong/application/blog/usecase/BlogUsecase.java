@@ -13,8 +13,9 @@ public interface BlogUsecase {
     List<PageVisitorResponseDto> countVisitor_firstPage();
     List<DailyVisitorResponseDto> countDailyVisitor();
     List<VisitorCountResponseDto> countVisitorRank();
-    List<VisitorCountResponseDto> countVisitorRank_date(String star, String end);
+    List<VisitorCountResponseDto> countVisitorRank_date(String startDate, String endDate);
     List<ArticleResponseDto> getArticleList();
     ArticleResponseDto getArticle(String category, Long categoryId);
     byte[] getImage(String imageName) throws IOException;
+    List<VisitorTimelineDto> getVisitorTimeline(String startDate, String endDate);
 }

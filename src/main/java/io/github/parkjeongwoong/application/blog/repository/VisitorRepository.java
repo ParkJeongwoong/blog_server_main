@@ -1,10 +1,7 @@
 package io.github.parkjeongwoong.application.blog.repository;
 
-import io.github.parkjeongwoong.application.blog.dto.DailyVisitorResponseDtoInterface;
-import io.github.parkjeongwoong.application.blog.dto.VisitorCountResponseDto;
-import io.github.parkjeongwoong.application.blog.dto.VisitorCountResponseDtoInterface;
+import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.entity.Visitor;
-import io.github.parkjeongwoong.application.blog.dto.PageVisitorResponseDtoInterface;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,4 +29,7 @@ public interface VisitorRepository extends JpaRepository<Visitor, Long> {
     List<VisitorCountResponseDtoInterface> countVisitor_date(@Param("startDate") String startDate, @Param("endDate") String endDate);
 
     Visitor findTop1ByOrderByIdDesc();
+
+    @Query("SELECT v FROM Visitor v WHERE CREATED_DATE BETWEEN :startDate AND :endDate ORDER BY 1 DESC")
+    List<Visitor> getVisitorTimeline(@Param("startDate") String startDate, @Param("endDate") String endDate);
 }

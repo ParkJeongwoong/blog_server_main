@@ -1,0 +1,42 @@
+{{>layout/header}}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h1>시간대별 방문객</h1>
+<div>
+    <canvas id="myChart"></canvas>
+</div>
+
+<script>
+  const labels = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+  ];
+
+  const data = {
+    labels: 'test',
+    datasets: [{
+      label: 'My First dataset',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: [0, 10, 5, 2, 20, 30, 45],
+    }]
+  };
+
+  const config = {
+    type: 'line',
+    data: data,
+    options: {}
+  };
+
+  const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );
+</script>
+
+{{>layout/footer}}
