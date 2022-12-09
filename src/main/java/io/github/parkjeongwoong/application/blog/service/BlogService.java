@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -128,10 +129,21 @@ public class BlogService implements BlogUsecase {
         return Base64.getDecoder().decode(image_string);
     }
 
-    public List<VisitorTimelineDto> getVisitorTimeline(String startDate, String endDate) {
-        return visitorRepository.getVisitorTimeline(startDate, endDate+"T23:59:59.99").stream()
+    public List<VisitorTimelineResponseDto> getVisitorTimeline(String startDate, String endDate) {
+        List<VisitorTimelineDto> timelineDtos = visitorRepository.getVisitorTimeline(startDate, endDate+"T23:59:59.99").stream()
                 .map(VisitorTimelineDto::new)
                 .collect(Collectors.toList());
+        startDate = startDate.replaceAll("-","");
+        endDate = endDate.replaceAll("-","");
+        return makeTimelineResponse(timelineDtos
+                , LocalDate.of(
+                        Integer.parseInt(startDate.substring(0,4)),
+                        Integer.parseInt(startDate.substring(4,6)),
+                        Integer.parseInt(startDate.substring(6,8)))
+                , LocalDate.of(
+                        Integer.parseInt(endDate.substring(0,4)),
+                        Integer.parseInt(endDate.substring(4,6)),
+                        Integer.parseInt(endDate.substring(6,8))));
     }
 
     private boolean isRecordable(String ip) {
@@ -152,5 +164,61 @@ public class BlogService implements BlogUsecase {
             return true;
         }
         return false;
+    }
+
+    private List<VisitorTimelineResponseDto> makeTimelineResponse(List<VisitorTimelineDto> timelineDtos, LocalDate startDate, LocalDate endDate) {
+        if (timelineDtos.size()==0) return new ArrayList<>();
+        List<VisitorTimelineResponseDto> responseDtos = new ArrayList<>();
+        VisitorTimelineDto timelineDto;
+        LocalDate date = null;
+        int hour = 0;
+        boolean getNewDtoTF = true;
+
+        LocalDate firstDate = timelineDtos.get(timelineDtos.size()-1).getVisitedDate().toLocalDate();
+        LocalDate currentDate = startDate;
+        VisitorTimelineResponseDto timelineResponseDto = new VisitorTimelineResponseDto(currentDate, 0);
+
+        while (currentDate.isBefore(firstDate)) {
+            responseDtos.add(timelineResponseDto);
+            int currentHour = timelineResponseDto.getHour()+1;
+            if (currentHour > 24) {
+                currentDate = currentDate.plusDays(1);
+                currentHour = 0;
+            }
+            timelineResponseDto = new VisitorTimelineResponseDto(currentDate, currentHour);
+        }
+        while (timelineDtos.size() > 0) {
+            if (getNewDtoTF) {
+                timelineDto = timelineDtos.remove(timelineDtos.size()-1);
+                date = timelineDto.getVisitedDate().toLocalDate();
+                hour = timelineDto.getVisitedDate().getHour();
+                getNewDtoTF = false;
+            }
+
+            if (date.isEqual(timelineResponseDto.getDate()) && hour == timelineResponseDto.getHour()) {
+                timelineResponseDto.addCount();
+                getNewDtoTF = true;
+            }
+            else {
+                responseDtos.add(timelineResponseDto);
+                int currentHour = timelineResponseDto.getHour()+1;
+                if (currentHour == 24) {
+                    currentDate = currentDate.plusDays(1);
+                    currentHour = 0;
+                }
+                timelineResponseDto = new VisitorTimelineResponseDto(currentDate, currentHour);
+            }
+        }
+        while (true) {
+            responseDtos.add(timelineResponseDto);
+            int currentHour = timelineResponseDto.getHour()+1;
+            if (currentHour > 24) {
+                currentDate = currentDate.plusDays(1);
+                currentHour = 0;
+            }
+            if (currentDate.isAfter(endDate)) break;
+            timelineResponseDto = new VisitorTimelineResponseDto(currentDate, currentHour);
+        }
+        return responseDtos;
     }
 }

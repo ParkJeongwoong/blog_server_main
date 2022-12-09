@@ -4,39 +4,19 @@
 
 <h1>시간대별 방문객</h1>
 <div>
-    <canvas id="myChart"></canvas>
+    <button type="button" class="btn btn-primary" id="btn-monitoring">조회</button>
+    <input type="text" id="monitoring-from-date" placeholder="조회 시작일을 입력하세요">
+    <input type="text" id="monitoring-to-date" placeholder="조회 종료일을 입력하세요">
+</div>
+<div>
+    <canvas id="timeline"></canvas>
 </div>
 
-<script>
-  const labels = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-  ];
+<!--footer 대신 직접 입력-->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-  const data = {
-    labels: 'test',
-    datasets: [{
-      label: 'My First dataset',
-      backgroundColor: 'rgb(255, 99, 132)',
-      borderColor: 'rgb(255, 99, 132)',
-      data: [0, 10, 5, 2, 20, 30, 45],
-    }]
-  };
-
-  const config = {
-    type: 'line',
-    data: data,
-    options: {}
-  };
-
-  const myChart = new Chart(
-    document.getElementById('myChart'),
-    config
-  );
-</script>
-
-{{>layout/footer}}
+<!--monitoring.js 추가-->
+<script src="/js/app/monitoring.js"></script>
+</body>
+</html>

@@ -54,7 +54,7 @@ public class BlogApiController {
     }
 
     @GetMapping("/visitor-timeline/{startDate}/{endDate}")
-    public List<VisitorTimelineDto> get_visitor_timeline(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate) {
+    public List<VisitorTimelineResponseDto> get_visitor_timeline(@PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate) {
         return blogUsecase.getVisitorTimeline(startDate, endDate);
     }
 

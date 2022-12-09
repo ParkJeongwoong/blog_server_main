@@ -17,5 +17,5 @@ public interface BlogUsecase {
     List<ArticleResponseDto> getArticleList();
     ArticleResponseDto getArticle(String category, Long categoryId);
     byte[] getImage(String imageName) throws IOException;
-    List<VisitorTimelineDto> getVisitorTimeline(String startDate, String endDate);
+    List<VisitorTimelineResponseDto> getVisitorTimeline(String startDate, String endDate);
 }

@@ -34,7 +34,7 @@ var main = {
             dataType: 'json',
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data)
-        }).done(function() {
+        }).done(function () {
             alert('글이 등록되었습니다.');
             window.location.href = '/';
         }).fail(function (error) {
@@ -55,7 +55,7 @@ var main = {
             dataType: 'json',
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data)
-        }).done(function() {
+        }).done(function () {
             alert('글이 수정되었습니다.');
             window.location.href = '/';
         }).fail(function (error) {
@@ -70,7 +70,7 @@ var main = {
             url: '/api/v1/posts/'+id,
             dataType: 'json',
             contentType:'application/json; charset=utf-8'
-        }).done(function() {
+        }).done(function () {
             alert('글이 삭제되었습니다.');
             window.location.href = '/';
         }).fail(function (error) {
@@ -88,8 +88,8 @@ var main = {
             dataType: 'text',
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data)
-        }).done(function() {
-            alert('방문하였습니다.');
+        }).done(function () {
+            console.log('방문하였습니다.');
             window.location.href = '/';
         }).fail(function (error) {
             alert(JSON.stringify(error));
@@ -117,7 +117,7 @@ var main = {
           , processData : false
           , contentType : false
           , data: markdownForm
-        }).done(function(res) {
+        }).done(function (res) {
             console.log(JSON.stringify(res));
             alert(res.message);
         }).fail(function (error) {
