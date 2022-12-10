@@ -24,9 +24,10 @@ var sub_monitoring = {
                 if (result.hour == 0) {
                     config.data.datasets.push({
                           label: result.date,
-                          backgroundColor: 'rgb(255, '+color2+', '+color3+')',
                           borderColor: 'rgb(255, '+color2+', '+color3+')',
                           data: [],
+                          tension: 0.3,
+                          fill: true
                     });
                 }
                 config.data.datasets[config.data.datasets.length-1].data.push(result.count);

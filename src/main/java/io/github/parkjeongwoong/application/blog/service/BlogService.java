@@ -202,7 +202,7 @@ public class BlogService implements BlogUsecase {
             else {
                 responseDtos.add(timelineResponseDto);
                 int currentHour = timelineResponseDto.getHour()+1;
-                if (currentHour == 24) {
+                if (currentHour > 24) {
                     currentDate = currentDate.plusDays(1);
                     currentHour = 0;
                 }
