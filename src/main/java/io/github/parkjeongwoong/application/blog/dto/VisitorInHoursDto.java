@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @Getter
-public class VisitorTimelineDto {
+public class VisitorInHoursDto {
     private final LocalDateTime visitedDate;
 
-    public VisitorTimelineDto(Visitor entity) {
+    public VisitorInHoursDto(Visitor entity) {
         this.visitedDate = entity.getCreatedDate();
     }
 }

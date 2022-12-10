@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface VisitorRepository extends JpaRepository<Visitor, Long> {
@@ -31,5 +30,5 @@ public interface VisitorRepository extends JpaRepository<Visitor, Long> {
     Visitor findTop1ByOrderByIdDesc();
 
     @Query("SELECT v FROM Visitor v WHERE CREATED_DATE BETWEEN :startDate AND :endDate ORDER BY 1 DESC")
-    List<Visitor> getVisitorTimeline(@Param("startDate") String startDate, @Param("endDate") String endDate);
+    List<Visitor> getVisitorInHours(@Param("startDate") String startDate, @Param("endDate") String endDate);
 }

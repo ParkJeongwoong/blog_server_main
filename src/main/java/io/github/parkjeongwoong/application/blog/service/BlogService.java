@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -129,13 +130,15 @@ public class BlogService implements BlogUsecase {
         return Base64.getDecoder().decode(image_string);
     }
 
-    public List<VisitorTimelineResponseDto> getVisitorTimeline(String startDate, String endDate) {
-        List<VisitorTimelineDto> timelineDtos = visitorRepository.getVisitorTimeline(startDate, endDate+"T23:59:59.99").stream()
-                .map(VisitorTimelineDto::new)
+    public List<VisitorInHoursResponseDto> getVisitorInHours(String startDate, String endDate) throws Exception {
+        if (startDate.length()<10||endDate.length()<10
+            ||!checkDateFormat(startDate)||!checkDateFormat(endDate)) throw new Exception(String.format("날짜 형식이 맞지 않습니다. 입력값 : {%s}, {%s}", startDate, endDate));
+        List<VisitorInHoursDto> visitorInHoursDtos = visitorRepository.getVisitorInHours(startDate, endDate+"T23:59:59.99").stream()
+                .map(VisitorInHoursDto::new)
                 .collect(Collectors.toList());
         startDate = startDate.replaceAll("-","");
         endDate = endDate.replaceAll("-","");
-        return makeTimelineResponse(timelineDtos
+        return makeVisitorInHoursResponse(visitorInHoursDtos
                 , LocalDate.of(
                         Integer.parseInt(startDate.substring(0,4)),
                         Integer.parseInt(startDate.substring(4,6)),
@@ -166,58 +169,70 @@ public class BlogService implements BlogUsecase {
         return false;
     }
 
-    private List<VisitorTimelineResponseDto> makeTimelineResponse(List<VisitorTimelineDto> timelineDtos, LocalDate startDate, LocalDate endDate) {
-        if (timelineDtos.size()==0) return new ArrayList<>();
-        List<VisitorTimelineResponseDto> responseDtos = new ArrayList<>();
-        VisitorTimelineDto timelineDto;
+    private static boolean checkDateFormat(String date) {
+        try {
+            SimpleDateFormat dateFormatParser = new SimpleDateFormat("yyyy-MM-dd"); //검증할 날짜 포맷 설정
+            dateFormatParser.setLenient(false); //false일경우 처리시 입력한 값이 잘못된 형식일 시 오류가 발생
+            dateFormatParser.parse(date); //대상 값 포맷에 적용되는지 확인
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private List<VisitorInHoursResponseDto> makeVisitorInHoursResponse(List<VisitorInHoursDto> visitorInHoursDtos, LocalDate startDate, LocalDate endDate) {
+        if (visitorInHoursDtos.size()==0) return new ArrayList<>();
+        List<VisitorInHoursResponseDto> responseDtos = new ArrayList<>();
+        VisitorInHoursDto visitorInHoursDto;
         LocalDate date = null;
         int hour = 0;
         boolean getNewDtoTF = true;
 
-        LocalDate firstDate = timelineDtos.get(timelineDtos.size()-1).getVisitedDate().toLocalDate();
+        LocalDate firstDate = visitorInHoursDtos.get(visitorInHoursDtos.size()-1).getVisitedDate().toLocalDate();
         LocalDate currentDate = startDate;
-        VisitorTimelineResponseDto timelineResponseDto = new VisitorTimelineResponseDto(currentDate, 0);
+        VisitorInHoursResponseDto visitorInHoursResponseDto = new VisitorInHoursResponseDto(currentDate, 0);
 
         while (currentDate.isBefore(firstDate)) {
-            responseDtos.add(timelineResponseDto);
-            int currentHour = timelineResponseDto.getHour()+1;
+            responseDtos.add(visitorInHoursResponseDto);
+            int currentHour = visitorInHoursResponseDto.getHour()+1;
             if (currentHour > 24) {
                 currentDate = currentDate.plusDays(1);
                 currentHour = 0;
             }
-            timelineResponseDto = new VisitorTimelineResponseDto(currentDate, currentHour);
+            visitorInHoursResponseDto = new VisitorInHoursResponseDto(currentDate, currentHour);
         }
-        while (timelineDtos.size() > 0) {
+        while (visitorInHoursDtos.size() > 0) {
             if (getNewDtoTF) {
-                timelineDto = timelineDtos.remove(timelineDtos.size()-1);
-                date = timelineDto.getVisitedDate().toLocalDate();
-                hour = timelineDto.getVisitedDate().getHour();
+                visitorInHoursDto = visitorInHoursDtos.remove(visitorInHoursDtos.size()-1);
+                date = visitorInHoursDto.getVisitedDate().toLocalDate();
+                hour = visitorInHoursDto.getVisitedDate().getHour();
                 getNewDtoTF = false;
             }
 
-            if (date.isEqual(timelineResponseDto.getDate()) && hour == timelineResponseDto.getHour()) {
-                timelineResponseDto.addCount();
+            if (date.isEqual(visitorInHoursResponseDto.getDate()) && hour == visitorInHoursResponseDto.getHour()) {
+                visitorInHoursResponseDto.addCount();
                 getNewDtoTF = true;
             }
             else {
-                responseDtos.add(timelineResponseDto);
-                int currentHour = timelineResponseDto.getHour()+1;
+                responseDtos.add(visitorInHoursResponseDto);
+                int currentHour = visitorInHoursResponseDto.getHour()+1;
                 if (currentHour > 24) {
                     currentDate = currentDate.plusDays(1);
                     currentHour = 0;
                 }
-                timelineResponseDto = new VisitorTimelineResponseDto(currentDate, currentHour);
+                visitorInHoursResponseDto = new VisitorInHoursResponseDto(currentDate, currentHour);
             }
         }
+        if (!getNewDtoTF) visitorInHoursResponseDto.addCount(); // while문에서 visitorInHoursDtos의 마지막 요소가 addCount를 돌지 않고 나왔을 때 개수 추가
         while (true) {
-            responseDtos.add(timelineResponseDto);
-            int currentHour = timelineResponseDto.getHour()+1;
+            responseDtos.add(visitorInHoursResponseDto);
+            int currentHour = visitorInHoursResponseDto.getHour()+1;
             if (currentHour > 24) {
                 currentDate = currentDate.plusDays(1);
                 currentHour = 0;
             }
             if (currentDate.isAfter(endDate)) break;
-            timelineResponseDto = new VisitorTimelineResponseDto(currentDate, currentHour);
+            visitorInHoursResponseDto = new VisitorInHoursResponseDto(currentDate, currentHour);
         }
         return responseDtos;
     }

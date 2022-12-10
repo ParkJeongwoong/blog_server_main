@@ -4,12 +4,16 @@
 
 <h1>시간대별 방문객</h1>
 <div>
+    <span> 조회할 기간 입력 : </span>
+    <input type="text" id="monitoring-from-date" placeholder="조회 시작일 입력">
+    <input type="text" id="monitoring-to-date" placeholder="조회 종료일 입력">
     <button type="button" class="btn btn-primary" id="btn-monitoring">조회</button>
-    <input type="text" id="monitoring-from-date" placeholder="조회 시작일을 입력하세요">
-    <input type="text" id="monitoring-to-date" placeholder="조회 종료일을 입력하세요">
 </div>
 <div>
-    <canvas class="w-75 h-50" id="timeline"></canvas>
+    <canvas class="w-75 h-50" id="visitorInHours"></canvas>
+</div>
+<div>
+    <canvas class="w-75 h-50" id="cumulativeVisitorInHours"></canvas>
 </div>
 
 <!--footer 대신 직접 입력-->
