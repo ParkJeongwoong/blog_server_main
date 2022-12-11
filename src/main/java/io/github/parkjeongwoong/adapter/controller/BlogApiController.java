@@ -5,7 +5,9 @@ import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
+import io.github.parkjeongwoong.entity.ServerState;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -107,4 +109,15 @@ public class BlogApiController {
     public List<RecommendedArticleResponseDto> get_5_similar_article(@PathVariable("articleId") long articleId) {
         return recommendationUsecase.get5SimilarArticle(articleId);
     }
+
+    // 전역 변수 TEST
+    @Autowired
+    private ServerState serverState;
+    @GetMapping("/checkUpdate")
+    public long checkUpdate() { return serverState.checkArticleUpdate(); }
+    @GetMapping("/setUpdate")
+    public void setUpdate() { serverState.articleIsUpdated(); }
+    @GetMapping("/finishUpdate")
+    public void finishUpdate() { serverState.postArticleUpdateProcessIsDone(); }
+
 }
