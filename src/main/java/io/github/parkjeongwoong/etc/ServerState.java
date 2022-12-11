@@ -1,4 +1,4 @@
-package io.github.parkjeongwoong.entity;
+package io.github.parkjeongwoong.etc;
 
 import org.springframework.stereotype.Component;
 

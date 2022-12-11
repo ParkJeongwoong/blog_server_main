@@ -5,7 +5,7 @@ import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.FileUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
-import io.github.parkjeongwoong.entity.ServerState;
+import io.github.parkjeongwoong.etc.ServerState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

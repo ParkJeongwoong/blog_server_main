@@ -1,7 +1,7 @@
 package io.github.parkjeongwoong.adapter.controller;
 
 import io.github.parkjeongwoong.application.data.usecase.DataUsecase;
-import io.github.parkjeongwoong.entity.ServerState;
+import io.github.parkjeongwoong.etc.ServerState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
