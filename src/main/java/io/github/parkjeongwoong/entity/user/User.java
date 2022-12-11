@@ -1,4 +1,4 @@
-package io.github.parkjeongwoong.entity.example;
+package io.github.parkjeongwoong.entity.user;
 
 import io.github.parkjeongwoong.entity.BaseTimeEntity;
 import lombok.Builder;
