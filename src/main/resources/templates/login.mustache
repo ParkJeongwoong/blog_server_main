@@ -1,0 +1,31 @@
+{{>layout/header}}
+
+<h1>로그인</h1>
+
+<div class="col-md-12">
+    <div class="col-md-4">
+        <form>
+            <div class="mb-3 row">
+                <label for="inputID" class="col-sm-2 col-form-label">UserID</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputID">
+                </div>
+                <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="inputPassword">
+                </div>
+            </div>
+            <a href="/blog/signup" role="button" class="btn btn-secondary">회원가입</a>
+            <button type="button" class="btn btn-warning" id="btn-login">로그인</button>
+        </form>
+    </div>
+</div>
+
+<!--footer 대신 직접 입력-->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!--monitoring.js 추가-->
+<script src="/js/app/login.js"></script>
+</body>
+</html>

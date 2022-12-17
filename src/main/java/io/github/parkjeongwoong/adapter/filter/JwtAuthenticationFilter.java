@@ -1,4 +1,4 @@
-package io.github.parkjeongwoong.config.Auth;
+package io.github.parkjeongwoong.adapter.filter;
 
 import io.github.parkjeongwoong.application.user.dto.AccessJwtAuth;
 import io.github.parkjeongwoong.application.user.service.JwtTokenProvider;
@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        String accessToken = jwtTokenProvider.resolveToken((HttpServletRequest) request, "AccessToken");
+        String accessToken = jwtTokenProvider.resolveToken((HttpServletRequest) request, "accessToken");
 
         if (accessToken != null) {
             try {
@@ -38,10 +38,9 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 }
             } catch (ExpiredJwtException accessTokenExpired) { // accessToken 만료
                 long refreshTokenId = accessTokenExpired.getClaims().get("refreshTokenId", Integer.class); // ExpiredJwtException에서 가져올 때 Integer 클래스로 가져옴
-                String refreshToken_server = userDeatilsService.getRefreshTokenById(refreshTokenId);
-                String refreshToken_client = jwtTokenProvider.resolveToken((HttpServletRequest) request, "RefreshToken");
+                String refreshToken = userDeatilsService.getRefreshTokenById(refreshTokenId);
                 try {
-                    if (jwtTokenProvider.compareRefreshToken(refreshToken_client, refreshToken_server) && jwtTokenProvider.validateToken(refreshToken_client)) {
+                    if (jwtTokenProvider.validateToken(refreshToken)) {
                         String userId = accessTokenExpired.getClaims().getSubject();
                         User user = userDeatilsService.getUser(userId);
                         JwtAuth jwtAuth = new AccessJwtAuth(userId,user.getUserType(),user.getUsername(),refreshTokenId);
@@ -50,7 +49,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                         Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
-                } catch (ExpiredJwtException refreshTokenExpired) {
+                } catch (ExpiredJwtException refreshTokenExpired) { // refreshToken 만료
                     System.out.println("Refresh Token 만료");
                 }
             }

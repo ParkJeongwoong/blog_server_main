@@ -20,14 +20,29 @@ public class UserDeatilsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userName) {
-        return userRepository.findByUsername(userName).orElseThrow(NoSuchElementException::new);
+        try {
+            return userRepository.findByUsername(userName).orElseThrow(NoSuchElementException::new);
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 사용자입니다.");
+            return null;
+        }
     }
 
     public String getRefreshTokenById(long refreshTokenId) {
-        return refreshTokenRepository.findById(refreshTokenId).orElseThrow(NoSuchElementException::new).getValue();
+        try {
+            return refreshTokenRepository.findById(refreshTokenId).orElseThrow(NoSuchElementException::new).getValue();
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 사용자입니다.");
+            return null;
+        }
     }
 
     public User getUser(String userId) {
-        return userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+        try {
+            return userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 사용자입니다.");
+            return null;
+        }
     }
 }

@@ -7,8 +7,10 @@ import io.github.parkjeongwoong.entity.user.User;
 import io.github.parkjeongwoong.entity.user.UserType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -20,7 +22,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDeatilsService userDeatilsService;
 
-    public UserLoginResponseDto login(UserLoginRequestDto requestDto) {
+    public UserLoginResponseDto login(UserLoginRequestDto requestDto, HttpServletResponse response) {
         try {
             User user = userDeatilsService.getUser(requestDto.getUserId());
             boolean result = user.getEncryptedPassword().checkPassword(requestDto.getPassword());
@@ -32,7 +34,14 @@ public class AuthService {
                 long refreshTokenId = refreshTokenRepository.save(refreshTokenEntity).getId();
                 AccessJwtAuth accessJwtAuth = new  AccessJwtAuth(user.getUserId(),user.getUserType(),user.getUsername(),refreshTokenId);
                 String accessToken = jwtTokenProvider.createToken(accessJwtAuth, "access");
-                return UserLoginResponseDto.builder().result(true).accessToken(accessToken).refreshToken(refreshToken).message("로그인에 성공했습니다.").build();
+                ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                        .secure(true)
+                        .path("/") // 쿠키가 저장되는 페이지
+                        .sameSite("Lax")
+                        .httpOnly(true)
+                        .build();
+                response.addHeader("Set-Cookie", cookie.toString());
+                return UserLoginResponseDto.builder().result(true).message("로그인에 성공했습니다.").build();
             } else {
                 log.info("로그인 실패 - 비밀번호 오입력");
                 return UserLoginResponseDto.builder().result(false).message("로그인에 실패했습니다.").build();

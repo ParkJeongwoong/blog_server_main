@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -39,8 +40,6 @@ public class JwtTokenProvider {
     public String createToken(JwtAuth jwtAuth, String requestType) {
         if (!requestType.equals("access") && !requestType.equals("refresh")) return null;
         long validTime = requestType.equals("access") ? 30 * 60 * 1000 : 3 * 60 * 60 * 1000;
-//        long validTime = requestType.equals("access") ? 5 * 1000 : 3 * 60 * 60 * 1000; // Test. AccessToken 5초
-//        long validTime = requestType.equals("access") ? 5 * 1000 : 10 * 1000; // Test. AccessToken 5초 RefreshToken 10초
         // JWT 토큰 정보 저장
         Claims claims = getClaims(jwtAuth, requestType);
 
@@ -55,7 +54,7 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDeatilsService.loadUserByUsername(this.getUserName(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        return userDetails == null ? null : new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String getUserName(String token) {
@@ -63,7 +62,16 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest request, String requestType) {
-        return request.getHeader(requestType);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length>0) {
+            for (Cookie cookie:cookies) {
+                if (cookie.getName().equals(requestType)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+//        return request.getHeader(requestType);
+        return null;
     }
 
     public boolean validateToken(String token) {
@@ -76,10 +84,6 @@ public class JwtTokenProvider {
             log.info(e.toString());
             return false;
         }
-    }
-
-    public boolean compareRefreshToken(String clientToken, String serverToken) {
-        return clientToken.equals(serverToken);
     }
 
     private Map<String, Object> createHeader() {

@@ -7,14 +7,10 @@ import lombok.Getter;
 public class UserLoginResponseDto {
     private final boolean result;
     private final String message;
-    private final String accessToken;
-    private final String refreshToken;
 
     @Builder
-    public UserLoginResponseDto(boolean result, String message, String accessToken, String refreshToken) {
+    public UserLoginResponseDto(boolean result, String message) {
         this.result = result;
         this.message = message;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
     }
 }

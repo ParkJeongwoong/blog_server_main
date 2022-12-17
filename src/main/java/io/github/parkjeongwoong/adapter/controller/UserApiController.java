@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("user")
-public class UserController {
+@RequestMapping("user-api")
+public class UserApiController {
 
     private final UserService userService;
     private final AuthService authService;
@@ -23,10 +25,10 @@ public class UserController {
         return userService.userSignup(requestDto);
     }
 
-    @GetMapping("/login")
-    public UserLoginResponseDto login(@RequestBody UserLoginRequestDto requestDto) {
+    @PostMapping("/login")
+    public UserLoginResponseDto login(@RequestBody UserLoginRequestDto requestDto, HttpServletResponse response) {
         log.info("로그인 시도 : User ID = {}", requestDto.getUserId());
-        return authService.login(requestDto);
+        return authService.login(requestDto, response);
     }
 
     // 임시

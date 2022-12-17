@@ -1,4 +1,4 @@
-var sub_monitoring = {
+var js_monitoring = {
     init : function () {
         var _this = this;
         $('#btn-monitoring').on('click', function () {
@@ -81,7 +81,7 @@ var sub_monitoring = {
     }
 }
 
-sub_monitoring.init();
+js_monitoring.init();
 
 const data = {
     labels: ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'],

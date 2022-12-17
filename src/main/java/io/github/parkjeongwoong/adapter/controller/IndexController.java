@@ -34,11 +34,21 @@ public class IndexController {
         return "posts-update";
     }
 
-    @GetMapping("/blog-api/upload")
+    @GetMapping("/blog/upload")
     public String upload() { return "article_upload"; }
 
-    @GetMapping("/blog-api/monitoring")
+    @GetMapping("/blog/monitoring")
     public String monitoring() {
         return "monitoring";
+    }
+
+    @GetMapping("/blog/signup")
+    public String signup() {
+        return "signup";
+    }
+
+    @GetMapping("/blog/login")
+    public String login() {
+        return "login";
     }
 }
