@@ -2,6 +2,7 @@ package io.github.parkjeongwoong.entity.user;
 
 import io.github.parkjeongwoong.entity.BaseTimeEntity;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.security.MessageDigest;
@@ -9,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+@NoArgsConstructor
 @Entity
 public class Password extends BaseTimeEntity {
 
@@ -18,7 +20,7 @@ public class Password extends BaseTimeEntity {
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    private final User user;
+    private User user;
 
     @Column(nullable = false)
     private String salt;
@@ -34,10 +36,10 @@ public class Password extends BaseTimeEntity {
 
     @Builder
     public Password(User user, String password) throws NoSuchAlgorithmException {
+        this.renewed = false;
+        this.streching = 0;
         this.user = user;
         this.password = passwordEncryption(password);
-        this.streching = 0;
-        this.renewed = false;
     }
 
     public boolean checkPassword(String inputPassword) {

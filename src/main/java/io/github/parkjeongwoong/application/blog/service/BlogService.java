@@ -4,6 +4,7 @@ import io.github.parkjeongwoong.application.blog.dto.*;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
+import io.github.parkjeongwoong.application.blog.usecase.ServerSynchronizingUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 public class BlogService implements BlogUsecase {
     private final VisitorRepository visitorRepository;
     private final ArticleRepository articleRepository;
-    private final ServerSynchronizingService serverSynchronizingService;
+    private final ServerSynchronizingUsecase serverSynchronizingUsecase;
 
     @Autowired
     private final RedisTemplate redisTemplate;
@@ -42,10 +43,10 @@ public class BlogService implements BlogUsecase {
         System.out.println("Visitor's IP address is : " + visitor.getIp());
         System.out.println("Current Time : " + currentTime);
 
-//        if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
+        if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         if (isStrangeAccess(visitor.getIp(), currentTime)) return ;
         visitorRepository.save(visitor);
-//        serverSynchronizingService.visitSync(requestDto);// Backup
+        serverSynchronizingUsecase.visitSync(requestDto);// Backup
     }
 
     @Transactional

@@ -36,9 +36,11 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-mustache')
 
     // Auth
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('io.jsonwebtoken:jjwt:0.9.1')
 //    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
 //    implementation('org.springframework.session:spring-session-jdbc')
-//    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.security:spring-security-test")
 
     // DB
     implementation("org.springframework.session:spring-session-jdbc")
@@ -51,16 +53,20 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-webflux')
 
     // QueryDSL
-    implementation("com.querydsl:querydsl-core:4.4.0")
-    implementation("com.querydsl:querydsl-jpa:4.4.0")
+    implementation("com.querydsl:querydsl-core:5.0.0")
+    implementation("com.querydsl:querydsl-jpa:5.0.0")
     annotationProcessor(
             "jakarta.persistence:jakarta.persistence-api",
             "jakarta.annotation:jakarta.annotation-api",
-            "com.querydsl:querydsl-apt:4.4.0:jpa")
+            "com.querydsl:querydsl-apt:5.0.0:jpa")
 
     // Prometheus
     implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('io.micrometer:micrometer-registry-prometheus')
+
+    // Logging
+    implementation('org.slf4j:jcl-over-slf4j')
+    implementation('ch.qos.logback:logback-classic')
 }
 
 // QueryDSL

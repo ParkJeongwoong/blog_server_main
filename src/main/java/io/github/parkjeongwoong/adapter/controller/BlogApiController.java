@@ -61,7 +61,7 @@ public class BlogApiController {
     }
 
     // Article
-    @PostMapping("/upload")
+    @PostMapping("/article/upload")
     public CommonResponseDto article_upload(MultipartHttpServletRequest multiRequest) {
         return fileUsecase.saveArticle(multiRequest);
     }

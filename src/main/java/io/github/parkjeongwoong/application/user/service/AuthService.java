@@ -1,0 +1,47 @@
+package io.github.parkjeongwoong.application.user.service;
+
+import io.github.parkjeongwoong.application.user.dto.*;
+import io.github.parkjeongwoong.application.user.repository.RefreshTokenRepository;
+import io.github.parkjeongwoong.entity.user.RefreshToken;
+import io.github.parkjeongwoong.entity.user.User;
+import io.github.parkjeongwoong.entity.user.UserType;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
+
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class AuthService {
+
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserDeatilsService userDeatilsService;
+
+    public UserLoginResponseDto login(UserLoginRequestDto requestDto) {
+        try {
+            User user = userDeatilsService.getUser(requestDto.getUserId());
+            boolean result = user.getEncryptedPassword().checkPassword(requestDto.getPassword());
+            if (result) {
+                log.info("로그인 성공");
+                RefreshJwtAuth refreshJwtAuth = new RefreshJwtAuth(user.getUserId(),user.getEmail());
+                String refreshToken = jwtTokenProvider.createToken(refreshJwtAuth, "refresh");
+                RefreshToken refreshTokenEntity = RefreshToken.builder().userId(user.getUserId()).userEmail(user.getEmail()).value(refreshToken).build();
+                long refreshTokenId = refreshTokenRepository.save(refreshTokenEntity).getId();
+                AccessJwtAuth accessJwtAuth = new  AccessJwtAuth(user.getUserId(),user.getUserType(),user.getUsername(),refreshTokenId);
+                String accessToken = jwtTokenProvider.createToken(accessJwtAuth, "access");
+                return UserLoginResponseDto.builder().result(true).accessToken(accessToken).refreshToken(refreshToken).message("로그인에 성공했습니다.").build();
+            } else {
+                log.info("로그인 실패 - 비밀번호 오입력");
+                return UserLoginResponseDto.builder().result(false).message("로그인에 실패했습니다.").build();
+            }
+        }
+        catch (NoSuchElementException e) {
+            log.info("로그인 실패 - 존재하지 않는 ID");
+            System.out.println("존재하지 않는 ID 입니다.");
+            return UserLoginResponseDto.builder().result(false).message("존재하지 않는 ID 입니다.").build();
+        }
+    }
+}
