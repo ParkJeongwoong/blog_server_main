@@ -34,6 +34,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToOne(mappedBy = "user")
     private Password EncryptedPassword;
 
+    @Column
     private String password; // UserDetails용
 
     @Builder

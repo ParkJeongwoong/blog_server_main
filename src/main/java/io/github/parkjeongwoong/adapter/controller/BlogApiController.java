@@ -85,12 +85,12 @@ public class BlogApiController {
         return searchUsecase.searchArticle(words, offset);
     }
 
-    @PutMapping("/article/{articleId}")
+    @PutMapping("/article/upload/{articleId}")
     public CommonResponseDto update_article(@PathVariable("articleId") long articleId, @RequestBody ArticleUpdateRequestDto requestDto) {
         return fileUsecase.updateArticle_string(articleId, requestDto);
     }
 
-    @DeleteMapping("/article/{articleId}")
+    @DeleteMapping("/article/upload/{articleId}")
     public CommonResponseDto delete_article(@PathVariable("articleId") long articleId) { return fileUsecase.deleteArticle(articleId); }
 
     // Media

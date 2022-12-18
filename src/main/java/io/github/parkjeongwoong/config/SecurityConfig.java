@@ -1,4 +1,4 @@
-package io.github.parkjeongwoong.config.Auth;
+package io.github.parkjeongwoong.config;
 
 import io.github.parkjeongwoong.adapter.filter.JwtAuthenticationFilter;
 import io.github.parkjeongwoong.adapter.handler.CustomAccessDeniedHandler;
@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
@@ -39,7 +38,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             // URL 권한 관리
             .authorizeRequests()
             .antMatchers("/data-api/download/**", "/blog-api/articleList", "/user-api/authtest").authenticated() // 인증 필요
-            .antMatchers("/h2-console", "/blog/upload", "/blog-api/article/**", "/user-api/admintest").hasRole("ADMIN") // 인증 & ADMIN 권한 필요
+            .antMatchers("/h2-console", "/blog/upload", "/blog-api/article/upload/**", "/user-api/admintest",
+                    "/recommend/make-similarity-index/**", "/search/make-inverted-index").hasRole("ADMIN") // 인증 & ADMIN 권한 필요
             .anyRequest().permitAll().and() // 다른 모든 Request -> 인증 불필요
             .exceptionHandling() // 인증/인가 실패에 따른 리다이렉트
                 .accessDeniedHandler(new CustomAccessDeniedHandler())
