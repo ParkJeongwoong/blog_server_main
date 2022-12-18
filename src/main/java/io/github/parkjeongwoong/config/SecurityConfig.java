@@ -38,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             // URL 권한 관리
             .authorizeRequests()
             .antMatchers("/data-api/download/**", "/blog-api/articleList", "/user-api/authtest").authenticated() // 인증 필요
-            .antMatchers("/h2-console", "/blog/upload", "/blog-api/article/upload/**", "/user-api/admintest",
+            .antMatchers("/h2-console", "/blog/upload", "/blog-api/article/upload/**", "/user-api/changeAdmin/**", "/user-api/admintest",
                     "/recommend/make-similarity-index/**", "/search/make-inverted-index").hasRole("ADMIN") // 인증 & ADMIN 권한 필요
             .anyRequest().permitAll().and() // 다른 모든 Request -> 인증 불필요
             .exceptionHandling() // 인증/인가 실패에 따른 리다이렉트
