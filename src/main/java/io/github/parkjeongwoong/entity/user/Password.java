@@ -26,7 +26,7 @@ public class Password extends BaseTimeEntity {
     private String salt;
 
     @Column(nullable = false)
-    private int streching;
+    private int stretching;
 
     @Column(nullable = false)
     private String password;
@@ -37,7 +37,7 @@ public class Password extends BaseTimeEntity {
     @Builder
     public Password(User user, String password) throws NoSuchAlgorithmException {
         this.renewed = false;
-        this.streching = 0;
+        this.stretching = 0;
         this.user = user;
         this.password = passwordEncryption(password);
     }
@@ -67,15 +67,15 @@ public class Password extends BaseTimeEntity {
     public String renewPassword() throws NoSuchAlgorithmException {
         this.renewed = true;
         this.salt = getSalt();
-        this.streching = getStretching();
+        this.stretching = getStretching();
         this.password = passwordEncryption(this.password);
         return this.password;
     }
 
     private String passwordEncryption(String inputPassword) throws NoSuchAlgorithmException {
         if (this.salt == null) { this.salt = getSalt(); }
-        if (this.streching == 0) { this.streching = getStretching(); }
-        return getEncrypt(inputPassword, this.salt, this.streching);
+        if (this.stretching == 0) { this.stretching = getStretching(); }
+        return getEncrypt(inputPassword, this.salt, this.stretching);
     }
 
     private String getSalt() {

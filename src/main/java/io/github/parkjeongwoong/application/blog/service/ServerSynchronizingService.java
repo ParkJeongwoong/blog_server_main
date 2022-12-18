@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkjeongwoong.application.blog.dto.SendArticleSyncDto;
 import io.github.parkjeongwoong.application.blog.dto.VisitorSaveRequestDto;
+import io.github.parkjeongwoong.application.blog.usecase.ServerSynchronizingUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +16,7 @@ import javax.annotation.PostConstruct;
 
 @RequiredArgsConstructor
 @Service
-public class ServerSynchronizingService {
+public class ServerSynchronizingService implements ServerSynchronizingUsecase {
     private WebClient webClient;
 
     @Value("${backup.server}")
