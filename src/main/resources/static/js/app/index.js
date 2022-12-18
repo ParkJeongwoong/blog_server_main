@@ -20,6 +20,10 @@ var main = {
         $('#btn-upload').on('click', function () {
             _this.upload();
         });
+
+        $('#btn-logout').on('click', function () {
+            _this.logout();
+        });
     },
     save : function () {
         var data = {
@@ -123,6 +127,16 @@ var main = {
         }).fail(function (error) {
             console.log(JSON.stringify(error));
             alert(error.message);
+        });
+    },
+    logout : function () {
+        $.ajax({
+            type: 'POST',
+            url: '/user-api/logout'
+        }).done(function () {
+            window.location.href = '/';
+        }).fail(function (error) {
+            alert(JSON.stringify(error));
         });
     }
 

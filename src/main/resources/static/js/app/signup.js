@@ -22,7 +22,8 @@ var js_signup = {
             alert('회원가입이 완료되었습니다.');
             window.location.href = '/blog/login';
         }).fail(function (error) {
-            alert(JSON.stringify(error));
+            console.log(JSON.stringify(error));
+            alert("입력한 정보를 다시 확인해주세요.");
         });
     }
 }

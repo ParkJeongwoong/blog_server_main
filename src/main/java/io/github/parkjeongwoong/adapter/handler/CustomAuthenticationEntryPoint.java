@@ -14,6 +14,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
         log.error("가입되지 않은 사용자의 접근");
-        response.sendRedirect("/blog/signup");
+        response.sendRedirect("/blog/login");
     }
 }

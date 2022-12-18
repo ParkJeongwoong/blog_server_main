@@ -4,9 +4,11 @@ import io.github.parkjeongwoong.application.user.dto.AccessJwtAuth;
 import io.github.parkjeongwoong.application.user.service.JwtTokenProvider;
 import io.github.parkjeongwoong.application.user.service.UserDeatilsService;
 import io.github.parkjeongwoong.application.user.dto.JwtAuth;
+import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
@@ -34,13 +36,24 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             try {
                 if (jwtTokenProvider.validateToken(accessToken)) {
                     Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+                    if (authentication == null) {
+                        ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                                .secure(true)
+                                .maxAge(0)
+                                .path("/") // 쿠키가 저장되는 페이지
+                                .sameSite("Lax")
+                                .httpOnly(true)
+                                .build();
+                        ((HttpServletResponse) response).addHeader("Set-Cookie", cookie.toString());
+                    }
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    ((HttpServletResponse) response).setStatus(200);
                 }
             } catch (ExpiredJwtException accessTokenExpired) { // accessToken 만료
                 long refreshTokenId = accessTokenExpired.getClaims().get("refreshTokenId", Integer.class); // ExpiredJwtException에서 가져올 때 Integer 클래스로 가져옴
-                String refreshToken = userDeatilsService.getRefreshTokenById(refreshTokenId);
+                RefreshToken refreshToken = userDeatilsService.getRefreshTokenById(refreshTokenId);
                 try {
-                    if (jwtTokenProvider.validateToken(refreshToken)) {
+                    if (refreshToken.isAvailable() && jwtTokenProvider.validateToken(refreshToken.getValue())) {
                         String userId = accessTokenExpired.getClaims().getSubject();
                         User user = userDeatilsService.getUser(userId);
                         JwtAuth jwtAuth = new AccessJwtAuth(userId,user.getUserType(),user.getUsername(),refreshTokenId);
@@ -48,6 +61,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                         ((HttpServletResponse) response).setHeader("AccessToken", newAccessToken);
                         Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
+                        ((HttpServletResponse) response).setStatus(206);
                     }
                 } catch (ExpiredJwtException refreshTokenExpired) { // refreshToken 만료
                     System.out.println("Refresh Token 만료");

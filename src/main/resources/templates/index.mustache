@@ -4,10 +4,18 @@
 <div class="col-md-12">
     <div class="row">
         <div class="col-md-6">
-            <a href="/blog/login" role="button" class="btn btn-warning">로그인</a>
-            <a href="/blog/signup" role="button" class="btn btn-success">회원가입</a>
-            <button type="button" class="btn btn-primary" id="btn-visit">방문</button>
-            <a href="/posts/save" role="button" class="btn btn-primary">글 등록</a>
+<!--            <button type="button" class="btn btn-primary" id="btn-visit">방문</button>-->
+<!--            <a href="/posts/save" role="button" class="btn btn-primary">글 등록</a>-->
+            <a href="/blog/monitoring" role="button" class="btn btn-dark">일별 방문객</a>
+            <a href="/blog/upload" role="button" class="btn btn-secondary">업로드 (ADMIN)</a>
+            {{^userId}}
+                <a href="/blog/login" role="button" class="btn btn-warning">로그인</a>
+                <a href="/blog/signup" role="button" class="btn btn-success">회원가입</a>
+            {{/userId}}
+            {{#userId}}
+                <button type="button" class="btn btn-warning" id="btn-logout">로그아웃</button>
+                <span> 접속 중 : {{userId}}</span>
+            {{/userId}}
         </div>
     </div>
     <br>

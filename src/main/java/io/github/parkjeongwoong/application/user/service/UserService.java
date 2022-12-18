@@ -9,9 +9,11 @@ import io.github.parkjeongwoong.entity.user.UserType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
 
@@ -24,7 +26,7 @@ public class UserService {
     private final PasswordRepository passwordRepository;
 
     @Transactional
-    public String userSignup(UserSignupRequestDto requestDto) {
+    public String userSignup(UserSignupRequestDto requestDto, HttpServletResponse response) {
         try {
             userIdDuplicationCheck(requestDto.getUserId());
             return signup(requestDto.getUserId(), requestDto.getUserName(), requestDto.getUserEmail(), UserType.USER, requestDto.getUserPassword());
@@ -32,6 +34,7 @@ public class UserService {
         catch (DuplicateKeyException e) {
             e.printStackTrace();
             System.out.println("User ID 중복");
+            response.setStatus(400);
         }
         catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

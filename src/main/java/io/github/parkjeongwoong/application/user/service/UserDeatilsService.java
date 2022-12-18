@@ -2,6 +2,7 @@ package io.github.parkjeongwoong.application.user.service;
 
 import io.github.parkjeongwoong.application.user.repository.RefreshTokenRepository;
 import io.github.parkjeongwoong.application.user.repository.UserRepository;
+import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,9 +29,9 @@ public class UserDeatilsService implements UserDetailsService {
         }
     }
 
-    public String getRefreshTokenById(long refreshTokenId) {
+    public RefreshToken getRefreshTokenById(long refreshTokenId) {
         try {
-            return refreshTokenRepository.findById(refreshTokenId).orElseThrow(NoSuchElementException::new).getValue();
+            return refreshTokenRepository.findById(refreshTokenId).orElseThrow(NoSuchElementException::new);
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 사용자입니다.");
             return null;

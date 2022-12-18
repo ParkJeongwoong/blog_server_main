@@ -24,10 +24,18 @@ public class RefreshToken extends BaseTimeEntity {
     @Column(nullable = false)
     private String value;
 
+    @Column(nullable = false)
+    private boolean available;
+
     @Builder
     public RefreshToken(String userId, String userEmail, String value) {
         this.userId = userId;
         this.userEmail = userEmail;
         this.value = value;
+        this.available = true;
+    }
+
+    public void disableRefreshToken() {
+        this.available = false;
     }
 }

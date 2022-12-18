@@ -18,9 +18,10 @@ var js_login = {
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data)
         }).done(function (data, textStatus, xhr) {
-//            window.location.href = '/';
+            window.location.href = '/';
         }).fail(function (error) {
-            alert(JSON.stringify(error));
+            console.log(JSON.stringify(error));
+            alert("아이디와 비밀번호를 확인해주세요.");
         });
     }
 }

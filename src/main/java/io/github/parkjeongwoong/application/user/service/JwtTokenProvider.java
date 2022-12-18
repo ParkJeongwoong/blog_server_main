@@ -48,7 +48,7 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(new Date()) // 발행시간
                 .setExpiration(new Date(System.currentTimeMillis() + validTime))
-                .signWith(SignatureAlgorithm.HS256, secretKey) // Header의 alg, HS256 값 자동 세팅
+                .signWith(SignatureAlgorithm.HS256, secretKey) // (Header) alg, HS256 값 자동 세팅
                 .compact();
     }
 
@@ -84,6 +84,16 @@ public class JwtTokenProvider {
             log.info(e.toString());
             return false;
         }
+    }
+
+    public String getUserIdFromToken(String token) {
+        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return claims.getBody().getSubject();
+    }
+
+    public long getRefreshTokenIdFromToken(String token) {
+        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return (long) claims.getBody().get("refreshTokenId", Integer.class);
     }
 
     private Map<String, Object> createHeader() {
