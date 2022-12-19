@@ -1,5 +1,6 @@
 package io.github.parkjeongwoong.application.blog.service;
 
+import io.github.parkjeongwoong.application.blog.dto.ArticleResponseDto;
 import io.github.parkjeongwoong.application.blog.dto.ArticleUpdateRequestDto;
 import io.github.parkjeongwoong.application.blog.dto.CommonResponseDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
@@ -10,6 +11,9 @@ import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 import io.github.parkjeongwoong.entity.Image;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service
@@ -27,6 +32,9 @@ public class FileService implements FileUsecase {
     private final ImageRepository imageRepository;
     private final SearchUsecase searchUsecase;
     private final RecommendationUsecase recommendationUsecase;
+
+    @Autowired
+    private final RedisTemplate redisTemplate;
 
     @Transactional
     public CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest) {
@@ -59,6 +67,14 @@ public class FileService implements FileUsecase {
     public CommonResponseDto updateArticle_string(Long articleId, ArticleUpdateRequestDto requestDto) {
         Article article = articleRepository.findById(articleId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. articleId = "+ articleId));
         article.update(null, requestDto.getContent());
+        // Redis 업데이트
+        ValueOperations<String, ArticleResponseDto> valueOperations = redisTemplate.opsForValue();
+        String redis_key = "a"+article.getCategory()+article.getCategoryId();
+        ArticleResponseDto article_redis = valueOperations.get(redis_key);
+        if (article_redis != null) {
+            article_redis.setContent(requestDto.getContent());
+            valueOperations.set(redis_key, article_redis, 7, TimeUnit.DAYS);
+        }
         return new CommonResponseDto("Update Article", "Success", "게시글을 성공적으로 수정했습니다.");
     }
 
