@@ -117,7 +117,7 @@ var main = {
 
         $.ajax({
             type: 'POST'
-          , url: '/blog-api/upload'
+          , url: '/blog-api/article/upload'
           , processData : false
           , contentType : false
           , data: markdownForm

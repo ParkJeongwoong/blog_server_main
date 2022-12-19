@@ -52,52 +52,40 @@ public class SearchService implements SearchUsecase {
     public void makeInvertedIndex(Article article) {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};
-
         long documentId = article.getId();
-        List<String> titleWords = new ArrayList<>(Arrays.asList(TextRefining.preprocessingContent(article.getTitle()).split(" "))).stream()
-                .map(TextRefining::refineWord)
-                .filter(str->str!=null&&!str.equals(""))
-                .collect(Collectors.toList());
-        List<String> contentWords = new ArrayList<>(Arrays.asList(TextRefining.preprocessingContent(article.getContent()).split(" "))).stream()
-                .map(TextRefining::refineWord)
-                .filter(str->str!=null&&!str.equals(""))
-                .collect(Collectors.toList());
 
-        // InvertedIndex 생성 - title
-        titleWords.forEach(word->{
-            if (word.length() > 20) return;
-            if (processedData.containsKey(word)) {
-                processedData.get(word).addTermFrequency("title");
-            }
-            else {
-                processedData.put(word, InvertedIndex.builder()
-                        .term(word)
-                        .documentId(documentId)
-                        .firstPosition(position[0])
-                        .textType("title")
-                        .build());
-            }
-            position[0] ++;
-        });
+        List<String> titleWords = makeRefinedWords(article.getTitle());
+        List<String> contentWords = makeRefinedWords(article.getContent());
 
-        // InvertedIndex 생성 - content
-        contentWords.forEach(word->{
-            if (word.length() > 20) return;
-            if (processedData.containsKey(word)) {
-                processedData.get(word).addTermFrequency("content");
-            }
-            else {
-                processedData.put(word, InvertedIndex.builder()
-                        .term(word)
-                        .documentId(documentId)
-                        .firstPosition(position[0])
-                        .textType("content")
-                        .build());
-            }
-            position[0] ++;
-        });
+        createProcessedInvertedIndexData(titleWords, "title", documentId, position, processedData);
+        createProcessedInvertedIndexData(contentWords, "content", documentId, position, processedData);
 
         processedData.values().forEach(invertedIndexRepository::save);
+    }
+
+    private List<String> makeRefinedWords(String rawStringData) {
+        return new ArrayList<>(Arrays.asList(TextRefining.preprocessingContent(rawStringData).split(" "))).stream()
+                .map(TextRefining::refineWord)
+                .filter(str->str!=null&&!str.equals(""))
+                .collect(Collectors.toList());
+    }
+
+    private void createProcessedInvertedIndexData(List<String> words, String textType, long documentId, long[] position, Map<String, InvertedIndex> processedData) {
+        words.forEach(word->{
+            if (word.length() > 20) return;
+            if (processedData.containsKey(word)) {
+                processedData.get(word).addTermFrequency(textType);
+            }
+            else {
+                processedData.put(word, InvertedIndex.builder()
+                        .term(word)
+                        .documentId(documentId)
+                        .firstPosition(position[0])
+                        .textType(textType)
+                        .build());
+            }
+            position[0] ++;
+        });
     }
 
 }

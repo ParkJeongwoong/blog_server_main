@@ -53,8 +53,8 @@ public class FileService implements FileUsecase {
 
             long articleId = articleRepository.save(article).getId();
             save_images(imageFiles, changedImageNames, articleId);
-            searchUsecase.makeInvertedIndex(article);
-            recommendationUsecase.saveSimilarArticle(articleId);
+            searchUsecase.makeInvertedIndex(article); // 검색
+            recommendationUsecase.saveSimilarArticle(articleId); // 추천
             return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,6 +67,7 @@ public class FileService implements FileUsecase {
     public CommonResponseDto updateArticle_string(Long articleId, ArticleUpdateRequestDto requestDto) {
         Article article = articleRepository.findById(articleId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. articleId = "+ articleId));
         article.update(null, requestDto.getContent());
+        // Todo - 역색인, 추천
         // Redis 업데이트
         ValueOperations<String, ArticleResponseDto> valueOperations = redisTemplate.opsForValue();
         String redis_key = "a"+article.getCategory()+article.getCategoryId();

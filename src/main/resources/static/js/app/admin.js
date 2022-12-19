@@ -23,7 +23,7 @@ var js_admin = {
     },
      createInvertedIndex : function () {
          $.ajax({
-             type: 'POST',
+             type: 'put',
              url: '/blog-api/search/make-inverted-index'
          }).done(function () {
              window.location.href = '/blog/admin';
@@ -33,7 +33,7 @@ var js_admin = {
      },
       createSimilarityIndex : function () {
           $.ajax({
-              type: 'POST',
+              type: 'put',
               url: '/blog-api/recommend/make-similarity-index'
           }).done(function () {
               window.location.href = '/blog/admin';

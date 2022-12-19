@@ -132,8 +132,7 @@ public class BlogService implements BlogUsecase {
     }
 
     public List<VisitorInHoursResponseDto> getVisitorInHours(String startDate, String endDate) throws Exception {
-        if (startDate.length()<10||endDate.length()<10
-            ||!checkDateFormat(startDate)||!checkDateFormat(endDate)) throw new Exception(String.format("날짜 형식이 맞지 않습니다. 입력값 : {%s}, {%s}", startDate, endDate));
+        if (!checkDateFormat(startDate)||!checkDateFormat(endDate)) throw new Exception(String.format("날짜 형식이 맞지 않습니다. 입력값 : {%s}, {%s}", startDate, endDate));
         List<VisitorInHoursDto> visitorInHoursDtos = visitorRepository.getVisitorInHours(startDate, endDate+"T23:59:59.99").stream()
                 .map(VisitorInHoursDto::new)
                 .collect(Collectors.toList());
@@ -171,6 +170,7 @@ public class BlogService implements BlogUsecase {
     }
 
     private static boolean checkDateFormat(String date) {
+        if (date.length()<10) { return false; }
         try {
             SimpleDateFormat dateFormatParser = new SimpleDateFormat("yyyy-MM-dd"); //검증할 날짜 포맷 설정
             dateFormatParser.setLenient(false); //false일경우 처리시 입력한 값이 잘못된 형식일 시 오류가 발생
