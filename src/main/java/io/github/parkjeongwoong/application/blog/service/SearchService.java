@@ -40,11 +40,11 @@ public class SearchService implements SearchUsecase {
 
     @Transactional
     public void invertedIndexProcess() {
+        long articleCount = articleRepository.count();
         invertedIndexRepository.deleteAll();
         articleRepository.findAll().forEach(this::makeInvertedIndex);
         invertedIndexRepository.findAll().forEach(invertedIndex -> invertedIndex.TFIDF(
-                QinvertedIndexRepository.getDocumentFrequency(invertedIndex.getTerm()),
-                articleRepository.count()
+                QinvertedIndexRepository.getDocumentFrequency(invertedIndex.getTerm()), articleCount
         ));
     }
 

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,12 +58,22 @@ public class RecommendationService implements RecommendationUsecase {
         });
     }
 
+    // Todo : 성능 개선
     @Transactional
     public void saveSimilarArticle(long documentId) {
-        System.out.println("Log. Document # " + documentId);
-        // Todo : 성능 개선
         // invertedIndex에서 동일한 term을 가진 두 문서의 priorityScore를 곱해서 유사도 점수를 파악
+        System.out.println("Log. Document # " + documentId);
+        long articleCount = articleRepository.count();
         similarityRepository.deleteAllByDocumentId(documentId);
+
+        List<SimilarityIndex> similarityIndexList = new ArrayList<>();
+        for (int i=0;i<articleCount+1;i++) {
+            similarityIndexList.add(SimilarityIndex.builder()
+                    .documentId(documentId)
+                    .counterDocumentId(i+1)
+                    .build()
+            );
+        }
 
         List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
         invertedIndexList.forEach(invertedIndex -> {
@@ -71,16 +82,29 @@ public class RecommendationService implements RecommendationUsecase {
             
             invertedIndexRepository.findAllByTerm(term).forEach(index -> {
                 if (documentId == index.getDocumentId()) return;
-                SimilarityIndex similarityIndex = similarityRepository.findById(new SimilarityIndexKey(documentId, index.getDocumentId()))
-                        .orElse(null);
-                if (similarityIndex == null) similarityIndex = SimilarityIndex.builder()
-                                                                .documentId(documentId)
-                                                                .counterDocumentId(index.getDocumentId())
-                                                                .build();
-                long multipledScore = (long) (termScore * index.getPriorityScore());
-                similarityIndex.addScore(multipledScore);
-                similarityRepository.save(similarityIndex);
+//                SimilarityIndex similarityIndex = getSimilarityIndex(documentId, index.getId());
+                SimilarityIndex similarityIndex = similarityIndexList.get((int) index.getDocumentId());
+                long multipliedScore = (long) (termScore * index.getPriorityScore());
+                similarityIndex.addScore(multipliedScore);
+//                similarityRepository.save(similarityIndex);
             });
         });
+
+        similarityIndexList.forEach(similarityIndex -> {
+            if (similarityIndex.getCounterDocumentId() != 0
+                && similarityIndex.getCounterDocumentId() != similarityIndex.getDocumentId()) {
+                similarityRepository.save(similarityIndex);
+            }
+        });
+    }
+
+    private SimilarityIndex getSimilarityIndex(long documentId, long counterDocumentId) {
+        SimilarityIndex similarityIndex = similarityRepository.findById(new SimilarityIndexKey(documentId, counterDocumentId))
+                .orElse(null);
+        if (similarityIndex == null) similarityIndex = SimilarityIndex.builder()
+                .documentId(documentId)
+                .counterDocumentId(counterDocumentId)
+                .build();
+        return similarityIndex;
     }
 }
