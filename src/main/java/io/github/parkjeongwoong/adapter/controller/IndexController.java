@@ -44,6 +44,11 @@ public class IndexController {
         return "posts-update";
     }
 
+    @GetMapping("/blog/admin")
+    public String admin() {
+        return "admin";
+    }
+
     @GetMapping("/blog/upload")
     public String upload() { return "article_upload"; }
 
