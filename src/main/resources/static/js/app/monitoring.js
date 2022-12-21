@@ -33,13 +33,14 @@ var js_monitoring = {
             config1.data.datasets = [];
             config2.data.datasets[0].data = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
             for (var i=0;i<res.length;i++) {
-                var color2 = Math.floor(Math.random() * 256);
-                var color3 = Math.floor(Math.random() * 256);
+                var color1 = Math.floor(Math.random() * 200);
+                var color2 = Math.floor(Math.random() * 200);
+                var color3 = Math.floor(Math.random() * 200);
                 result = res[i];
                 if (result.hour == 0) {
                     config1.data.datasets.push({
                           label: result.date,
-                          borderColor: 'rgb(255, '+color2+', '+color3+')',
+                          borderColor: 'rgb('+color1+', '+color2+', '+color3+')',
                           data: [],
                           tension: 0.3,
                           fill: true
