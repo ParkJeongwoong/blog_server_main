@@ -19,7 +19,7 @@ public class SimilarityIndex {
     private long counterDocumentId;
 
     @Column(nullable = false)
-    private long similarityScore = 0;
+    private double similarityScore = 0;
 
     @Builder
     public SimilarityIndex(long documentId, long counterDocumentId) {
@@ -27,5 +27,5 @@ public class SimilarityIndex {
         this.counterDocumentId = counterDocumentId;
     }
 
-    public void addScore(long score) {this.similarityScore += score;}
+    public void addScore(double score) {this.similarityScore += score;}
 }

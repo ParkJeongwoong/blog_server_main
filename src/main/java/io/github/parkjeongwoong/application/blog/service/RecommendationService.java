@@ -67,44 +67,33 @@ public class RecommendationService implements RecommendationUsecase {
         similarityRepository.deleteAllByDocumentId(documentId);
 
         List<SimilarityIndex> similarityIndexList = new ArrayList<>();
-        for (int i=0;i<articleCount+1;i++) {
+        List<SimilarityIndex> similarityIndexList_counterDocument = new ArrayList<>();
+        for (int i=0;i<articleCount;i++) {
             similarityIndexList.add(SimilarityIndex.builder()
                     .documentId(documentId)
                     .counterDocumentId(i+1)
-                    .build()
-            );
+                    .build());
+            similarityIndexList_counterDocument.add(SimilarityIndex.builder()
+                    .documentId(i+1)
+                    .counterDocumentId(documentId)
+                    .build());
         }
 
         List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
         invertedIndexList.forEach(invertedIndex -> {
             String term = invertedIndex.getTerm();
-            long termScore = (long) invertedIndex.getPriorityScore();
-            
+            double termScore = invertedIndex.getPriorityScore();
+
             invertedIndexRepository.findAllByTerm(term).forEach(index -> {
                 if (documentId == index.getDocumentId()) return;
-//                SimilarityIndex similarityIndex = getSimilarityIndex(documentId, index.getId());
-                SimilarityIndex similarityIndex = similarityIndexList.get((int) index.getDocumentId());
-                long multipliedScore = (long) (termScore * index.getPriorityScore());
+                SimilarityIndex similarityIndex = similarityIndexList.get((int) index.getDocumentId()-1);
+                SimilarityIndex similarityIndex_counterDocument = similarityIndexList_counterDocument.get((int) index.getDocumentId()-1);
+                double multipliedScore = termScore * index.getPriorityScore();
                 similarityIndex.addScore(multipliedScore);
-//                similarityRepository.save(similarityIndex);
+                similarityIndex_counterDocument.addScore(multipliedScore);
+                similarityRepository.save(similarityIndex);
+                similarityRepository.save(similarityIndex_counterDocument);
             });
         });
-
-        similarityIndexList.forEach(similarityIndex -> {
-            if (similarityIndex.getCounterDocumentId() != 0
-                && similarityIndex.getCounterDocumentId() != similarityIndex.getDocumentId()) {
-                similarityRepository.save(similarityIndex);
-            }
-        });
-    }
-
-    private SimilarityIndex getSimilarityIndex(long documentId, long counterDocumentId) {
-        SimilarityIndex similarityIndex = similarityRepository.findById(new SimilarityIndexKey(documentId, counterDocumentId))
-                .orElse(null);
-        if (similarityIndex == null) similarityIndex = SimilarityIndex.builder()
-                .documentId(documentId)
-                .counterDocumentId(counterDocumentId)
-                .build();
-        return similarityIndex;
     }
 }

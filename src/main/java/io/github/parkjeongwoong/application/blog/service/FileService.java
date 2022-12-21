@@ -10,6 +10,7 @@ import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 import io.github.parkjeongwoong.entity.Image;
+import io.github.parkjeongwoong.etc.ServerState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -35,6 +36,8 @@ public class FileService implements FileUsecase {
 
     @Autowired
     private final RedisTemplate redisTemplate;
+    @Autowired
+    private ServerState serverState;
 
     @Transactional
     public CommonResponseDto saveArticle(MultipartHttpServletRequest multiRequest) {
@@ -55,6 +58,7 @@ public class FileService implements FileUsecase {
             save_images(imageFiles, changedImageNames, articleId);
             searchUsecase.makeInvertedIndex(article); // 검색
             recommendationUsecase.saveSimilarArticle(articleId); // 추천
+            serverState.articleIsUpdated();
             return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,6 +76,7 @@ public class FileService implements FileUsecase {
         ValueOperations<String, ArticleResponseDto> valueOperations = redisTemplate.opsForValue();
         String redis_key = "a"+article.getCategory()+article.getCategoryId();
         ArticleResponseDto article_redis = valueOperations.get(redis_key);
+        serverState.articleIsUpdated();
         if (article_redis != null) {
             article_redis.setContent(requestDto.getContent());
             valueOperations.set(redis_key, article_redis, 7, TimeUnit.DAYS);
@@ -88,6 +93,7 @@ public class FileService implements FileUsecase {
     public CommonResponseDto deleteArticle(Long articleId) {
         Article article = articleRepository.findById(articleId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. articleId = "+ articleId));
         articleRepository.delete(article);
+        serverState.articleIsUpdated();
         return new CommonResponseDto("Delete Article", "Success", "게시글을 성공적으로 삭제했습니다.");
     }
 

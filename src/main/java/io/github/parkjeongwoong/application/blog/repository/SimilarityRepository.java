@@ -11,5 +11,6 @@ public interface SimilarityRepository extends JpaRepository<SimilarityIndex, Sim
 
     List<SimilarityIndex> findTop5ByDocumentIdOrderBySimilarityScoreDesc(long documentId);
     void deleteAllByDocumentId(long documentId);
+    List<SimilarityIndex> findAllByDocumentId(long documentId);
 
 }

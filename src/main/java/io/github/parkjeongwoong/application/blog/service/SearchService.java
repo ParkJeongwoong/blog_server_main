@@ -41,11 +41,12 @@ public class SearchService implements SearchUsecase {
     @Transactional
     public void invertedIndexProcess() {
         long articleCount = articleRepository.count();
-        invertedIndexRepository.deleteAll();
+        invertedIndexRepository.deleteAll(); // Todo - 이거 지우기
         articleRepository.findAll().forEach(this::makeInvertedIndex);
-        invertedIndexRepository.findAll().forEach(invertedIndex -> invertedIndex.TFIDF(
-                QinvertedIndexRepository.getDocumentFrequency(invertedIndex.getTerm()), articleCount
-        ));
+        invertedIndexRepository.findAll().forEach(invertedIndex -> {
+            invertedIndex.TFIDF(QinvertedIndexRepository.getDocumentFrequency(invertedIndex.getTerm()), articleCount);
+            invertedIndexRepository.save(invertedIndex);
+        });
     }
 
     @Transactional
@@ -71,6 +72,8 @@ public class SearchService implements SearchUsecase {
     }
 
     private void createProcessedInvertedIndexData(List<String> words, String textType, long documentId, long[] position, Map<String, InvertedIndex> processedData) {
+        long articleCount = articleRepository.count();
+
         words.forEach(word->{
             if (word.length() > 20) return;
             if (processedData.containsKey(word)) {
@@ -87,5 +90,7 @@ public class SearchService implements SearchUsecase {
             position[0] ++;
         });
     }
+
+    // Todo - 글 수정 삭제 이후의 작업
 
 }

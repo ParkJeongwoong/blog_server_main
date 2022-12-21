@@ -1,5 +1,6 @@
 package io.github.parkjeongwoong.entity;
 
+import io.github.parkjeongwoong.entity.CompositeKey.InvertedIndexKey;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,16 +10,15 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Entity
+@IdClass(InvertedIndexKey.class)
 public class InvertedIndex {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(length = 20, nullable = false)
-    private String term;
-
-    @Column(nullable = false)
     private long documentId;
+
+    @Id
+    @Column(length = 20)
+    private String term;
 
     @Column
     private long firstPosition;
