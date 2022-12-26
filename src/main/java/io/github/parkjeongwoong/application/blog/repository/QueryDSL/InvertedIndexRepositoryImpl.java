@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import static com.querydsl.core.group.GroupBy.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,6 +43,13 @@ public class InvertedIndexRepositoryImpl implements InvertedIndexRepositoryCusto
         return jpaQueryFactory.selectFrom(invertedIndex)
                 .where(invertedIndex.term.eq(term))
                 .fetchCount();
+    }
+
+    public Map<String, Long> getDocumentFrequencyByTerm() {
+        QInvertedIndex invertedIndex = QInvertedIndex.invertedIndex;
+        return jpaQueryFactory.selectFrom(invertedIndex)
+                .groupBy(invertedIndex.term)
+                .transform(groupBy(invertedIndex.term).as(invertedIndex.count()));
     }
 
 }

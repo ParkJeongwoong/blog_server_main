@@ -9,5 +9,6 @@ public interface InvertedIndexRepository extends JpaRepository<InvertedIndex, Lo
 
     List<InvertedIndex> findAllByDocumentId(long documentId);
     List<InvertedIndex> findAllByTerm(String term);
+    void deleteAllByDocumentId(long documentId);
 
 }

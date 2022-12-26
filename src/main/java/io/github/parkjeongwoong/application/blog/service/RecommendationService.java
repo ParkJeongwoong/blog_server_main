@@ -3,12 +3,15 @@ package io.github.parkjeongwoong.application.blog.service;
 import io.github.parkjeongwoong.application.blog.dto.RecommendedArticleResponseDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
+import io.github.parkjeongwoong.application.blog.repository.QueryDSL.SimilarityIndexRepositoryImpl;
 import io.github.parkjeongwoong.application.blog.repository.SimilarityRepository;
+import io.github.parkjeongwoong.application.blog.repository.WordRepository;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.CompositeKey.SimilarityIndexKey;
 import io.github.parkjeongwoong.entity.InvertedIndex;
 import io.github.parkjeongwoong.entity.SimilarityIndex;
+import io.github.parkjeongwoong.entity.Word;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,8 @@ public class RecommendationService implements RecommendationUsecase {
     private final ArticleRepository articleRepository;
     private final InvertedIndexRepository invertedIndexRepository;
     private final SimilarityRepository similarityRepository;
+    private final SimilarityIndexRepositoryImpl QsimilarityIndexRepository;
+    private final WordRepository wordRepository;
 
     public List<RecommendedArticleResponseDto> get5SimilarArticle(long documentId) {
         return similarityRepository.findTop5ByDocumentIdOrderBySimilarityScoreDesc(documentId)
@@ -34,36 +39,37 @@ public class RecommendationService implements RecommendationUsecase {
     }
 
     @Transactional
-    public void makeSimilarityIndex(long offset) {
-        List<Article> articleList = articleRepository.findAllDesc();
+    public void makeSimilarityIndexList(long offset) {
+        List<Article> articleList = articleRepository.findAllByDocumentIdGreaterThanEqual(offset);
+        long articleCount = articleRepository.count();
         System.out.println("ARTICLE SIZE : " + articleList.size());
         articleList.forEach(article -> {
-            if (article.getId() < offset) return;
             System.out.println(article.getId() + " 유사도 분석 시작");
-            saveSimilarArticle(article.getId());
+            saveSimilarArticle(article.getId(), articleCount);
             System.out.println(article.getId() + " 유사도 분석 완료//");
         });
     }
 
     @Transactional
-    public void makeSimilarityIndex(long offset, long endpoint) {
-        List<Article> articleList = articleRepository.findAllDesc();
+    public void makeSimilarityIndexList(long offset, long endpoint) {
+        List<Article> articleList = articleRepository.findAllByDocumentIdBetween(offset, endpoint);
+        long articleCount = articleRepository.count();
         System.out.println("ARTICLE SIZE : " + articleList.size());
         articleList.forEach(article -> {
-            if (article.getId() < offset) return;
-            if (article.getId() > endpoint) return;
             System.out.println(article.getId() + " 유사도 분석 시작");
-            saveSimilarArticle(article.getId());
+            saveSimilarArticle(article.getId(), articleCount);
             System.out.println(article.getId() + " 유사도 분석 완료");
         });
     }
 
     // Todo : 성능 개선
     @Transactional
-    public void saveSimilarArticle(long documentId) {
+    public void saveSimilarArticle(long documentId, long articleCount) {
         // invertedIndex에서 동일한 term을 가진 두 문서의 priorityScore를 곱해서 유사도 점수를 파악
         System.out.println("Log. Document # " + documentId);
-        long articleCount = articleRepository.count();
+        if (articleCount == -1) {
+            articleCount = articleRepository.count();
+        }
         similarityRepository.deleteAllByDocumentId(documentId);
 
         List<SimilarityIndex> similarityIndexList = new ArrayList<>();
@@ -79,7 +85,8 @@ public class RecommendationService implements RecommendationUsecase {
                     .build());
         }
 
-        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
+//        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
+        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAll();
         invertedIndexList.forEach(invertedIndex -> {
             String term = invertedIndex.getTerm();
             double termScore = invertedIndex.getPriorityScore();
@@ -95,5 +102,20 @@ public class RecommendationService implements RecommendationUsecase {
                 similarityRepository.save(similarityIndex_counterDocument);
             });
         });
+    }
+
+    private void updateSimilarityByWord(String term) {
+        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByTerm(term);
+        List<Long> documentIdList = invertedIndexList.stream().map(InvertedIndex::getDocumentId).collect(Collectors.toList());
+        List<SimilarityIndex> similarityIndexList = QsimilarityIndexRepository.getSimilarityIndexByDocumentIdList(documentIdList);
+
+    }
+
+    private void updateDocumentFrequency(String term) {
+        Word word = wordRepository.findById(term).orElse(null);
+        if (word == null) {
+            word = Word.builder().term(term).build();
+        }
+        word.addDocumentFrequency();
     }
 }

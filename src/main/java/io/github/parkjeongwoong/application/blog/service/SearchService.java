@@ -8,6 +8,7 @@ import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.InvertedIndex;
+import io.github.parkjeongwoong.entity.QInvertedIndex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,10 +42,10 @@ public class SearchService implements SearchUsecase {
     @Transactional
     public void invertedIndexProcess() {
         long articleCount = articleRepository.count();
-        invertedIndexRepository.deleteAll(); // Todo - 이거 지우기
+        Map<String, Long> termToDF = QinvertedIndexRepository.getDocumentFrequencyByTerm();
         articleRepository.findAll().forEach(this::makeInvertedIndex);
         invertedIndexRepository.findAll().forEach(invertedIndex -> {
-            invertedIndex.TFIDF(QinvertedIndexRepository.getDocumentFrequency(invertedIndex.getTerm()), articleCount);
+            invertedIndex.TFIDF(termToDF.get(invertedIndex.getTerm()), articleCount);
             invertedIndexRepository.save(invertedIndex);
         });
     }
@@ -54,6 +55,7 @@ public class SearchService implements SearchUsecase {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};
         long documentId = article.getId();
+        invertedIndexRepository.deleteAllByDocumentId(documentId);
 
         List<String> titleWords = makeRefinedWords(article.getTitle());
         List<String> contentWords = makeRefinedWords(article.getContent());
