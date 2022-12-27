@@ -38,84 +38,107 @@ public class RecommendationService implements RecommendationUsecase {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void makeSimilarityIndexList(long offset) {
-        List<Article> articleList = articleRepository.findAllByDocumentIdGreaterThanEqual(offset);
-        long articleCount = articleRepository.count();
-        System.out.println("ARTICLE SIZE : " + articleList.size());
-        articleList.forEach(article -> {
-            System.out.println(article.getId() + " 유사도 분석 시작");
-            saveSimilarArticle(article.getId(), articleCount);
-            System.out.println(article.getId() + " 유사도 분석 완료//");
-        });
-    }
+//    @Transactional
+//    public void makeSimilarityIndexList(long offset) {
+//        List<Article> articleList = articleRepository.findAllByDocumentIdGreaterThanEqual(offset);
+//        long articleCount = articleRepository.count();
+//        System.out.println("ARTICLE SIZE : " + articleList.size());
+//        articleList.forEach(article -> {
+//            System.out.println(article.getId() + " 유사도 분석 시작");
+//            saveSimilarArticle(article.getId(), articleCount);
+//            System.out.println(article.getId() + " 유사도 분석 완료//");
+//        });
+//    }
+
+//    @Transactional
+//    public void makeSimilarityIndexList(long offset, long endpoint) {
+//        List<Article> articleList = articleRepository.findAllByDocumentIdBetween(offset, endpoint);
+//        long articleCount = articleRepository.count();
+//        System.out.println("ARTICLE SIZE : " + articleList.size());
+//        articleList.forEach(article -> {
+//            System.out.println(article.getId() + " 유사도 분석 시작");
+//            saveSimilarArticle(article.getId(), articleCount);
+//            System.out.println(article.getId() + " 유사도 분석 완료");
+//        });
+//    }
+
+//    // Todo : 성능 개선
+//    @Transactional
+//    public void saveSimilarArticle(long documentId, long articleCount) {
+//        // invertedIndex에서 동일한 term을 가진 두 문서의 priorityScore를 곱해서 유사도 점수를 파악
+//        System.out.println("Log. Document # " + documentId);
+//        if (articleCount == -1) {
+//            articleCount = articleRepository.count();
+//        }
+//        similarityRepository.deleteAllByDocumentId(documentId);
+//
+//        List<SimilarityIndex> similarityIndexList = new ArrayList<>();
+//        List<SimilarityIndex> similarityIndexList_counterDocument = new ArrayList<>();
+//        for (int i=0;i<articleCount;i++) {
+//            similarityIndexList.add(SimilarityIndex.builder()
+//                    .documentId(documentId)
+//                    .counterDocumentId(i+1)
+//                    .build());
+//            similarityIndexList_counterDocument.add(SimilarityIndex.builder()
+//                    .documentId(i+1)
+//                    .counterDocumentId(documentId)
+//                    .build());
+//        }
+//
+////        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
+//        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAll();
+//        invertedIndexList.forEach(invertedIndex -> {
+//            String term = invertedIndex.getTerm();
+//            double termScore = invertedIndex.getPriorityScore();
+//
+//            invertedIndexRepository.findAllByTerm(term).forEach(index -> {
+//                if (documentId == index.getDocumentId()) return;
+//                SimilarityIndex similarityIndex = similarityIndexList.get((int) index.getDocumentId()-1);
+//                SimilarityIndex similarityIndex_counterDocument = similarityIndexList_counterDocument.get((int) index.getDocumentId()-1);
+//                double multipliedScore = termScore * index.getPriorityScore();
+//                similarityIndex.addScore(multipliedScore);
+//                similarityIndex_counterDocument.addScore(multipliedScore);
+//                similarityRepository.save(similarityIndex);
+//                similarityRepository.save(similarityIndex_counterDocument);
+//            });
+//        });
+//    }
 
     @Transactional
-    public void makeSimilarityIndexList(long offset, long endpoint) {
-        List<Article> articleList = articleRepository.findAllByDocumentIdBetween(offset, endpoint);
-        long articleCount = articleRepository.count();
-        System.out.println("ARTICLE SIZE : " + articleList.size());
-        articleList.forEach(article -> {
-            System.out.println(article.getId() + " 유사도 분석 시작");
-            saveSimilarArticle(article.getId(), articleCount);
-            System.out.println(article.getId() + " 유사도 분석 완료");
-        });
-    }
-
-    // Todo : 성능 개선
-    @Transactional
-    public void saveSimilarArticle(long documentId, long articleCount) {
-        // invertedIndex에서 동일한 term을 가진 두 문서의 priorityScore를 곱해서 유사도 점수를 파악
-        System.out.println("Log. Document # " + documentId);
-        if (articleCount == -1) {
-            articleCount = articleRepository.count();
-        }
-        similarityRepository.deleteAllByDocumentId(documentId);
-
-        List<SimilarityIndex> similarityIndexList = new ArrayList<>();
-        List<SimilarityIndex> similarityIndexList_counterDocument = new ArrayList<>();
-        for (int i=0;i<articleCount;i++) {
-            similarityIndexList.add(SimilarityIndex.builder()
-                    .documentId(documentId)
-                    .counterDocumentId(i+1)
-                    .build());
-            similarityIndexList_counterDocument.add(SimilarityIndex.builder()
-                    .documentId(i+1)
-                    .counterDocumentId(documentId)
-                    .build());
-        }
-
-//        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
-        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAll();
-        invertedIndexList.forEach(invertedIndex -> {
-            String term = invertedIndex.getTerm();
-            double termScore = invertedIndex.getPriorityScore();
-
-            invertedIndexRepository.findAllByTerm(term).forEach(index -> {
-                if (documentId == index.getDocumentId()) return;
-                SimilarityIndex similarityIndex = similarityIndexList.get((int) index.getDocumentId()-1);
-                SimilarityIndex similarityIndex_counterDocument = similarityIndexList_counterDocument.get((int) index.getDocumentId()-1);
-                double multipliedScore = termScore * index.getPriorityScore();
-                similarityIndex.addScore(multipliedScore);
-                similarityIndex_counterDocument.addScore(multipliedScore);
-                similarityRepository.save(similarityIndex);
-                similarityRepository.save(similarityIndex_counterDocument);
-            });
-        });
-    }
-
-    private void updateSimilarityByWord(String term) {
-        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByTerm(term);
-        List<Long> documentIdList = invertedIndexList.stream().map(InvertedIndex::getDocumentId).collect(Collectors.toList());
-        List<SimilarityIndex> similarityIndexList = QsimilarityIndexRepository.getSimilarityIndexByDocumentIdList(documentIdList);
-
-    }
-
-    private void updateDocumentFrequency(String term) {
+    public void saveWord(String term) {
         Word word = wordRepository.findById(term).orElse(null);
         if (word == null) {
             word = Word.builder().term(term).build();
         }
         word.addDocumentFrequency();
+        wordRepository.save(word);
+    }
+
+    @Transactional
+    public void updateSimilarity() {
+        // Similarity 업데이트
+        List<Word> updatedWords = wordRepository.findAllByIsUpdatedTrue();
+        long articleCount = articleRepository.count();
+        updatedWords.forEach(word -> updateSimilarityByWord(word, articleCount));
+    }
+
+    @Transactional
+    private void updateSimilarityByWord(Word word, long articleCount) {
+        // 단어별 Similarity 업데이트
+        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByTerm(word.getTerm());
+        List<Long> documentIdList = invertedIndexList.stream().map(InvertedIndex::getDocumentId).collect(Collectors.toList());
+        List<SimilarityIndex> similarityIndexList = QsimilarityIndexRepository.getSimilarityIndexByDocumentIdList(documentIdList);
+
+        for (int i=0;i<invertedIndexList.size();i++) {
+            double oldTfIdf = invertedIndexList.get(i).getPriorityScore();
+            double newTfIdf = invertedIndexList.get(i).TFIDF(word.getDocumentFrequency(), articleCount);
+            similarityIndexList.get(i).addScore(newTfIdf-oldTfIdf);
+        }
+
+        word.updateFinished();
+
+        invertedIndexRepository.saveAll(invertedIndexList);
+        similarityRepository.saveAll(similarityIndexList);
+        wordRepository.save(word);
     }
 }

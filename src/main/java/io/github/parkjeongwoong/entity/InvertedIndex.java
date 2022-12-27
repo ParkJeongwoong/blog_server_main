@@ -49,9 +49,10 @@ public class InvertedIndex {
         this.priorityScore = termFrequency;
     }
 
-    public void TFIDF(double df, long totalArticleNumber) {
+    public double TFIDF(double df, long totalArticleNumber) {
         double tf = this.termFrequency;
         double idf = Math.log(totalArticleNumber / df);
         this.priorityScore = tf * idf;
+        return this.priorityScore;
     }
 }

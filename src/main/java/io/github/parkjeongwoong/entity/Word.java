@@ -34,6 +34,11 @@ public class Word {
         this.isUpdated = true;
     }
 
+    public void subDocumentFrequency() {
+        this.documentFrequency--;
+        this.isUpdated = true;
+    }
+
     public void updateFinished() {
         this.isUpdated = false;
     }

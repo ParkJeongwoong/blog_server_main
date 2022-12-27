@@ -98,12 +98,12 @@ public class BlogApiController {
     public byte[] get_image(@PathVariable("imageName") String imageName) throws IOException { return blogUsecase.getImage(imageName); }
 
     // Recommendation
-    @PutMapping("/recommend/make-similarity-index")
-    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndexList(0); }
-    @PutMapping("/recommend/make-similarity-index/{offset}")
-    public void make_similarity_index_offset(@PathVariable("offset") Long offset) { recommendationUsecase.makeSimilarityIndexList(offset); }
-    @PutMapping("/recommend/make-similarity-index/{offset}/{endpoint}")
-    public void make_similarity_index_offset(@PathVariable("offset") Long offset, @PathVariable("endpoint") Long endpoint) { recommendationUsecase.makeSimilarityIndexList(offset, endpoint); }
+//    @PutMapping("/recommend/make-similarity-index")
+//    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndexList(0); }
+//    @PutMapping("/recommend/make-similarity-index/{offset}")
+//    public void make_similarity_index_offset(@PathVariable("offset") Long offset) { recommendationUsecase.makeSimilarityIndexList(offset); }
+//    @PutMapping("/recommend/make-similarity-index/{offset}/{endpoint}")
+//    public void make_similarity_index_offset(@PathVariable("offset") Long offset, @PathVariable("endpoint") Long endpoint) { recommendationUsecase.makeSimilarityIndexList(offset, endpoint); }
 
     @GetMapping(value = "/recommend/get-5-similar-article/{articleId}")
     public List<RecommendedArticleResponseDto> get_5_similar_article(@PathVariable("articleId") long articleId) {

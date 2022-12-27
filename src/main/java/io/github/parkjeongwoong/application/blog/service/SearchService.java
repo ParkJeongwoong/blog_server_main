@@ -5,10 +5,10 @@ import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
 import io.github.parkjeongwoong.application.blog.repository.QueryDSL.InvertedIndexRepositoryCustom;
 import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
+import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.InvertedIndex;
-import io.github.parkjeongwoong.entity.QInvertedIndex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +23,7 @@ public class SearchService implements SearchUsecase {
     private final InvertedIndexRepository invertedIndexRepository;
     private final InvertedIndexRepositoryCustom QinvertedIndexRepository;
     private final ArticleRepository articleRepository;
+    private final RecommendationUsecase recommendationUsecase;
 
     public List<ArticleSearchResultDto> searchArticle(String words, long offset) {
         String[] wordArray = words.split(" ");
@@ -59,6 +60,8 @@ public class SearchService implements SearchUsecase {
 
         List<String> titleWords = makeRefinedWords(article.getTitle());
         List<String> contentWords = makeRefinedWords(article.getContent());
+        titleWords.forEach(recommendationUsecase::saveWord);
+        contentWords.forEach(recommendationUsecase::saveWord);
 
         createProcessedInvertedIndexData(titleWords, "title", documentId, position, processedData);
         createProcessedInvertedIndexData(contentWords, "content", documentId, position, processedData);
