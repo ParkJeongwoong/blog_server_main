@@ -20,7 +20,9 @@ public class SimilarityIndexRepositoryImpl implements SimilarityIndexRepositoryC
     public List<SimilarityIndex> getSimilarityIndexByDocumentIdList(List<Long> documentIdList) {
         QSimilarityIndex similarityIndex = QSimilarityIndex.similarityIndex;
         BooleanBuilder builder = new BooleanBuilder();
-        documentIdList.forEach(documentId->builder.or(similarityIndex.documentId.eq(documentId)));
+        builder.and(similarityIndex.documentId.in(documentIdList));
+        builder.and(similarityIndex.counterDocumentId.in(documentIdList));
+//        documentIdList.forEach(documentId->builder.or(similarityIndex.documentId.eq(documentId)));
 
         return jpaQueryFactory.selectFrom(similarityIndex)
                 .where(builder)

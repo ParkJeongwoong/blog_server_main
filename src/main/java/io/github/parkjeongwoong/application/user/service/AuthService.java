@@ -20,11 +20,11 @@ public class AuthService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDeatilsService userDeatilsService;
+    private final UserDetailsService userDetailsService;
 
     public UserLoginResponseDto login(UserLoginRequestDto requestDto, HttpServletResponse response) {
         try {
-            User user = userDeatilsService.getUser(requestDto.getUserId());
+            User user = userDetailsService.getUser(requestDto.getUserId());
             boolean result = user.getEncryptedPassword().checkPassword(requestDto.getPassword());
             if (result) {
                 log.info("로그인 성공");
@@ -69,7 +69,7 @@ public class AuthService {
                     .build();
             response.addHeader("Set-Cookie", cookie.toString());
             long refreshTokenId = jwtTokenProvider.getRefreshTokenIdFromToken(accessToken);
-            RefreshToken refreshToken = userDeatilsService.getRefreshTokenById(refreshTokenId);
+            RefreshToken refreshToken = userDetailsService.getRefreshTokenById(refreshTokenId);
             refreshToken.disableRefreshToken();
             refreshTokenRepository.save(refreshToken);
             return true;

@@ -56,12 +56,17 @@ public class SearchService implements SearchUsecase {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};
         long documentId = article.getId();
+        recommendationUsecase.deleteWordByDocumentId_wordEffectOnly(documentId);
         invertedIndexRepository.deleteAllByDocumentId(documentId);
 
         List<String> titleWords = makeRefinedWords(article.getTitle());
         List<String> contentWords = makeRefinedWords(article.getContent());
-        titleWords.forEach(recommendationUsecase::saveWord);
-        contentWords.forEach(recommendationUsecase::saveWord);
+
+        List<String> totalWords = new ArrayList<>();
+        totalWords.addAll(titleWords);
+        totalWords.addAll(contentWords);
+        Set<String> wordSets = new HashSet<>(totalWords);
+        wordSets.forEach(recommendationUsecase::saveWord);
 
         createProcessedInvertedIndexData(titleWords, "title", documentId, position, processedData);
         createProcessedInvertedIndexData(contentWords, "content", documentId, position, processedData);

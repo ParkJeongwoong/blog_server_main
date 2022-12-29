@@ -10,6 +10,9 @@ var js_admin = {
         $('#btn-similarity-index').on('focus keyup', function (event) {
            _this.createSimilarityIndex(event);
         });
+        $('#btn-similarity-index-new').on('focus keyup', function (event) {
+           _this.createSimilarityIndexNew(event);
+        });
     },
     logout : function () {
         $.ajax({
@@ -40,7 +43,17 @@ var js_admin = {
           }).fail(function (error) {
               alert(JSON.stringify(error));
           });
-      }
+      },
+             createSimilarityIndexNew : function () {
+                 $.ajax({
+                     type: 'put',
+                     url: '/blog-api/recommend/make-similarity-index2'
+                 }).done(function () {
+                     window.location.href = '/blog/admin';
+                 }).fail(function (error) {
+                     alert(JSON.stringify(error));
+                 });
+             }
 }
 
 js_admin.init();

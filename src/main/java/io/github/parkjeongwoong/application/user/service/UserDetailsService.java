@@ -6,14 +6,13 @@ import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Service
-public class UserDeatilsService implements UserDetailsService {
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
     // Security Config의 AuthenticationManager를 사용하려면 Spring Security에서 제공하는 UserDetailsService를 구현한 클래스가 필요
 
     private final UserRepository userRepository;

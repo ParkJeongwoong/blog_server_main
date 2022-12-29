@@ -19,6 +19,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Query("SELECT COUNT(1) FROM Article A WHERE CATEGORY = :category")
     long countCategory(@Param("category") String category);
 
-    List<Article> findAllByDocumentIdBetween(long start, long end);
-    List<Article> findAllByDocumentIdGreaterThanEqual(long start);
+    List<Article> findAllByIdBetween(long start, long end);
+    List<Article> findAllByIdGreaterThanEqual(long start);
 }

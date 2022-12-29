@@ -30,7 +30,7 @@ public class JwtTokenProvider {
 
     @Value("${jwtToken.key}")
     private String secretKey;
-    private final UserDeatilsService userDeatilsService;
+    private final UserDetailsService userDetailsService;
 
     @PostConstruct
     protected void init() {
@@ -53,7 +53,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDeatilsService.loadUserByUsername(this.getUserName(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserName(token));
         return userDetails == null ? null : new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 

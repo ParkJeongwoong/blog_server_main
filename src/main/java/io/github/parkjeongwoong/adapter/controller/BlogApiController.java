@@ -98,8 +98,10 @@ public class BlogApiController {
     public byte[] get_image(@PathVariable("imageName") String imageName) throws IOException { return blogUsecase.getImage(imageName); }
 
     // Recommendation
-//    @PutMapping("/recommend/make-similarity-index")
-//    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndexList(0); }
+    @PutMapping("/recommend/make-similarity-index")
+    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndexList(0); }
+    @PutMapping("/recommend/make-similarity-index2")
+    public void make_similarity_index2() { recommendationUsecase.updateAllSimilarity(); }
 //    @PutMapping("/recommend/make-similarity-index/{offset}")
 //    public void make_similarity_index_offset(@PathVariable("offset") Long offset) { recommendationUsecase.makeSimilarityIndexList(offset); }
 //    @PutMapping("/recommend/make-similarity-index/{offset}/{endpoint}")
