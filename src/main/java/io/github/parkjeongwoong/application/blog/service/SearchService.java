@@ -4,13 +4,11 @@ import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
 import io.github.parkjeongwoong.application.blog.repository.QueryDSL.InvertedIndexRepositoryCustom;
-import io.github.parkjeongwoong.application.blog.repository.WordRepository;
 import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.InvertedIndex;
-import io.github.parkjeongwoong.entity.Word;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +23,6 @@ public class SearchService implements SearchUsecase {
     private final InvertedIndexRepository invertedIndexRepository;
     private final InvertedIndexRepositoryCustom QinvertedIndexRepository;
     private final ArticleRepository articleRepository;
-    private final WordRepository wordRepository;
     private final RecommendationUsecase recommendationUsecase;
 
     public List<ArticleSearchResultDto> searchArticle(String words, long offset) {
@@ -59,32 +56,23 @@ public class SearchService implements SearchUsecase {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};
         long documentId = article.getId();
-        long articleCount = articleRepository.count();
         recommendationUsecase.deleteWordByDocumentId_wordEffectOnly(documentId);
         invertedIndexRepository.deleteAllByDocumentId(documentId);
 
         List<String> titleWords = makeRefinedWords(article.getTitle());
         List<String> contentWords = makeRefinedWords(article.getContent());
-
-        List<String> totalWords = new ArrayList<>();
-        totalWords.addAll(titleWords);
-        totalWords.addAll(contentWords);
-        Set<String> wordSets = new HashSet<>(totalWords);
-        wordSets.forEach(recommendationUsecase::saveWord);
+        saveDocumentWords(titleWords, contentWords);
 
         createProcessedInvertedIndexData(titleWords, "title", documentId, position, processedData);
         createProcessedInvertedIndexData(contentWords, "content", documentId, position, processedData);
 
-        processedData.values().forEach(invertedIndex -> {
-            Word word = wordRepository.findById(invertedIndex.getTerm()).orElse(null);
-        });
         processedData.values().forEach(invertedIndexRepository::save);
     }
 
     private List<String> makeRefinedWords(String rawStringData) {
         return new ArrayList<>(Arrays.asList(TextRefining.preprocessingContent(rawStringData).split(" "))).stream()
                 .map(TextRefining::refineWord)
-                .filter(str->str!=null&&!str.equals(""))
+                .filter(str-> !str.equals(""))
                 .collect(Collectors.toList());
     }
 
@@ -96,14 +84,18 @@ public class SearchService implements SearchUsecase {
             }
             else {
                 processedData.put(word, InvertedIndex.builder()
-                        .term(word)
-                        .documentId(documentId)
-                        .firstPosition(position[0])
-                        .textType(textType)
-                        .build());
+                        .term(word).documentId(documentId).firstPosition(position[0]).textType(textType).build());
             }
             position[0] ++;
         });
+    }
+
+    private void saveDocumentWords(List<String> titleWords, List<String> contentWords) {
+        List<String> totalWords = new ArrayList<>();
+        totalWords.addAll(titleWords);
+        totalWords.addAll(contentWords);
+        Set<String> wordSets = new HashSet<>(totalWords);
+        wordSets.forEach(recommendationUsecase::saveWord);
     }
 
     // Todo - 글 수정 삭제 이후의 작업
