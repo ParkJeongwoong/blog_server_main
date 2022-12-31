@@ -39,6 +39,10 @@ public class Word {
         this.isUpdated = true;
     }
 
+    public void updated() {
+        this.isUpdated = true;
+    }
+
     public void updateFinished() {
         this.isUpdated = false;
     }

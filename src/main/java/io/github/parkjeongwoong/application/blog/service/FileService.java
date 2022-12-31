@@ -56,10 +56,9 @@ public class FileService implements FileUsecase {
 
             long articleId = articleRepository.save(article).getId();
             save_images(imageFiles, changedImageNames, articleId);
-            searchUsecase.makeInvertedIndex(article); // 검색
-            recommendationUsecase.createSimilarityIndex(articleId);
-            recommendationUsecase.updateSimilarity(); // 추천
-//            recommendationUsecase.saveSimilarArticle(articleId, -1); // 추천
+            searchUsecase.createInvertedIndex(article); // 검색 역색인 생성
+            recommendationUsecase.createSimilarityIndex(articleId); // 추천 유사도 생성
+            recommendationUsecase.updateAllSimilarity(); // 추천 유사도 적용
             serverState.articleIsUpdated();
             return new CommonResponseDto("Save Article", "Success", "등록되었습니다");
         } catch (Exception e) {

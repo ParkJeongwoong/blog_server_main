@@ -46,7 +46,6 @@ public class InvertedIndex {
             case "content":
                 this.termFrequency += 1;
         }
-        this.priorityScore = termFrequency;
     }
 
     public double TFIDF(double df, long totalArticleNumber) {

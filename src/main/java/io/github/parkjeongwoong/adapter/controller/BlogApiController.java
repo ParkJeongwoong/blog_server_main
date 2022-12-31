@@ -99,15 +99,9 @@ public class BlogApiController {
 
     // Recommendation
     @PutMapping("/recommend/make-similarity-index")
-    public void make_similarity_index() { recommendationUsecase.makeSimilarityIndexList(0); }
-    @PutMapping("/recommend/make-similarity-index2")
     public void make_similarity_index2() { recommendationUsecase.updateAllSimilarity(); }
-    @PutMapping("/recommend/reset-similarity-index2")
+    @PutMapping("/recommend/reset-similarity-index")
     public void reset_similarity_index2() { recommendationUsecase.resetAllSimilarity(); }
-//    @PutMapping("/recommend/make-similarity-index/{offset}")
-//    public void make_similarity_index_offset(@PathVariable("offset") Long offset) { recommendationUsecase.makeSimilarityIndexList(offset); }
-//    @PutMapping("/recommend/make-similarity-index/{offset}/{endpoint}")
-//    public void make_similarity_index_offset(@PathVariable("offset") Long offset, @PathVariable("endpoint") Long endpoint) { recommendationUsecase.makeSimilarityIndexList(offset, endpoint); }
 
     @GetMapping(value = "/recommend/get-5-similar-article/{articleId}")
     public List<RecommendedArticleResponseDto> get_5_similar_article(@PathVariable("articleId") long articleId) {

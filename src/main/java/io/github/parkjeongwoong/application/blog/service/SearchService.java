@@ -47,7 +47,7 @@ public class SearchService implements SearchUsecase {
     public void invertedIndexProcess() {
         long articleCount = articleRepository.count();
         Map<String, Long> termToDF = QinvertedIndexRepository.getDocumentFrequencyByTerm();
-        articleRepository.findAll().forEach(this::makeInvertedIndex);
+        articleRepository.findAll().forEach(this::createInvertedIndex);
         invertedIndexRepository.findAll().forEach(invertedIndex -> {
             invertedIndex.TFIDF(termToDF.get(invertedIndex.getTerm()), articleCount);
             invertedIndexRepository.save(invertedIndex);
@@ -55,7 +55,7 @@ public class SearchService implements SearchUsecase {
     }
 
     @Transactional
-    public void makeInvertedIndex(Article article) {
+    public void createInvertedIndex(Article article) {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};
         long documentId = article.getId();
@@ -77,7 +77,6 @@ public class SearchService implements SearchUsecase {
 
         processedData.values().forEach(invertedIndex -> {
             Word word = wordRepository.findById(invertedIndex.getTerm()).orElse(null);
-            invertedIndex.TFIDF(word.getDocumentFrequency(), articleCount);
         });
         processedData.values().forEach(invertedIndexRepository::save);
     }
@@ -90,8 +89,6 @@ public class SearchService implements SearchUsecase {
     }
 
     private void createProcessedInvertedIndexData(List<String> words, String textType, long documentId, long[] position, Map<String, InvertedIndex> processedData) {
-        long articleCount = articleRepository.count();
-
         words.forEach(word->{
             if (word.length() > 20) return;
             if (processedData.containsKey(word)) {
