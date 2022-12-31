@@ -27,5 +27,6 @@ public class SimilarityIndex {
         this.counterDocumentId = counterDocumentId;
     }
 
-    public void addScore(double score) {this.similarityScore += score;}
+    public void addScore(double score) {this.similarityScore += score;System.out.println(this.similarityScore);}
+    public void subScore(double score) {this.similarityScore -= score;}
 }

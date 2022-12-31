@@ -15,5 +15,5 @@ public interface RecommendationUsecase {
     void createSimilarityIndex(long documentId);
     void updateSimilarity();
     void updateAllSimilarity();
-    void resetAllSimilarityIndex();
+    void resetAllSimilarity();
 }

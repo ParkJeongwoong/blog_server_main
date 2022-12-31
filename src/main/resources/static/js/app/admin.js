@@ -13,6 +13,9 @@ var js_admin = {
         $('#btn-similarity-index-new').on('focus keyup', function (event) {
            _this.createSimilarityIndexNew(event);
         });
+        $('#btn-reset-similarity-index-new').on('focus keyup', function (event) {
+           _this.resetSimilarityIndexNew(event);
+        });
     },
     logout : function () {
         $.ajax({
@@ -44,16 +47,26 @@ var js_admin = {
               alert(JSON.stringify(error));
           });
       },
-             createSimilarityIndexNew : function () {
-                 $.ajax({
-                     type: 'put',
-                     url: '/blog-api/recommend/make-similarity-index2'
-                 }).done(function () {
-                     window.location.href = '/blog/admin';
-                 }).fail(function (error) {
-                     alert(JSON.stringify(error));
-                 });
-             }
+     createSimilarityIndexNew : function () {
+         $.ajax({
+             type: 'put',
+             url: '/blog-api/recommend/make-similarity-index2'
+         }).done(function () {
+             window.location.href = '/blog/admin';
+         }).fail(function (error) {
+             alert(JSON.stringify(error));
+         });
+     },
+     resetSimilarityIndexNew : function () {
+         $.ajax({
+             type: 'put',
+             url: '/blog-api/recommend/reset-similarity-index2'
+         }).done(function () {
+             window.location.href = '/blog/admin';
+         }).fail(function (error) {
+             alert(JSON.stringify(error));
+         });
+     }
 }
 
 js_admin.init();

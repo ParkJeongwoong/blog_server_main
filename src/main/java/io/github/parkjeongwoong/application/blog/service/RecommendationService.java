@@ -145,6 +145,7 @@ public class RecommendationService implements RecommendationUsecase {
     public void createSimilarityIndex(long documentId) {
         List<SimilarityIndex> similarityIndexList = new ArrayList<>();
         List<Article> articleList = articleRepository.findAll();
+        long articleCount = articleRepository.count();
         articleList.forEach(article -> {
             if (article.getId() == documentId) return;
             similarityIndexList.add(SimilarityIndex.builder()
@@ -160,26 +161,38 @@ public class RecommendationService implements RecommendationUsecase {
     }
 
     @Transactional
-    public void resetAllSimilarityIndex() {
-        List<SimilarityIndex> similarityIndexList = new ArrayList<>();
-        List<Article> articleList = articleRepository.findAll();
+    public void resetAllSimilarity() {
         similarityRepository.deleteAll();
 
-        articleList.forEach(article -> {
-            long documentId = article.getId();
-            articleList.forEach(article_sub -> {
-                if (article_sub.getId() == documentId) return;
-                similarityIndexList.add(SimilarityIndex.builder()
-                        .documentId(documentId)
-                        .counterDocumentId(article_sub.getId())
-                        .build());
-                similarityIndexList.add(SimilarityIndex.builder()
-                        .documentId(article_sub.getId())
-                        .counterDocumentId(documentId)
-                        .build());
-            });
-        });
-        similarityRepository.saveAll(similarityIndexList);
+        List<Article> articleList = articleRepository.findAll();
+        articleList.forEach(article -> createSimilarityIndex(article.getId()));
+
+        List<Word> wordList = wordRepository.findAll();
+        long articleCount = articleList.size();
+
+        for (Word word:wordList) {
+            // Get List
+            List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByTerm(word.getTerm());
+            List<Long> documentIdList = invertedIndexList.stream().map(InvertedIndex::getDocumentId).collect(Collectors.toList());
+            List<SimilarityIndex> similarityIndexList = QsimilarityIndexRepository.getSimilarityIndexByDocumentIdList(documentIdList);
+
+            // Get Map
+            Map<Long, InvertedIndex> invertedIndexMap = invertedIndexList.stream().collect(
+                    Collectors.toMap(InvertedIndex::getDocumentId,invertedIndex -> invertedIndex)
+            );
+            Map<Long, List<SimilarityIndex>> similarityIndexMap = new HashMap<>();
+            for (long documentID:documentIdList) {
+                List<SimilarityIndex> sub_similarityIndexList = similarityIndexList.stream()
+                        .filter(similarityIndex -> similarityIndex.getDocumentId()==documentID)
+                        .collect(Collectors.toList());
+                similarityIndexMap.put(documentID, sub_similarityIndexList);
+            }
+
+            // Create Similarity Index By Word
+            addSimilarityScore(word, articleCount, invertedIndexList, invertedIndexMap, similarityIndexMap);
+
+            similarityRepository.saveAll(similarityIndexList);
+        }
     }
 
     @Transactional
@@ -216,20 +229,64 @@ public class RecommendationService implements RecommendationUsecase {
             similarityIndexMap.put(documentID, sub_similarityIndexList);
         }
 
-        for (InvertedIndex invertedIndex:invertedIndexList) {
-            for (SimilarityIndex similarityIndex : similarityIndexMap.get(invertedIndex.getDocumentId())) {
-                InvertedIndex counterInvertedIndex = invertedIndexMap.get(similarityIndex.getCounterDocumentId());
-                double OldScore = invertedIndex.getPriorityScore() * counterInvertedIndex.getPriorityScore();
-                double newScore = invertedIndex.TFIDF(word.getDocumentFrequency(), articleCount)
-                        * counterInvertedIndex.TFIDF(word.getDocumentFrequency(), articleCount);
-                similarityIndex.addScore(newScore - OldScore);
-            }
-        }
+        subSimilarityScore(invertedIndexList, invertedIndexMap, similarityIndexMap);
+        addSimilarityScore(word, articleCount, invertedIndexList, invertedIndexMap, similarityIndexMap);
 
         word.updateFinished();
 
         invertedIndexRepository.saveAll(invertedIndexList);
         similarityRepository.saveAll(similarityIndexList);
         wordRepository.save(word);
+    }
+
+    private void subSimilarityScore(List<InvertedIndex> invertedIndexList,
+                                    Map<Long, InvertedIndex> invertedIndexMap,
+                                    Map<Long, List<SimilarityIndex>> similarityIndexMap) {
+        for (InvertedIndex invertedIndex:invertedIndexList) {
+            for (SimilarityIndex similarityIndex : similarityIndexMap.get(invertedIndex.getDocumentId())) {
+                InvertedIndex counterInvertedIndex = invertedIndexMap.get(similarityIndex.getCounterDocumentId());
+                double OldScore = invertedIndex.getPriorityScore() * counterInvertedIndex.getPriorityScore();
+                similarityIndex.subScore(OldScore);
+            }
+        }
+    }
+
+    private void addSimilarityScore(Word word, long articleCount,
+                                    List<InvertedIndex> invertedIndexList,
+                                    Map<Long, InvertedIndex> invertedIndexMap,
+                                    Map<Long, List<SimilarityIndex>> similarityIndexMap) {
+        for (InvertedIndex invertedIndex:invertedIndexList) {
+            for (SimilarityIndex similarityIndex : similarityIndexMap.get(invertedIndex.getDocumentId())) {
+                InvertedIndex counterInvertedIndex = invertedIndexMap.get(similarityIndex.getCounterDocumentId());
+                double newScore = invertedIndex.TFIDF(word.getDocumentFrequency(), articleCount)
+                        * counterInvertedIndex.TFIDF(word.getDocumentFrequency(), articleCount);
+                System.out.println(word.getTerm() + " " + similarityIndex.getDocumentId() + " " + similarityIndex.getCounterDocumentId() + " " + newScore);
+                similarityIndex.addScore(newScore);
+            }
+        }
+    }
+
+    private void addSimilarityScoreByDocumentId(long documentId, long articleCount) {
+        List<SimilarityIndex> similarityIndexList = new ArrayList<>();
+        for (int i=0;i<articleCount;i++) {
+            similarityIndexList.add(SimilarityIndex.builder()
+                    .documentId(documentId)
+                    .counterDocumentId(i+1)
+                    .build());
+        }
+
+        List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByDocumentId(documentId);
+        invertedIndexList.forEach(invertedIndex -> {
+            String term = invertedIndex.getTerm();
+            double termScore = invertedIndex.getPriorityScore();
+
+            invertedIndexRepository.findAllByTerm(term).forEach(index -> {
+                if (documentId == index.getDocumentId()) return;
+                SimilarityIndex similarityIndex = similarityIndexList.get((int) index.getDocumentId()-1);
+                double multipliedScore = termScore * index.getPriorityScore();
+                similarityIndex.addScore(multipliedScore);
+                similarityRepository.save(similarityIndex);
+            });
+        });
     }
 }

@@ -4,11 +4,13 @@ import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
 import io.github.parkjeongwoong.application.blog.repository.QueryDSL.InvertedIndexRepositoryCustom;
+import io.github.parkjeongwoong.application.blog.repository.WordRepository;
 import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.InvertedIndex;
+import io.github.parkjeongwoong.entity.Word;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ public class SearchService implements SearchUsecase {
     private final InvertedIndexRepository invertedIndexRepository;
     private final InvertedIndexRepositoryCustom QinvertedIndexRepository;
     private final ArticleRepository articleRepository;
+    private final WordRepository wordRepository;
     private final RecommendationUsecase recommendationUsecase;
 
     public List<ArticleSearchResultDto> searchArticle(String words, long offset) {
@@ -56,6 +59,7 @@ public class SearchService implements SearchUsecase {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};
         long documentId = article.getId();
+        long articleCount = articleRepository.count();
         recommendationUsecase.deleteWordByDocumentId_wordEffectOnly(documentId);
         invertedIndexRepository.deleteAllByDocumentId(documentId);
 
@@ -71,6 +75,10 @@ public class SearchService implements SearchUsecase {
         createProcessedInvertedIndexData(titleWords, "title", documentId, position, processedData);
         createProcessedInvertedIndexData(contentWords, "content", documentId, position, processedData);
 
+        processedData.values().forEach(invertedIndex -> {
+            Word word = wordRepository.findById(invertedIndex.getTerm()).orElse(null);
+            invertedIndex.TFIDF(word.getDocumentFrequency(), articleCount);
+        });
         processedData.values().forEach(invertedIndexRepository::save);
     }
 
