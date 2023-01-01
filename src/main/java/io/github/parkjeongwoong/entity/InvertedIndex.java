@@ -1,5 +1,6 @@
 package io.github.parkjeongwoong.entity;
 
+import io.github.parkjeongwoong.application.blog.dto.DocumentFrequencyDto;
 import io.github.parkjeongwoong.entity.CompositeKey.InvertedIndexKey;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +47,15 @@ public class InvertedIndex {
             case "content":
                 this.termFrequency += 1;
         }
+    }
+
+    public double TFIDF(DocumentFrequencyDto documentFrequencyDto) {
+        double df = documentFrequencyDto.getDf();
+        long totalArticleNumber = documentFrequencyDto.getArticleCount();
+        double tf = this.termFrequency;
+        double idf = Math.log(totalArticleNumber / df);
+        this.priorityScore = tf * idf;
+        return this.priorityScore;
     }
 
     public double TFIDF(double df, long totalArticleNumber) {

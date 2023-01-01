@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,8 +25,7 @@ public class SimilarityIndexRepositoryImpl implements SimilarityIndexRepositoryC
 
         return jpaQueryFactory.selectFrom(similarityIndex)
                 .where(builder)
-                .fetch()
-                .stream().collect(Collectors.toList());
+                .fetch();
     }
 
 }

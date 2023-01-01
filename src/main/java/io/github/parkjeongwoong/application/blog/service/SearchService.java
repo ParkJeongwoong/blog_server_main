@@ -1,14 +1,18 @@
 package io.github.parkjeongwoong.application.blog.service;
 
 import io.github.parkjeongwoong.application.blog.dto.ArticleSearchResultDto;
+import io.github.parkjeongwoong.application.blog.dto.Word_SimilarityScoreDto;
 import io.github.parkjeongwoong.application.blog.repository.ArticleRepository;
 import io.github.parkjeongwoong.application.blog.repository.InvertedIndexRepository;
 import io.github.parkjeongwoong.application.blog.repository.QueryDSL.InvertedIndexRepositoryCustom;
+import io.github.parkjeongwoong.application.blog.repository.QueryDSL.WordRepositoryCustom;
+import io.github.parkjeongwoong.application.blog.repository.WordRepository;
 import io.github.parkjeongwoong.application.blog.service.textRefine.TextRefining;
 import io.github.parkjeongwoong.application.blog.usecase.RecommendationUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.SearchUsecase;
 import io.github.parkjeongwoong.entity.Article;
 import io.github.parkjeongwoong.entity.InvertedIndex;
+import io.github.parkjeongwoong.entity.Word;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,8 @@ public class SearchService implements SearchUsecase {
     private final InvertedIndexRepository invertedIndexRepository;
     private final InvertedIndexRepositoryCustom QinvertedIndexRepository;
     private final ArticleRepository articleRepository;
+    private final WordRepository wordRepository;
+    private final WordRepositoryCustom QwordRepository;
     private final RecommendationUsecase recommendationUsecase;
 
     public List<ArticleSearchResultDto> searchArticle(String words, long offset) {
@@ -44,7 +50,8 @@ public class SearchService implements SearchUsecase {
     public void invertedIndexProcess() {
         long articleCount = articleRepository.count();
         Map<String, Long> termToDF = QinvertedIndexRepository.getDocumentFrequencyByTerm();
-        articleRepository.findAll().forEach(this::createInvertedIndex);
+
+        articleRepository.findAll().forEach(this::createInvertedIndex); // Inverted_index, Word 재생성
         invertedIndexRepository.findAll().forEach(invertedIndex -> {
             invertedIndex.TFIDF(termToDF.get(invertedIndex.getTerm()), articleCount);
             invertedIndexRepository.save(invertedIndex);
@@ -56,7 +63,7 @@ public class SearchService implements SearchUsecase {
         Map<String, InvertedIndex> processedData = new HashMap<>();
         final long[] position = {0};
         long documentId = article.getId();
-        recommendationUsecase.deleteWordByDocumentId_wordEffectOnly(documentId);
+        deleteWordByDocumentId_wordEffectOnly(documentId);
         invertedIndexRepository.deleteAllByDocumentId(documentId);
 
         List<String> titleWords = makeRefinedWords(article.getTitle());
@@ -69,11 +76,38 @@ public class SearchService implements SearchUsecase {
         processedData.values().forEach(invertedIndexRepository::save);
     }
 
-    private List<String> makeRefinedWords(String rawStringData) {
-        return new ArrayList<>(Arrays.asList(TextRefining.preprocessingContent(rawStringData).split(" "))).stream()
-                .map(TextRefining::refineWord)
-                .filter(str-> !str.equals(""))
-                .collect(Collectors.toList());
+    @Transactional
+    private void saveWord(String term) {
+        Word word = wordRepository.findById(term).orElse(null);
+        if (word == null) {
+            word = Word.builder().term(term).build();
+        }
+        word.addDocumentFrequency();
+        wordRepository.save(word);
+    }
+
+    @Transactional
+    private void deleteWord(String term) {
+        Word word = wordRepository.findById(term).orElse(null);
+        if (word == null) {
+            return;
+        }
+        word.subDocumentFrequency();
+        wordRepository.save(word);
+    }
+
+    @Transactional
+    private void deleteWordByDocumentId_similarityUpdate(long documentId) {
+        List<String> termList = invertedIndexRepository.findAllByDocumentId(documentId).stream().map(InvertedIndex::getTerm).collect(Collectors.toList());
+        termList.forEach(this::deleteWord);
+        List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllByIdWithArticleCount(termList);
+        wordSimilarityScoreDtoList.forEach(recommendationUsecase::updateSimilarityByWord);
+    }
+
+    @Transactional
+    private void deleteWordByDocumentId_wordEffectOnly(long documentId) {
+        List<String> termList = invertedIndexRepository.findAllByDocumentId(documentId).stream().map(InvertedIndex::getTerm).collect(Collectors.toList());
+        termList.forEach(this::deleteWord);
     }
 
     private void createProcessedInvertedIndexData(List<String> words, String textType, long documentId, long[] position, Map<String, InvertedIndex> processedData) {
@@ -95,7 +129,14 @@ public class SearchService implements SearchUsecase {
         totalWords.addAll(titleWords);
         totalWords.addAll(contentWords);
         Set<String> wordSets = new HashSet<>(totalWords);
-        wordSets.forEach(recommendationUsecase::saveWord);
+        wordSets.forEach(this::saveWord);
+    }
+
+    private List<String> makeRefinedWords(String rawStringData) {
+        return new ArrayList<>(Arrays.asList(TextRefining.preprocessingContent(rawStringData).split(" "))).stream()
+                .map(TextRefining::refineWord)
+                .filter(str-> !str.equals(""))
+                .collect(Collectors.toList());
     }
 
     // Todo - 글 수정 삭제 이후의 작업
