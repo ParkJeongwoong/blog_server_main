@@ -4,7 +4,7 @@ import io.github.parkjeongwoong.adapter.filter.JwtAuthenticationFilter;
 import io.github.parkjeongwoong.adapter.handler.CustomAccessDeniedHandler;
 import io.github.parkjeongwoong.adapter.handler.CustomAuthenticationEntryPoint;
 import io.github.parkjeongwoong.application.user.service.JwtTokenProvider;
-import io.github.parkjeongwoong.application.user.service.UserDeatilsService;
+import io.github.parkjeongwoong.application.user.service.UserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDeatilsService userDeatilsService;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     @Override
@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()).and()
             .formLogin().loginPage("/blog/login").and()
             .logout().logoutSuccessUrl("/").and()
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userDeatilsService),
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService),
                              UsernamePasswordAuthenticationFilter.class); // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가
 
 
