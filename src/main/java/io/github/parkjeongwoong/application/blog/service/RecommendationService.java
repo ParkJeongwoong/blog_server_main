@@ -69,21 +69,39 @@ public class RecommendationService implements RecommendationUsecase {
         articleList.forEach(article -> createSimilarityIndex(article.getId()));
 
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllWithArticleCount();
-        wordSimilarityScoreDtoList.forEach(this::addSimilarityProcess_byWord);
+        final int[] step = {1};
+        wordSimilarityScoreDtoList.forEach(word_similarityScoreDto -> {
+            System.out.println(step[0] + "/" + wordSimilarityScoreDtoList.size());
+            addSimilarityProcess_byWord(word_similarityScoreDto);
+            step[0] = step[0] +1;
+        });
+        System.out.println("resetAllSimilarity Finished");
     }
 
     @Transactional
     public void updateSimilarityProcess() {
         // Similarity 업데이트
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllByIsUpdatedTrue();
-        wordSimilarityScoreDtoList.forEach(this::updateSimilarityProcess_byWord);
+        final int[] step = {1};
+        wordSimilarityScoreDtoList.forEach(word_similarityScoreDto -> {
+            System.out.println(step[0] + "/" + wordSimilarityScoreDtoList.size());
+            updateSimilarityProcess_byWord(word_similarityScoreDto);
+            step[0] = step[0] +1;
+        });
+        System.out.println("updateSimilarityProcess Finished");
     }
 
     @Transactional
     public void updateAllSimilarityProcess() {
         // Similarity 전체 업데이트
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllWithArticleCount();
-        wordSimilarityScoreDtoList.forEach(this::updateSimilarityProcess_byWord);
+        final int[] step = {1};
+        wordSimilarityScoreDtoList.forEach(word_similarityScoreDto -> {
+            System.out.println(step[0] + "/" + wordSimilarityScoreDtoList.size());
+            updateSimilarityProcess_byWord(word_similarityScoreDto);
+            step[0] = step[0] +1;
+        });
+        System.out.println("updateAllSimilarityProcess Finished");
     }
 
     @Transactional
@@ -101,7 +119,7 @@ public class RecommendationService implements RecommendationUsecase {
         Map<Long, List<SimilarityIndex>> similarityIndexMap = getSimilarityIndexMap(similarityIndexList, documentIdList);
 
         // Sub & Add Similarity Index By Word
-        System.out.println("Word : " + word);
+        System.out.println("Word : " + word.getTerm());
         System.out.println("Start Subtracting...");
         subSimilarityScore(invertedIndexList, invertedIndexMap, similarityIndexMap);
         System.out.println("Start Adding...");
