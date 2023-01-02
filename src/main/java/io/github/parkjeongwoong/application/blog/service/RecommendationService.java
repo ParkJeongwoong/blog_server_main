@@ -69,35 +69,42 @@ public class RecommendationService implements RecommendationUsecase {
         articleList.forEach(article -> createSimilarityIndex(article.getId()));
 
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllWithArticleCount();
-        wordSimilarityScoreDtoList.forEach(this::addSimilarityScoreByWord);
+        wordSimilarityScoreDtoList.forEach(this::addSimilarityProcess_byWord);
     }
 
     @Transactional
-    public void updateSimilarity() {
+    public void updateSimilarityProcess() {
         // Similarity 업데이트
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllByIsUpdatedTrue();
-        wordSimilarityScoreDtoList.forEach(this::updateSimilarityByWord);
+        wordSimilarityScoreDtoList.forEach(this::updateSimilarityProcess_byWord);
     }
 
     @Transactional
-    public void updateAllSimilarity() {
+    public void updateAllSimilarityProcess() {
         // Similarity 전체 업데이트
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllWithArticleCount();
-        wordSimilarityScoreDtoList.forEach(this::updateSimilarityByWord);
+        wordSimilarityScoreDtoList.forEach(this::updateSimilarityProcess_byWord);
     }
 
     @Transactional
-    public void updateSimilarityByWord(Word_SimilarityScoreDto wordSimilarityScoreDto) {
-        Word word = wordSimilarityScoreDto.getWord();
+    public void updateSimilarityProcess_byWord(Word_SimilarityScoreDto wordSimilarityScoreDto) {
         // 단어별 Similarity 업데이트
+        Word word = wordSimilarityScoreDto.getWord();
+
+        // Get List
         List<InvertedIndex> invertedIndexList = invertedIndexRepository.findAllByTerm(word.getTerm());
         List<Long> documentIdList = invertedIndexList.stream().map(InvertedIndex::getDocumentId).collect(Collectors.toList());
         List<SimilarityIndex> similarityIndexList = QsimilarityIndexRepository.getSimilarityIndexByDocumentIdList(documentIdList);
 
+        // Get Map
         Map<Long, InvertedIndex> invertedIndexMap = getInvertedIndexMap(invertedIndexList);
         Map<Long, List<SimilarityIndex>> similarityIndexMap = getSimilarityIndexMap(similarityIndexList, documentIdList);
 
+        // Sub & Add Similarity Index By Word
+        System.out.println("Word : " + word);
+        System.out.println("Start Subtracting...");
         subSimilarityScore(invertedIndexList, invertedIndexMap, similarityIndexMap);
+        System.out.println("Start Adding...");
         addSimilarityScore(wordSimilarityScoreDto, invertedIndexList, invertedIndexMap, similarityIndexMap);
 
         word.updateFinished();
@@ -107,7 +114,7 @@ public class RecommendationService implements RecommendationUsecase {
         wordRepository.save(word);
     }
 
-    private void addSimilarityScoreByWord(Word_SimilarityScoreDto wordSimilarityScoreDto) {
+    private void addSimilarityProcess_byWord(Word_SimilarityScoreDto wordSimilarityScoreDto) {
         Word word = wordSimilarityScoreDto.getWord();
 
         // Get List
@@ -120,6 +127,8 @@ public class RecommendationService implements RecommendationUsecase {
         Map<Long, List<SimilarityIndex>> similarityIndexMap = getSimilarityIndexMap(similarityIndexList, documentIdList);
 
         // Create Similarity Index By Word
+        System.out.println("Word : " + word);
+        System.out.println("Start Adding...");
         addSimilarityScore(wordSimilarityScoreDto, invertedIndexList, invertedIndexMap, similarityIndexMap);
 
         similarityRepository.saveAll(similarityIndexList);

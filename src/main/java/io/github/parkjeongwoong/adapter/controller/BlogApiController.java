@@ -99,7 +99,7 @@ public class BlogApiController {
 
     // Recommendation
     @PutMapping("/recommend/make-similarity-index")
-    public void make_similarity_index2() { recommendationUsecase.updateAllSimilarity(); }
+    public void make_similarity_index2() { recommendationUsecase.updateAllSimilarityProcess(); }
     @PutMapping("/recommend/reset-similarity-index")
     public void reset_similarity_index2() { recommendationUsecase.resetAllSimilarity(); }
 

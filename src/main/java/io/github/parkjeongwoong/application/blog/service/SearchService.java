@@ -101,7 +101,7 @@ public class SearchService implements SearchUsecase {
         List<String> termList = invertedIndexRepository.findAllByDocumentId(documentId).stream().map(InvertedIndex::getTerm).collect(Collectors.toList());
         termList.forEach(this::deleteWord);
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllByIdWithArticleCount(termList);
-        wordSimilarityScoreDtoList.forEach(recommendationUsecase::updateSimilarityByWord);
+        wordSimilarityScoreDtoList.forEach(recommendationUsecase::updateSimilarityProcess_byWord);
     }
 
     @Transactional

@@ -29,6 +29,7 @@ var js_admin = {
              type: 'put',
              url: '/blog-api/search/make-inverted-index'
          }).done(function () {
+             alert('Inverted Index 생성 완료');
              window.location.href = '/blog/admin';
          }).fail(function (error) {
              alert(JSON.stringify(error));
@@ -39,6 +40,7 @@ var js_admin = {
               type: 'put',
               url: '/blog-api/recommend/make-similarity-index'
           }).done(function () {
+             alert('Similarity Index 수정 완료');
               window.location.href = '/blog/admin';
           }).fail(function (error) {
               alert(JSON.stringify(error));
@@ -49,6 +51,7 @@ var js_admin = {
              type: 'put',
              url: '/blog-api/recommend/reset-similarity-index'
          }).done(function () {
+             alert('Similarity Index 재생성 완료');
              window.location.href = '/blog/admin';
          }).fail(function (error) {
              alert(JSON.stringify(error));

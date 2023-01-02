@@ -8,8 +8,8 @@ import java.util.List;
 public interface RecommendationUsecase {
     List<RecommendedArticleResponseDto> get5SimilarArticle(long documentId);
     void createSimilarityIndex(long documentId);
-    void updateSimilarity();
-    void updateAllSimilarity();
+    void updateSimilarityProcess();
+    void updateAllSimilarityProcess();
     void resetAllSimilarity();
-    void updateSimilarityByWord(Word_SimilarityScoreDto wordSimilarityScoreDto);
+    void updateSimilarityProcess_byWord(Word_SimilarityScoreDto wordSimilarityScoreDto);
 }
