@@ -127,7 +127,7 @@ public class RecommendationService implements RecommendationUsecase {
         Map<Long, List<SimilarityIndex>> similarityIndexMap = getSimilarityIndexMap(similarityIndexList, documentIdList);
 
         // Create Similarity Index By Word
-        System.out.println("Word : " + word);
+        System.out.println("Word : " + word.getTerm());
         System.out.println("Start Adding...");
         addSimilarityScore(wordSimilarityScoreDto, invertedIndexList, invertedIndexMap, similarityIndexMap);
 
