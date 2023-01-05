@@ -7,6 +7,7 @@ import io.github.parkjeongwoong.application.blog.usecase.BlogUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.ServerSynchronizingUsecase;
 import io.github.parkjeongwoong.entity.Visitor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -26,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BlogService implements BlogUsecase {
@@ -39,9 +41,9 @@ public class BlogService implements BlogUsecase {
     public void visited(VisitorSaveRequestDto requestDto) {
         Visitor visitor = requestDto.toEntity();
         LocalDateTime currentTime = LocalDateTime.now();
-        System.out.println("Visitor just visited : " + visitor.getUrl());
-        System.out.println("Visitor's IP address is : " + visitor.getIp());
-        System.out.println("Current Time : " + currentTime);
+        log.info("Visitor just visited : {}", visitor.getUrl());
+        log.info("Visitor's IP address is : {}", visitor.getIp());
+        log.info("Current Time : {}", currentTime);
 
         if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         if (isStrangeAccess(visitor.getIp(), currentTime)) return ;
@@ -163,7 +165,7 @@ public class BlogService implements BlogUsecase {
         if (lastVisitor == null || !Objects.equals(lastVisitor.getIp(), ip)) return false;
         Duration duration = Duration.between(lastVisitor.getCreatedDate(), date);
         if (duration.getSeconds() < 1 && duration.getNano() < 700000000) {
-            System.out.println("Warning Too Fast Access! Duration : " + duration.getSeconds() + "." + String.format("%09d",duration.getNano()) + "s");
+            log.warn("Warning - Too Fast Access! Duration : {}.{}s", duration.getSeconds(), String.format("%09d",duration.getNano()));
             return true;
         }
         return false;

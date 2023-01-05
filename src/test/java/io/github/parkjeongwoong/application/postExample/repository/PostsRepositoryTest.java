@@ -2,6 +2,7 @@ package io.github.parkjeongwoong.application.postExample.repository;
 
 import io.github.parkjeongwoong.application.postExample.repository.PostsRepository;
 import io.github.parkjeongwoong.entity.example.Posts;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class PostsRepositoryTest {
@@ -63,7 +65,7 @@ public class PostsRepositoryTest {
         // Then
         Posts posts = postsList.get(0);
 
-        System.out.println(">>>>>>>>>> createDate="+posts.getCreatedDate()+", modifiedDate="+posts.getModifiedDate());
+        log.info(">>>>>>>>>> createDate={}, modifiedDate={}", posts.getCreatedDate(), posts.getModifiedDate());
 
         assertThat(posts.getCreatedDate()).isAfter(now);
         assertThat(posts.getModifiedDate()).isAfter(now);

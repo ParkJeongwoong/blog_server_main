@@ -12,6 +12,7 @@ import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 import io.github.parkjeongwoong.entity.Image;
 import io.github.parkjeongwoong.etc.ServerState;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -26,6 +27,7 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class FileService implements FileUsecase {
@@ -99,8 +101,8 @@ public class FileService implements FileUsecase {
     }
 
     private boolean compareImageCnt(int uploadedImageCnt, int articleImageCnt) throws InputMismatchException {
-        System.out.println("업로드된 이미지 개수 : " + uploadedImageCnt);
-        System.out.println("파일의 이미지 개수 : " + articleImageCnt);
+        log.info("업로드된 이미지 개수 : {}", uploadedImageCnt);
+        log.info("파일의 이미지 개수 : {}", articleImageCnt);
         return uploadedImageCnt != articleImageCnt;
     }
 
@@ -118,9 +120,9 @@ public class FileService implements FileUsecase {
                 imageIdx++;
             }
 
-            System.out.println("이미지 저장 완료");
+            log.info("이미지 저장 완료");
         } catch (Exception e) {
-            System.out.println("에러 : " + e.getMessage());
+            log.error("이미지 저장 에러", e);
         }
 
         if (imageIdx != imageFiles.size()) throw new RuntimeException("이미지 저장 중 문제가 발생했습니다");

@@ -1,9 +1,11 @@
 package io.github.parkjeongwoong.etc;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+@Slf4j
 @Component
 public class ServerState {
     private long isArticleUpdate;
@@ -11,7 +13,7 @@ public class ServerState {
     @PostConstruct
     public void init() {
         this.isArticleUpdate = 0;
-        System.out.println("ServerState init");
+        log.info("ServerState init");
     }
 
     public long checkArticleUpdate() { return isArticleUpdate; }

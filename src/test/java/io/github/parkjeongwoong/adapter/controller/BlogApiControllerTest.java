@@ -6,6 +6,7 @@
 //import io.github.parkjeongwoong.application.blog.repository.VisitorRepository;
 //import io.github.parkjeongwoong.application.blog.repository.ImageRepository;
 //import io.github.parkjeongwoong.entity.Visitor;
+//import lombok.extern.slf4j.Slf4j;
 //import org.junit.jupiter.api.AfterEach;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,7 @@
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 //
+//@Slf4j
 //@ExtendWith(SpringExtension.class)
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //@AutoConfigureMockMvc
@@ -113,7 +115,7 @@
 //    public void test_history() throws Exception {
 //        // Given
 //        LocalDateTime now = LocalDateTime.now();
-//        System.out.println(now);
+//        log.info(now);
 //        String url = "http://localhost:" + port + "/blog-api/history";
 //        String localAddress = "127.0.0.1";
 //        String testUrl1 = "https://www.test.com";
@@ -146,7 +148,7 @@
 //                .andExpect(jsonPath("$[1].lastPage").doesNotExist())
 //                .andReturn();
 //        String content = mvcResult.getResponse().getContentAsString();
-//        System.out.println(content);
+//        log.info(content);
 //    }
 //
 //    @Test

@@ -32,8 +32,7 @@ public class UserService {
             return signup(requestDto.getUserId(), requestDto.getUserName(), requestDto.getUserEmail(), UserType.USER, requestDto.getUserPassword());
         }
         catch (DuplicateKeyException e) {
-            e.printStackTrace();
-            System.out.println("User ID 중복");
+            log.error("User ID 중복", e);
             response.setStatus(400);
         }
         catch (NoSuchAlgorithmException e) {
@@ -51,8 +50,7 @@ public class UserService {
             return newUserType;
         }
         catch (NoSuchElementException e) {
-            e.printStackTrace();
-            System.out.println("존재하지 않는 ID 입니다.");
+            log.error("존재하지 않는 ID 입니다.", e);
         }
         return null;
     }

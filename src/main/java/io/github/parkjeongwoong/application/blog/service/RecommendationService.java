@@ -15,6 +15,7 @@ import io.github.parkjeongwoong.entity.InvertedIndex;
 import io.github.parkjeongwoong.entity.SimilarityIndex;
 import io.github.parkjeongwoong.entity.Word;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class RecommendationService implements RecommendationUsecase {
@@ -71,11 +73,11 @@ public class RecommendationService implements RecommendationUsecase {
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllWithArticleCount();
         final int[] step = {1};
         wordSimilarityScoreDtoList.forEach(word_similarityScoreDto -> {
-            System.out.println(step[0] + "/" + wordSimilarityScoreDtoList.size());
+            log.info("{}/{}", step[0], wordSimilarityScoreDtoList.size());
             addSimilarityProcess_byWord(word_similarityScoreDto);
             step[0] = step[0] +1;
         });
-        System.out.println("resetAllSimilarity Finished");
+        log.info("resetAllSimilarity Finished");
     }
 
     @Transactional
@@ -84,11 +86,11 @@ public class RecommendationService implements RecommendationUsecase {
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllByIsUpdatedTrue();
         final int[] step = {1};
         wordSimilarityScoreDtoList.forEach(word_similarityScoreDto -> {
-            System.out.println(step[0] + "/" + wordSimilarityScoreDtoList.size());
+            log.info("{}/{}", step[0], wordSimilarityScoreDtoList.size());
             updateSimilarityProcess_byWord(word_similarityScoreDto);
             step[0] = step[0] +1;
         });
-        System.out.println("updateSimilarityProcess Finished");
+        log.info("updateSimilarityProcess Finished");
     }
 
     @Transactional
@@ -97,11 +99,11 @@ public class RecommendationService implements RecommendationUsecase {
         List<Word_SimilarityScoreDto> wordSimilarityScoreDtoList = QwordRepository.findAllWithArticleCount();
         final int[] step = {1};
         wordSimilarityScoreDtoList.forEach(word_similarityScoreDto -> {
-            System.out.println(step[0] + "/" + wordSimilarityScoreDtoList.size());
+            log.info("{}/{}", step[0], wordSimilarityScoreDtoList.size());
             updateSimilarityProcess_byWord(word_similarityScoreDto);
             step[0] = step[0] +1;
         });
-        System.out.println("updateAllSimilarityProcess Finished");
+        log.info("updateAllSimilarityProcess Finished");
     }
 
     @Transactional
@@ -119,10 +121,10 @@ public class RecommendationService implements RecommendationUsecase {
         Map<Long, List<SimilarityIndex>> similarityIndexMap = getSimilarityIndexMap(similarityIndexList, documentIdList);
 
         // Sub & Add Similarity Index By Word
-        System.out.println("Word : " + word.getTerm());
-        System.out.println("Start Subtracting...");
+        log.info("Word : {}", word.getTerm());
+        log.info("Start Subtracting...");
         subSimilarityScore(invertedIndexList, invertedIndexMap, similarityIndexMap);
-        System.out.println("Start Adding...");
+        log.info("Start Adding...");
         addSimilarityScore(wordSimilarityScoreDto, invertedIndexList, invertedIndexMap, similarityIndexMap);
 
         word.updateFinished();
@@ -145,8 +147,8 @@ public class RecommendationService implements RecommendationUsecase {
         Map<Long, List<SimilarityIndex>> similarityIndexMap = getSimilarityIndexMap(similarityIndexList, documentIdList);
 
         // Create Similarity Index By Word
-        System.out.println("Word : " + word.getTerm());
-        System.out.println("Start Adding...");
+        log.info("Word : {}", word.getTerm());
+        log.info("Start Adding...");
         addSimilarityScore(wordSimilarityScoreDto, invertedIndexList, invertedIndexMap, similarityIndexMap);
 
         similarityRepository.saveAll(similarityIndexList);

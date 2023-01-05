@@ -2,6 +2,7 @@ package io.github.parkjeongwoong.application.data.service;
 
 import io.github.parkjeongwoong.application.data.usecase.DataUsecase;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class DataService implements DataUsecase {
@@ -86,7 +88,7 @@ public class DataService implements DataUsecase {
         String filePath = default_filePath + filename;
         File dFile = new File(filePath);
         if (!dFile.exists()) {
-            System.out.println("Find file again");
+            log.info("Find file again");
 
             filePath = System.getProperty("user.dir")
                     + File.separator + "src"
@@ -95,9 +97,9 @@ public class DataService implements DataUsecase {
                     + File.separator + "downloadable"
                     + File.separator + filename;
             dFile = new File(filePath);
-        } else {System.out.println("Find file");}
+        } else {log.info("Find file");}
 
-        System.out.println("File Path : " + filePath);
+        log.info("File Path : {}", filePath);
         return dFile;
     }
 

@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @Getter
 @NoArgsConstructor
 public class VisitorSaveRequestDto {
@@ -26,10 +28,10 @@ public class VisitorSaveRequestDto {
     private void setIp() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ip = request.getHeader("X-FORWARDED-FOR");
-        System.out.println("X-FORWARDED-FOR : " + ip);
+        log.info("X-FORWARDED-FOR : {}", ip);
         if (ip == null) {
             ip = request.getRemoteAddr();
-            System.out.println("getRemoteAddr : " + ip);
+            log.info("getRemoteAddr: {}", ip);
         }
         this.ip = ip;
     }

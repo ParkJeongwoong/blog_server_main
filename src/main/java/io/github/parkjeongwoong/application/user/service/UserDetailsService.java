@@ -5,11 +5,13 @@ import io.github.parkjeongwoong.application.user.repository.UserRepository;
 import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
@@ -23,7 +25,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         try {
             return userRepository.findByUsername(userName).orElseThrow(NoSuchElementException::new);
         } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다.");
+            log.error("존재하지 않는 사용자입니다.");
             return null;
         }
     }
@@ -32,7 +34,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         try {
             return refreshTokenRepository.findById(refreshTokenId).orElseThrow(NoSuchElementException::new);
         } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다.");
+            log.error("존재하지 않는 사용자입니다.");
             return null;
         }
     }
@@ -41,7 +43,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         try {
             return userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
         } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다.");
+            log.error("존재하지 않는 사용자입니다.");
             return null;
         }
     }

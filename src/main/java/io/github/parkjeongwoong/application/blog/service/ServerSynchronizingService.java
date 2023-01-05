@@ -6,6 +6,7 @@ import io.github.parkjeongwoong.application.blog.dto.SendArticleSyncDto;
 import io.github.parkjeongwoong.application.blog.dto.VisitorSaveRequestDto;
 import io.github.parkjeongwoong.application.blog.usecase.ServerSynchronizingUsecase;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.PostConstruct;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ServerSynchronizingService implements ServerSynchronizingUsecase {
@@ -43,7 +45,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
                     .bodyToMono(String.class)
                     .block();
 
-            System.out.println("Backup To : " + backupServer);
+            log.info("Backup To : {}", backupServer);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -65,7 +67,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
                     .bodyToMono(String.class)
                     .block();
 
-            System.out.println("Backup To : " + backupServer);
+            log.info("Backup To : {}", backupServer);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

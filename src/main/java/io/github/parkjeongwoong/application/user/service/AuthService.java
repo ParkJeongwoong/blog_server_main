@@ -51,7 +51,6 @@ public class AuthService {
         }
         catch (NoSuchElementException e) {
             log.info("로그인 실패 - 존재하지 않는 ID");
-            System.out.println("존재하지 않는 ID 입니다.");
             response.setStatus(404);
             return UserLoginResponseDto.builder().result(false).message("존재하지 않는 ID 입니다.").build();
         }

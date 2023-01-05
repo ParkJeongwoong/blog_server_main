@@ -8,6 +8,7 @@ import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
     // JwtTokenProvider의 검증 이후 Jwt로 유저 정보를 조회 -> UserPasswordAuthenticationFilter로 전달
@@ -64,7 +66,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                         ((HttpServletResponse) response).setStatus(206);
                     }
                 } catch (ExpiredJwtException refreshTokenExpired) { // refreshToken 만료
-                    System.out.println("Refresh Token 만료");
+                    log.info("Refresh Token 만료");
                 }
             }
         }
