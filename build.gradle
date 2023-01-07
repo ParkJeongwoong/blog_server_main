@@ -67,6 +67,9 @@ dependencies {
     // Logging
     implementation('org.slf4j:jcl-over-slf4j')
     implementation('ch.qos.logback:logback-classic')
+
+    // Mailing
+    implementation('org.springframework.boot:spring-boot-starter-mail')
 }
 
 // QueryDSL

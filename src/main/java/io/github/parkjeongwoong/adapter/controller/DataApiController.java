@@ -1,5 +1,6 @@
 package io.github.parkjeongwoong.adapter.controller;
 
+import io.github.parkjeongwoong.application.blog.usecase.ServerSynchronizingUsecase;
 import io.github.parkjeongwoong.application.data.usecase.DataUsecase;
 import io.github.parkjeongwoong.etc.ServerState;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +20,16 @@ import java.io.IOException;
 public class DataApiController {
 
     private final DataUsecase dataUsecase;
+    private final ServerSynchronizingUsecase serverSynchronizingUsecase;
 
     @GetMapping("/download/{filename}")
     public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable("filename") String filename) throws IOException {
         dataUsecase.download(request, response, filename);
+    }
+
+    @GetMapping("/ping")
+    public boolean ping() {
+        return serverSynchronizingUsecase.ping("sub");
     }
 
     // 전역 변수 TEST

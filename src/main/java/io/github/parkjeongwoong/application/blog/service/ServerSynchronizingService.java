@@ -2,8 +2,10 @@ package io.github.parkjeongwoong.application.blog.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.parkjeongwoong.application.blog.dto.MailSendDto;
 import io.github.parkjeongwoong.application.blog.dto.SendArticleSyncDto;
 import io.github.parkjeongwoong.application.blog.dto.VisitorSaveRequestDto;
+import io.github.parkjeongwoong.application.blog.usecase.MailingUsecase;
 import io.github.parkjeongwoong.application.blog.usecase.ServerSynchronizingUsecase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +16,16 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class ServerSynchronizingService implements ServerSynchronizingUsecase {
+
+    private final MailingUsecase mailingUsecase;
     private WebClient webClient;
 
     @Value("${backup.server}")
@@ -74,6 +81,31 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
     }
 
+    public boolean ping(String address) {
+
+        try {
+
+            if (address.equals("sub")) address = "146.56.105.176";
+            InetAddress inetAddress = InetAddress.getByName(address);
+
+            if (!inetAddress.isReachable(2000)) {
+                log.info("Reachable IP : {}", address);
+                return true;
+            } else {
+                sendSubServerPingErrorMail();
+                log.info("Unreachable IP : {}", address);
+            }
+
+        } catch (UnknownHostException e) {
+            log.error("IP 주소 문제", e);
+        } catch (IOException e) {
+            log.error("isReachable 문제", e);
+        }
+
+        return false;
+
+    }
+
     public void updateArticleSync() {
 
     }
@@ -85,4 +117,18 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
     private boolean isBackupServerNotExist() {
         return backupServer == null || backupServer.length() == 0;
     }
+
+    private void sendSubServerPingErrorMail() {
+        MailSendDto mailSendDto = makeSubServerPingErrorMail();
+        mailingUsecase.sendMail(mailSendDto);
+    }
+
+    private MailSendDto makeSubServerPingErrorMail() {
+        return MailSendDto.builder()
+                .address("dvlprjw@gmail.com")
+                .title("[Woong's Blog] Sub Server - Ping Error")
+                .content("Sub-Server Ping Error occurred. Check your blog's sub-server.")
+                .build();
+    }
+
 }
