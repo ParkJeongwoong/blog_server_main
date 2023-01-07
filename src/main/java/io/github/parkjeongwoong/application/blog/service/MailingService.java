@@ -2,16 +2,16 @@ package io.github.parkjeongwoong.application.blog.service;
 
 import io.github.parkjeongwoong.application.blog.dto.MailSendDto;
 import io.github.parkjeongwoong.application.blog.usecase.MailingUsecase;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
 public class MailingService implements MailingUsecase {
 
-    private final JavaMailSender javaMailSender;
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Override
     public void sendMail(MailSendDto mailSendDto) {

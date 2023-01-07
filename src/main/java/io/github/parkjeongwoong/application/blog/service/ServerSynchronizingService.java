@@ -92,8 +92,8 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
                 log.info("Reachable IP : {}", address);
                 return true;
             } else {
-                sendSubServerPingErrorMail();
                 log.info("Unreachable IP : {}", address);
+                sendSubServerPingErrorMail();
             }
 
         } catch (UnknownHostException e) {
@@ -119,6 +119,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
     }
 
     private void sendSubServerPingErrorMail() {
+        log.warn("Sub Server Ping Error 발생!!");
         MailSendDto mailSendDto = makeSubServerPingErrorMail();
         mailingUsecase.sendMail(mailSendDto);
     }
