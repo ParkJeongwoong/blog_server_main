@@ -88,7 +88,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
             if (address.equals("sub")) address = "146.56.105.176";
             InetAddress inetAddress = InetAddress.getByName(address);
 
-            if (!inetAddress.isReachable(2000)) {
+            if (inetAddress.isReachable(2000)) {
                 log.info("Reachable IP : {}", address);
                 return true;
             } else {
