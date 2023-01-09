@@ -1,12 +1,13 @@
-package io.github.parkjeongwoong.application.blog.service;
+package io.github.parkjeongwoong.application.data.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkjeongwoong.application.blog.dto.MailSendDto;
 import io.github.parkjeongwoong.application.blog.dto.SendArticleSyncDto;
+import io.github.parkjeongwoong.application.data.dto.SyncServerRequestDto;
 import io.github.parkjeongwoong.application.blog.dto.VisitorSaveRequestDto;
 import io.github.parkjeongwoong.application.blog.usecase.MailingUsecase;
-import io.github.parkjeongwoong.application.blog.usecase.ServerSynchronizingUsecase;
+import io.github.parkjeongwoong.application.data.usecase.ServerSynchronizingUsecase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,10 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
     @Value("${backup.server}")
     String backupServer;
+    @Value("${backup.db.sub.ip}")
+    String subServerIp;
+    @Value("${backup.db.sub.pw}")
+    String subServerPw;
 
     @PostConstruct
     public void initWebClient() {
@@ -85,7 +90,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
         try {
 
-            if (address.equals("sub")) address = "146.56.105.176";
+            if (address.equals("sub")) address = subServerIp;
             InetAddress inetAddress = InetAddress.getByName(address);
 
             if (inetAddress.isReachable(2000)) {
@@ -104,6 +109,14 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
         return false;
 
+    }
+
+    @Override
+    public boolean sync(SyncServerRequestDto requestDto) {
+        if (requestDto.checkSyncServer(subServerIp, subServerPw)) {
+
+        }
+        return false;
     }
 
     public void updateArticleSync() {

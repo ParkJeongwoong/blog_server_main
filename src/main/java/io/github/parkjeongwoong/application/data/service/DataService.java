@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
@@ -19,40 +18,19 @@ public class DataService implements DataUsecase {
     String default_filePath;
 
     @Override
-    public void download(HttpServletRequest request, HttpServletResponse response, String filename) throws IOException {
+    public void download(String filename, HttpServletResponse response) throws IOException {
         if (filename == null || filename.equals("")) {
             return ;
         }
 
         File dFile = getFilePath(filename);
 
-        int fSize = (int) dFile.length();
+        long fSize = dFile.length();
 
         if (fSize > 0) {
             String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(filename, "UTF-8");
-            response.setContentType("application/octet-stream; charset=utf-8");
-            response.setHeader("Content-Dispotition", encodedFilename);
-            response.setContentLengthLong(fSize);
-
-            BufferedInputStream in;
-            BufferedOutputStream out;
-
-            in = new BufferedInputStream(new FileInputStream(dFile));
-            out = new BufferedOutputStream(response.getOutputStream());
-
-            try {
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-
-                while ((bytesRead = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesRead);
-                }
-
-                out.flush();
-            } finally {
-                in.close();
-                out.close();
-            }
+            setResponse(response, encodedFilename, fSize);
+            bufferedStream(response, dFile);
         }
 
     }
@@ -101,6 +79,31 @@ public class DataService implements DataUsecase {
 
         log.info("File Path : {}", filePath);
         return dFile;
+    }
+
+    private void setResponse(HttpServletResponse response, String encodedFilename, long fSize) {
+        response.setContentType("application/octet-stream; charset=utf-8");
+        response.setHeader("Content-Dispotition", encodedFilename);
+        response.setContentLengthLong(fSize);
+    }
+
+    private void bufferedStream(HttpServletResponse response, File dFile) throws IOException {
+        BufferedInputStream in = new BufferedInputStream(new FileInputStream(dFile));
+        BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream());
+
+        try {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+
+            out.flush();
+        } finally {
+            in.close();
+            out.close();
+        }
     }
 
 }
