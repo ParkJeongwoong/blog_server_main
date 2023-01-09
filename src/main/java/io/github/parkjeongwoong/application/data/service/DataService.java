@@ -16,9 +16,12 @@ import java.net.URLEncoder;
 public class DataService implements DataUsecase {
     @Value("${download.path}")
     String default_filePath;
+    @Value("${backup.path}")
+    String backup_filePath;
 
     @Override
     public void download(String filename, HttpServletResponse response) throws IOException {
+
         if (filename == null || filename.equals("")) {
             return ;
         }
@@ -29,6 +32,23 @@ public class DataService implements DataUsecase {
 
         if (fSize > 0) {
             String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(filename, "UTF-8");
+            setResponse(response, encodedFilename, fSize);
+            bufferedStream(response, dFile);
+        }
+
+    }
+
+    @Override
+    public void backup(HttpServletResponse response) throws IOException {
+
+        File dFile = getBackupFile();
+        long fSize = dFile.length();
+        log.info("FILE NAME : {}", dFile.getName());
+        log.info("FILE PATH : {}", dFile.getPath());
+
+        if (fSize > 0) {
+            String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(dFile.getName(), "UTF-8");
+            log.info("encodedFilename : {}", encodedFilename);
             setResponse(response, encodedFilename, fSize);
             bufferedStream(response, dFile);
         }
@@ -81,9 +101,18 @@ public class DataService implements DataUsecase {
         return dFile;
     }
 
+    private File getBackupFile() {
+        String directoryPath = backup_filePath;
+        File directory = new File(directoryPath);
+        FileFilter filter = pathname -> pathname.getName().startsWith("mariadb_")&&pathname.getName().endsWith("sql.tar.gz");
+
+        File[] files = directory.listFiles(filter);
+        return files[0];
+    }
+
     private void setResponse(HttpServletResponse response, String encodedFilename, long fSize) {
         response.setContentType("application/octet-stream; charset=utf-8");
-        response.setHeader("Content-Dispotition", encodedFilename);
+        response.setHeader("Content-Disposition", encodedFilename);
         response.setContentLengthLong(fSize);
     }
 

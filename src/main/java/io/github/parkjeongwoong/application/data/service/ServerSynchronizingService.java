@@ -7,6 +7,7 @@ import io.github.parkjeongwoong.application.blog.dto.SendArticleSyncDto;
 import io.github.parkjeongwoong.application.data.dto.SyncServerRequestDto;
 import io.github.parkjeongwoong.application.blog.dto.VisitorSaveRequestDto;
 import io.github.parkjeongwoong.application.blog.usecase.MailingUsecase;
+import io.github.parkjeongwoong.application.data.usecase.DataUsecase;
 import io.github.parkjeongwoong.application.data.usecase.ServerSynchronizingUsecase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -27,6 +29,7 @@ import java.net.UnknownHostException;
 public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
     private final MailingUsecase mailingUsecase;
+    private final DataUsecase dataUsecase;
     private WebClient webClient;
 
     @Value("${backup.server}")
@@ -112,9 +115,14 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
     }
 
     @Override
-    public boolean sync(SyncServerRequestDto requestDto) {
+    public boolean sync(SyncServerRequestDto requestDto, HttpServletResponse response) {
         if (requestDto.checkSyncServer(subServerIp, subServerPw)) {
-
+            try {
+                dataUsecase.backup(response);
+            } catch (IOException e) {
+                log.error("Sub Server Synchronizing Error", e);
+            }
+            return true;
         }
         return false;
     }
