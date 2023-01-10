@@ -5,6 +5,8 @@ import io.github.parkjeongwoong.adapter.handler.CustomAccessDeniedHandler;
 import io.github.parkjeongwoong.adapter.handler.CustomAuthenticationEntryPoint;
 import io.github.parkjeongwoong.application.user.service.JwtTokenProvider;
 import io.github.parkjeongwoong.application.user.service.UserDetailsService;
+import io.github.parkjeongwoong.application.user.usecase.AuthUsecase;
+import io.github.parkjeongwoong.application.user.usecase.UserDetailsUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsUsecase userDetailsUsecase;
+    private final AuthUsecase authUsecase;
 
     @Bean
     @Override
@@ -46,11 +49,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()).and()
             .formLogin().loginPage("/blog/login").and()
             .logout().logoutSuccessUrl("/").and()
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService),
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userDetailsUsecase, authUsecase),
                              UsernamePasswordAuthenticationFilter.class); // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가
 
 
-        // 토큰에 저장된 유저정보를 활용하여야 하기 때문에 CustomUserDetailService 클래스를 생성
+        // 토큰에 저장된 유저정보를 활용하여야 하기 때문에 CustomUserDetailsService 클래스를 생성
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 

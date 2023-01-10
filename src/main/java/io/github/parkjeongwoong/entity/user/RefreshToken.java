@@ -35,6 +35,10 @@ public class RefreshToken extends BaseTimeEntity {
         this.available = true;
     }
 
+    public void setNewValue(String value) {
+        this.value = value;
+    }
+
     public void disableRefreshToken() {
         this.available = false;
     }

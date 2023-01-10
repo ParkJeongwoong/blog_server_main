@@ -2,6 +2,8 @@ package io.github.parkjeongwoong.application.user.service;
 
 import io.github.parkjeongwoong.application.user.dto.*;
 import io.github.parkjeongwoong.application.user.repository.RefreshTokenRepository;
+import io.github.parkjeongwoong.application.user.usecase.AuthUsecase;
+import io.github.parkjeongwoong.application.user.usecase.UserDetailsUsecase;
 import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +18,15 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AuthService {
+public class AuthService implements AuthUsecase {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsUsecase userDetailsUsecase;
 
     public UserLoginResponseDto login(UserLoginRequestDto requestDto, HttpServletResponse response) {
         try {
-            User user = userDetailsService.getUser(requestDto.getUserId());
+            User user = userDetailsUsecase.getUser(requestDto.getUserId());
             boolean result = user.getEncryptedPassword().checkPassword(requestDto.getPassword());
             if (result) {
                 log.info("로그인 성공");
@@ -68,11 +70,19 @@ public class AuthService {
                     .build();
             response.addHeader("Set-Cookie", cookie.toString());
             long refreshTokenId = jwtTokenProvider.getRefreshTokenIdFromToken(accessToken);
-            RefreshToken refreshToken = userDetailsService.getRefreshTokenById(refreshTokenId);
+            RefreshToken refreshToken = userDetailsUsecase.getRefreshTokenById(refreshTokenId);
             refreshToken.disableRefreshToken();
             refreshTokenRepository.save(refreshToken);
             return true;
         }
         return false;
     }
+
+    public void extendRefreshToken(RefreshToken refreshToken) {
+        RefreshJwtAuth refreshJwtAuth = new RefreshJwtAuth(refreshToken.getUserId(),refreshToken.getUserEmail());
+        String newRefreshToken = jwtTokenProvider.createToken(refreshJwtAuth, "refresh");
+        refreshToken.setNewValue(newRefreshToken);
+        refreshTokenRepository.save(refreshToken);
+    }
+
 }

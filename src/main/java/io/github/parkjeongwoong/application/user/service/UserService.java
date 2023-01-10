@@ -3,6 +3,7 @@ package io.github.parkjeongwoong.application.user.service;
 import io.github.parkjeongwoong.application.user.dto.UserSignupRequestDto;
 import io.github.parkjeongwoong.application.user.repository.PasswordRepository;
 import io.github.parkjeongwoong.application.user.repository.UserRepository;
+import io.github.parkjeongwoong.application.user.usecase.UserUsecase;
 import io.github.parkjeongwoong.entity.user.Password;
 import io.github.parkjeongwoong.entity.user.User;
 import io.github.parkjeongwoong.entity.user.UserType;
@@ -20,7 +21,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserUsecase {
 
     private final UserRepository userRepository;
     private final PasswordRepository passwordRepository;

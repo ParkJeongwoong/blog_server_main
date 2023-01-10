@@ -2,8 +2,9 @@ package io.github.parkjeongwoong.adapter.filter;
 
 import io.github.parkjeongwoong.application.user.dto.AccessJwtAuth;
 import io.github.parkjeongwoong.application.user.service.JwtTokenProvider;
-import io.github.parkjeongwoong.application.user.service.UserDetailsService;
 import io.github.parkjeongwoong.application.user.dto.JwtAuth;
+import io.github.parkjeongwoong.application.user.usecase.AuthUsecase;
+import io.github.parkjeongwoong.application.user.usecase.UserDetailsUsecase;
 import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -28,7 +29,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     // JwtTokenProvider의 검증 이후 Jwt로 유저 정보를 조회 -> UserPasswordAuthenticationFilter로 전달
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsUsecase userDetailsUsecase;
+    private final AuthUsecase authUsecase;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
@@ -53,17 +55,19 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 }
             } catch (ExpiredJwtException accessTokenExpired) { // accessToken 만료
                 long refreshTokenId = accessTokenExpired.getClaims().get("refreshTokenId", Integer.class); // ExpiredJwtException에서 가져올 때 Integer 클래스로 가져옴
-                RefreshToken refreshToken = userDetailsService.getRefreshTokenById(refreshTokenId);
+                RefreshToken refreshToken = userDetailsUsecase.getRefreshTokenById(refreshTokenId);
                 try {
                     if (refreshToken.isAvailable() && jwtTokenProvider.validateToken(refreshToken.getValue())) {
                         String userId = accessTokenExpired.getClaims().getSubject();
-                        User user = userDetailsService.getUser(userId);
+                        User user = userDetailsUsecase.getUser(userId);
                         JwtAuth jwtAuth = new AccessJwtAuth(userId,user.getUserType(),user.getUsername(),refreshTokenId);
                         String newAccessToken = jwtTokenProvider.createToken(jwtAuth, "access");
                         ((HttpServletResponse) response).setHeader("AccessToken", newAccessToken);
                         Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         ((HttpServletResponse) response).setStatus(206);
+
+                        authUsecase.extendRefreshToken(refreshToken);
                     }
                 } catch (ExpiredJwtException refreshTokenExpired) { // refreshToken 만료
                     log.info("Refresh Token 만료");

@@ -3,6 +3,7 @@ package io.github.parkjeongwoong.application.user.service;
 import io.github.parkjeongwoong.application.user.dto.AccessJwtAuth;
 import io.github.parkjeongwoong.application.user.dto.JwtAuth;
 import io.github.parkjeongwoong.application.user.dto.RefreshJwtAuth;
+import io.github.parkjeongwoong.application.user.usecase.UserDetailsUsecase;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class JwtTokenProvider {
 
     @Value("${jwtToken.key}")
     private String secretKey;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsUsecase userDetailsUsecase;
 
     @PostConstruct
     protected void init() {
@@ -53,7 +54,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserName(token));
+        UserDetails userDetails = userDetailsUsecase.loadUserByUsername(this.getUserName(token));
         return userDetails == null ? null : new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 

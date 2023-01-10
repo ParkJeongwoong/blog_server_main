@@ -2,6 +2,7 @@ package io.github.parkjeongwoong.application.user.service;
 
 import io.github.parkjeongwoong.application.user.repository.RefreshTokenRepository;
 import io.github.parkjeongwoong.application.user.repository.UserRepository;
+import io.github.parkjeongwoong.application.user.usecase.UserDetailsUsecase;
 import io.github.parkjeongwoong.entity.user.RefreshToken;
 import io.github.parkjeongwoong.entity.user.User;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+public class UserDetailsService implements UserDetailsUsecase {
     // Security Config의 AuthenticationManager를 사용하려면 Spring Security에서 제공하는 UserDetailsService를 구현한 클래스가 필요
 
     private final UserRepository userRepository;
