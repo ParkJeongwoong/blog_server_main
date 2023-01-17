@@ -10,7 +10,6 @@ public interface ServerSynchronizingUsecase {
     void initWebClient();
     void visitSync(VisitorSaveRequestDto requestDto);
     void sendArticleSync(SendArticleSyncDto requestDto);
-    boolean ping(String address);
     boolean sync(SyncServerRequestDto requestDto, HttpServletResponse response);
     void updateArticleSync();
     void deleteArticleSync();

@@ -24,11 +24,6 @@ public class DataApiController {
         dataUsecase.download(filename, response);
     }
 
-    @GetMapping("/ping")
-    public boolean ping() {
-        return serverSynchronizingUsecase.ping("sub");
-    }
-
     @PostMapping("/sync")
     public boolean sync(@RequestBody SyncServerRequestDto requestDto, HttpServletResponse response) {
         return serverSynchronizingUsecase.sync(requestDto, response);

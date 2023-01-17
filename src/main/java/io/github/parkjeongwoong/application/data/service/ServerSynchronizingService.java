@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,6 +44,17 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
     @PostConstruct
     public void initWebClient() {
         webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
+    }
+    
+    @Scheduled(cron = "0 0 * * * *")
+    public void ScheduleTest() {
+        log.info("Sub Server Ping Check");
+        if (ping("sub")) {
+            log.info("Sub Server is Good!");
+        } else {
+            log.warn("WARNING!! Your Back-up Server doesn't respond. Check Your Server Status!");
+            log.warn("If you haven't received any email, check Main Server Error Mail Function.");
+        }
     }
 
     public void visitSync(VisitorSaveRequestDto requestDto) {
@@ -89,7 +102,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
     }
 
-    public boolean ping(String address) {
+    private boolean ping(String address) {
 
         try {
 
