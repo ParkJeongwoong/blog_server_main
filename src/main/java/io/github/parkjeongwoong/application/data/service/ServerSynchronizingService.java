@@ -99,6 +99,8 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
                 log.error("Sub Server Synchronizing Error", e);
             }
             return true;
+        } else {
+            log.warn("검증/등록된 Sub Server가 아닙니다.");
         }
         return false;
     }
