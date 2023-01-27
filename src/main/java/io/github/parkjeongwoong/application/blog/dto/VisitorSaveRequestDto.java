@@ -25,6 +25,15 @@ public class VisitorSaveRequestDto {
         this.lastPage = lastPage;
     }
 
+    public Visitor toEntity() {
+        if (this.ip == null) setIp();
+        return Visitor.builder()
+                .url(url)
+                .lastPage(lastPage)
+                .ip(ip)
+                .build();
+    }
+
     private void setIp() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ip = request.getHeader("X-FORWARDED-FOR");
@@ -34,14 +43,5 @@ public class VisitorSaveRequestDto {
             log.info("getRemoteAddr: {}", ip);
         }
         this.ip = ip;
-    }
-
-    public Visitor toEntity() {
-        if (this.ip == null) setIp();
-        return Visitor.builder()
-                .url(url)
-                .lastPage(lastPage)
-                .ip(ip)
-                .build();
     }
 }

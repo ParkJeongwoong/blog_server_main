@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,17 +44,6 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
     public void initWebClient() {
         webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
     }
-    
-    @Scheduled(cron = "0 0 * * * *")
-    public void ScheduleTest() {
-        log.info("Sub Server Ping Check");
-        if (ping("sub")) {
-            log.info("Sub Server is Good!");
-        } else {
-            log.warn("WARNING!! Your Back-up Server doesn't respond. Check Your Server Status!");
-            log.warn("If you haven't received any email, check Main Server Error Mail Function.");
-        }
-    }
 
     public void visitSync(VisitorSaveRequestDto requestDto) {
         if (isBackupServerNotExist()) return;
@@ -75,7 +63,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
             log.info("Backup To : {}", backupServer);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Visit Sync Error", e);
         }
     }
 
@@ -97,9 +85,45 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
             log.info("Backup To : {}", backupServer);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Send Article Sync Error", e);
         }
 
+    }
+
+    @Override
+    public boolean sync(SyncServerRequestDto requestDto, HttpServletResponse response) {
+        if (requestDto.checkSyncServer(subServerIp, subServerPw)) {
+            try {
+                dataUsecase.downloadDumpFile(response);
+            } catch (IOException e) {
+                log.error("Sub Server Synchronizing Error", e);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public void updateArticleSync() {
+
+    }
+
+    public void deleteArticleSync() {
+
+    }
+
+    private boolean isBackupServerNotExist() {
+        return backupServer == null || backupServer.length() == 0;
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    private void subServerHealthCheck() {
+        log.info("Sub Server Ping Check");
+        if (ping("sub")) {
+            log.info("Sub Server is Good!");
+        } else {
+            log.warn("WARNING!! Your Back-up Server doesn't respond. Check Your Server Status!");
+            log.warn("If you haven't received any email, check Main Server Error Mail Function.");
+        }
     }
 
     private boolean ping(String address) {
@@ -127,31 +151,6 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
 
     }
 
-    @Override
-    public boolean sync(SyncServerRequestDto requestDto, HttpServletResponse response) {
-        if (requestDto.checkSyncServer(subServerIp, subServerPw)) {
-            try {
-                dataUsecase.backup(response);
-            } catch (IOException e) {
-                log.error("Sub Server Synchronizing Error", e);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public void updateArticleSync() {
-
-    }
-
-    public void deleteArticleSync() {
-
-    }
-
-    private boolean isBackupServerNotExist() {
-        return backupServer == null || backupServer.length() == 0;
-    }
-
     private void sendSubServerPingErrorMail() {
         log.warn("Sub Server Ping Error 발생!!");
         MailSendDto mailSendDto = makeSubServerPingErrorMail();
@@ -162,7 +161,7 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
         return MailSendDto.builder()
                 .address("dvlprjw@gmail.com")
                 .title("[Woong's Blog] Sub Server - Ping Error")
-                .content("Sub-Server Ping Error occurred. Check your blog's sub-server.")
+                .content("Sub Server Ping Error occurred. Check your blog's sub server.")
                 .build();
     }
 

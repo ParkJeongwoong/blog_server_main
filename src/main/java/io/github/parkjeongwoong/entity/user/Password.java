@@ -3,6 +3,7 @@ package io.github.parkjeongwoong.entity.user;
 import io.github.parkjeongwoong.entity.BaseTimeEntity;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.security.MessageDigest;
@@ -10,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+@Slf4j
 @NoArgsConstructor
 @Entity
 public class Password extends BaseTimeEntity {
@@ -46,7 +48,7 @@ public class Password extends BaseTimeEntity {
         try {
             return this.password.equals(passwordEncryption(inputPassword));
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error("Password Check Error", e);
             return false;
         }
     }

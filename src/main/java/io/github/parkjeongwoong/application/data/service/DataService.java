@@ -14,6 +14,7 @@ import java.net.URLEncoder;
 @RequiredArgsConstructor
 @Service
 public class DataService implements DataUsecase {
+
     @Value("${download.path}")
     String default_filePath;
     @Value("${backup.path}")
@@ -39,7 +40,7 @@ public class DataService implements DataUsecase {
     }
 
     @Override
-    public void backup(HttpServletResponse response) throws IOException {
+    public void downloadDumpFile(HttpServletResponse response) throws IOException {
 
         File dFile = getBackupFile();
         long fSize = dFile.length();
@@ -57,7 +58,7 @@ public class DataService implements DataUsecase {
 
     public boolean backupDB(String dbUsername, String dbPassword, String dbName, String outputFile) throws IOException, InterruptedException {
 
-        String command = String.format("mysqldump -u %s -p %s --add-drop-table --databases %s -r %s",
+        String command = String.format("mysqldump -u%s -p%s --add-drop-table --databases %s -r %s",
                 dbUsername, dbPassword, dbName, outputFile);
         Process process = Runtime.getRuntime().exec(command);
         int processComplete = process.waitFor();
@@ -70,8 +71,8 @@ public class DataService implements DataUsecase {
 
         String[] command = new String[]{
                 "mysql",
-                "-u " + dbUsername,
-                "-p " + dbPassword,
+                "-u" + dbUsername,
+                "-p" + dbPassword,
                 "-e",
                 " source " + sourceFile,
                 dbName

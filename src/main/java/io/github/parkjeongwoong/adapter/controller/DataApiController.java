@@ -28,10 +28,6 @@ public class DataApiController {
     public boolean sync(@RequestBody SyncServerRequestDto requestDto, HttpServletResponse response) {
         return serverSynchronizingUsecase.sync(requestDto, response);
     }
-    @GetMapping("/sync")
-    public boolean sync2(HttpServletResponse response) {
-        return serverSynchronizingUsecase.sync(null, response);
-    }
 
     // 전역 변수 TEST
     @Autowired

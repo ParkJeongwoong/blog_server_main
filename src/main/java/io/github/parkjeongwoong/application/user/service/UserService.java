@@ -37,7 +37,7 @@ public class UserService implements UserUsecase {
             response.setStatus(400);
         }
         catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error("Signup Algorithm Error", e);
         }
         return null;
     }

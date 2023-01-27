@@ -22,31 +22,4 @@ public class VisitorTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
-    @Test
-    public void test_setIp() {
-        // Given
-        String testUrl1 = "https://www.test.com";
-        String testUrl2 = "https://github.com/ParkJeongwoong/";
-        Visitor visitor1 = Visitor.builder()
-                .url(testUrl1)
-                .build();
-        Visitor visitor2 = Visitor.builder()
-                .url(testUrl2)
-                .lastPage(testUrl1)
-                .build();
-
-        // When -- setData 메서드가 없어짐
-//        visitor1.setData();
-//        visitor2.setData();
-
-        // Then
-        assertThat(visitor1.getIp()).isEqualTo("127.0.0.1");
-        assertThat(visitor1.getUrl()).isEqualTo(testUrl1);
-        assertThat(visitor1.getLastPage()).isEqualTo(null);
-        assertThat(visitor1.isJustVisited()).isEqualTo(true);
-        assertThat(visitor2.getIp()).isEqualTo("127.0.0.1");
-        assertThat(visitor2.getUrl()).isEqualTo(testUrl2);
-        assertThat(visitor2.getLastPage()).isEqualTo(testUrl1);
-        assertThat(visitor2.isJustVisited()).isEqualTo(false);
-    }
 }
