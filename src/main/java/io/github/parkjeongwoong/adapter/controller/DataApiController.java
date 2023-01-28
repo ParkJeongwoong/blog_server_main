@@ -20,13 +20,13 @@ public class DataApiController {
     private final ServerSynchronizingUsecase serverSynchronizingUsecase;
 
     @GetMapping("/download/{filename}")
-    public void download(HttpServletResponse response, @PathVariable("filename") String filename) throws IOException {
-        dataUsecase.download(filename, response);
+    public void download(@PathVariable("filename") String filename, HttpServletResponse response) throws IOException {
+        dataUsecase.downloadFile(filename, response);
     }
 
     @PostMapping("/sync")
-    public boolean sync(@RequestBody SyncServerRequestDto requestDto, HttpServletResponse response) {
-        return serverSynchronizingUsecase.sync(requestDto, response);
+    public void sync(@RequestBody SyncServerRequestDto requestDto, HttpServletResponse response) {
+        serverSynchronizingUsecase.sync(requestDto, response);
     }
 
     // 전역 변수 TEST

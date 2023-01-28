@@ -4,6 +4,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public interface DataUsecase {
-    void download(String filename, HttpServletResponse response) throws IOException;
+    void downloadFile(String filename, HttpServletResponse response) throws IOException;
     void downloadDumpFile(HttpServletResponse response) throws IOException;
 }

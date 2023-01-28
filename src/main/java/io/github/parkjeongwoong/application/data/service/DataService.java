@@ -21,21 +21,11 @@ public class DataService implements DataUsecase {
     String backup_filePath;
 
     @Override
-    public void download(String filename, HttpServletResponse response) throws IOException {
+    public void downloadFile(String filename, HttpServletResponse response) throws IOException {
 
-        if (filename == null || filename.equals("")) {
-            return ;
-        }
-
+        if (filename == null || filename.equals("")) return ;
         File dFile = getFilePath(filename);
-
-        long fSize = dFile.length();
-
-        if (fSize > 0) {
-            String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(filename, "UTF-8");
-            setResponse(response, encodedFilename, fSize);
-            bufferedStream(response, dFile);
-        }
+        download(dFile, response);
 
     }
 
@@ -43,16 +33,7 @@ public class DataService implements DataUsecase {
     public void downloadDumpFile(HttpServletResponse response) throws IOException {
 
         File dFile = getBackupFile();
-        long fSize = dFile.length();
-        log.info("FILE NAME : {}", dFile.getName());
-        log.info("FILE PATH : {}", dFile.getPath());
-
-        if (fSize > 0) {
-            String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(dFile.getName(), "UTF-8");
-            log.info("encodedFilename : {}", encodedFilename);
-            setResponse(response, encodedFilename, fSize);
-            bufferedStream(response, dFile);
-        }
+        download(dFile, response);
 
     }
 
@@ -96,9 +77,8 @@ public class DataService implements DataUsecase {
                     + File.separator + "downloadable"
                     + File.separator + filename;
             dFile = new File(filePath);
-        } else {log.info("Find file");}
+        } else {log.info("File found");}
 
-        log.info("File Path : {}", filePath);
         return dFile;
     }
 
@@ -106,9 +86,23 @@ public class DataService implements DataUsecase {
         String directoryPath = backup_filePath;
         File directory = new File(directoryPath);
         FileFilter filter = pathname -> pathname.getName().startsWith("mariadb_")&&pathname.getName().endsWith("sql.tar.gz");
+//        FilenameFilter filter = (dir, name) -> name.startsWith("mariadb_") && name.endsWith("sql.tar.gz");
 
         File[] files = directory.listFiles(filter);
         return files[0];
+    }
+
+    private void download(File dFile, HttpServletResponse response) throws IOException {
+        log.info("FILE NAME : {}", dFile.getName());
+        log.info("FILE PATH : {}", dFile.getPath());
+        long fSize = dFile.length();
+
+        if (fSize > 0) {
+            String encodedFilename = "attachment; filename*=" + "UTF-8" + "''" + URLEncoder.encode(dFile.getName(), "UTF-8");
+            log.info("encodedFilename : {}", encodedFilename);
+            setResponse(response, encodedFilename, fSize);
+            bufferedStream(response, dFile);
+        }
     }
 
     private void setResponse(HttpServletResponse response, String encodedFilename, long fSize) {

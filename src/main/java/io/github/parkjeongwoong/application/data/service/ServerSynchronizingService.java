@@ -91,18 +91,16 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
     }
 
     @Override
-    public boolean sync(SyncServerRequestDto requestDto, HttpServletResponse response) {
+    public void sync(SyncServerRequestDto requestDto, HttpServletResponse response) {
         if (requestDto.checkSyncServer(subServerIp, subServerPw)) {
             try {
                 dataUsecase.downloadDumpFile(response);
             } catch (IOException e) {
                 log.error("Sub Server Synchronizing Error", e);
             }
-            return true;
         } else {
             log.warn("검증/등록된 Sub Server가 아닙니다.");
         }
-        return false;
     }
 
     public void updateArticleSync() {
