@@ -4,11 +4,11 @@ import io.github.parkjeongwoong.adapter.filter.JwtAuthenticationFilter;
 import io.github.parkjeongwoong.adapter.handler.CustomAccessDeniedHandler;
 import io.github.parkjeongwoong.adapter.handler.CustomAuthenticationEntryPoint;
 import io.github.parkjeongwoong.application.user.service.JwtTokenProvider;
-import io.github.parkjeongwoong.application.user.service.UserDetailsService;
 import io.github.parkjeongwoong.application.user.usecase.AuthUsecase;
 import io.github.parkjeongwoong.application.user.usecase.UserDetailsUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @RequiredArgsConstructor
 @EnableWebSecurity
+@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -40,9 +41,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             // URL 권한 관리
             .authorizeRequests()
-            .antMatchers("/data-api/download/**", "/blog-api/articleList", "/user-api/authtest").authenticated() // 인증 필요
-            .antMatchers("/h2-console", "/blog/upload", "/blog-api/article/upload/**", "/user-api/changeAdmin/**", "/user-api/admintest",
-                    "/blog-api/recommend/make-similarity-index/**", "/blog-api/search/make-inverted-index", "/blog/admin").hasRole("ADMIN") // 인증 & ADMIN 권한 필요
+//            .antMatchers("/data-api/download/**", "/blog-api/articleList", "/user-api/authtest").authenticated() // 인증 필요
+//            .antMatchers("/h2-console", "/blog/upload", "/blog-api/article/upload/**", "/user-api/changeAdmin/**", "/user-api/admintest",
+//                    "/blog-api/recommend/make-similarity-index/**", "/blog-api/search/make-inverted-index", "/blog/admin").hasRole("ADMIN") // 인증 & ADMIN 권한 필요
             .anyRequest().permitAll().and() // 다른 모든 Request -> 인증 불필요
             .exceptionHandling() // 인증/인가 실패에 따른 리다이렉트
                 .accessDeniedHandler(new CustomAccessDeniedHandler())

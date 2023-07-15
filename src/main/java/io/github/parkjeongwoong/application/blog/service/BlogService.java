@@ -42,6 +42,7 @@ public class BlogService implements BlogUsecase {
         log.info("Visitor just visited : {}", visitor.getUrl());
         log.info("Visitor's IP address is : {}", visitor.getIp());
         log.info("Current Time : {}", currentTime);
+        log.info("Visitor is From : {}", visitor.getReferrer());
 
         if (isRecordable(visitor.getIp())) return ; // 구글 봇 (66.249.~) 와 내 ip (58.140.57.190) 제외
         if (isStrangeAccess(visitor.getIp(), currentTime)) return ;

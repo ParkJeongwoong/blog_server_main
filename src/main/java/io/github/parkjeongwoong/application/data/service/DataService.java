@@ -16,9 +16,9 @@ import java.net.URLEncoder;
 public class DataService implements DataUsecase {
 
     @Value("${download.path}")
-    String default_filePath;
+    String DEFAULT_FILE_PATH;
     @Value("${backup.path}")
-    String backup_filePath;
+    String BACKUP_FILE_PATH;
 
     @Override
     public void downloadFile(String filename, HttpServletResponse response) throws IOException {
@@ -37,7 +37,7 @@ public class DataService implements DataUsecase {
 
     }
 
-    public boolean backupDB(String dbUsername, String dbPassword, String dbName, String outputFile) throws IOException, InterruptedException {
+    private boolean backupDB(String dbUsername, String dbPassword, String dbName, String outputFile) throws IOException, InterruptedException {
 
         String command = String.format("mysqldump -u%s -p%s --add-drop-table --databases %s -r %s",
                 dbUsername, dbPassword, dbName, outputFile);
@@ -47,7 +47,7 @@ public class DataService implements DataUsecase {
 
     }
 
-    public boolean restoreDB(String dbUsername, String dbPassword, String dbName, String sourceFile)
+    private boolean restoreDB(String dbUsername, String dbPassword, String dbName, String sourceFile)
             throws IOException, InterruptedException {
 
         String[] command = new String[]{
@@ -65,7 +65,7 @@ public class DataService implements DataUsecase {
     }
 
     private File getFilePath(String filename) {
-        String filePath = default_filePath + filename;
+        String filePath = DEFAULT_FILE_PATH + filename;
         File dFile = new File(filePath);
         if (!dFile.exists()) {
             log.info("Find file again");
@@ -83,11 +83,9 @@ public class DataService implements DataUsecase {
     }
 
     private File getBackupFile() {
-        String directoryPath = backup_filePath;
+        String directoryPath = BACKUP_FILE_PATH;
         File directory = new File(directoryPath);
         FileFilter filter = pathname -> pathname.getName().startsWith("mariadb_")&&pathname.getName().endsWith("sql.tar.gz");
-//        FilenameFilter filter = (dir, name) -> name.startsWith("mariadb_") && name.endsWith("sql.tar.gz");
-
         File[] files = directory.listFiles(filter);
         return files[0];
     }
