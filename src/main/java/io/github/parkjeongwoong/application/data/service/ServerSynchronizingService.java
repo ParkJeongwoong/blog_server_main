@@ -115,16 +115,16 @@ public class ServerSynchronizingService implements ServerSynchronizingUsecase {
         return backupServer == null || backupServer.length() == 0;
     }
 
-    @Scheduled(cron = "0 0 * * * *")
-    private void subServerHealthCheck() {
-        log.info("Sub Server Ping Check");
-        if (ping("sub")) {
-            log.info("Sub Server is Good!");
-        } else {
-            log.warn("WARNING!! Your Back-up Server doesn't respond. Check Your Server Status!");
-            log.warn("If you haven't received any email, check Main Server Error Mail Function.");
-        }
-    }
+//    @Scheduled(cron = "0 0 * * * *")
+//    private void subServerHealthCheck() {
+//        log.info("Sub Server Ping Check");
+//        if (ping("sub")) {
+//            log.info("Sub Server is Good!");
+//        } else {
+//            log.warn("WARNING!! Your Back-up Server doesn't respond. Check Your Server Status!");
+//            log.warn("If you haven't received any email, check Main Server Error Mail Function.");
+//        }
+//    }
 
     private boolean ping(String address) {
 
